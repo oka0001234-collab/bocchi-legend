@@ -431,6 +431,8 @@ DATA.bocchiHurt61="assets/image-006.png";
 DATA.bocchiJumpKick61="assets/image-007.png";
 DATA.bocchiPunch61="assets/image-008.png";
 DATA.bocchiKick61="assets/image-009.png";
+DATA.bocchiConcept='assets/concept-bocchi-misaki.jpg';DATA.misakiConcept='assets/concept-bocchi-misaki.jpg';
+DATA.mogakiConcept='assets/concept-mogaki.png';DATA.haffunConcept='assets/concept-haffun.png';DATA.tentenConcept='assets/concept-tenten.png';
 const assetStates=new Map(Object.keys(DATA).map(k=>[k,'pending']));
 function refreshAssetProgress(){const values=[...assetStates.values()],done=values.filter(v=>v!=='pending').length,failed=values.filter(v=>v==='error').length,total=values.length;const get=id=>document.getElementById(id);get('assetProgress').value=Math.round(done/total*100);get('assetProgressText').textContent=done===total?(failed?'画像の読み込み完了（一部失敗）':'画像の読み込み完了！'):('画像をダウンロード・読み込み中 '+done+' / '+total);get('assetProgressNote').textContent=failed?failed+'枚を読み込めませんでした。再読み込みできます。':'読み込み中でもスタートできます。';get('assetRetry').hidden=!failed;}
 const imgs={};for(const [k,v] of Object.entries(DATA)){const im=new Image();imgs[k]=im;
@@ -1693,11 +1695,12 @@ const ARC_CHARACTERS=['bocchi','misaki','tetsu','haffun','mogaki','tenten','matt
 let arcSelection=null;
 function arcPortrait(type,id){
  const canvas=$(id);if(!canvas)return;const c=canvas.getContext('2d');if(!c)return;
- const key=type==='shadow'?'bocchi':type,im=imgs[key];
- c.clearRect(0,0,canvas.width,canvas.height);if(!im?.complete||!im.naturalWidth)return;
+ const concepts={bocchi:['bocchiConcept',[275,55,320,340]],misaki:['misakiConcept',[12,738,365,400]],mogaki:['mogakiConcept',[410,0,360,350]],haffun:['haffunConcept',[0,70,400,360]],tenten:['tentenConcept',[320,0,340,300]]};
+ const concept=concepts[type],key=concept?.[0]||(type==='shadow'?'bocchi':type),im=imgs[key];
+ c.clearRect(0,0,canvas.width,canvas.height);if(!im?.complete||!im.naturalWidth){if(im)im.addEventListener('load',()=>arcPortrait(type,id),{once:true});return;}
  // Existing first-pose face crops: no extra image downloads and no enlarged atlas neighbors.
  const boxes={shinbocchi:[145,12,120,115],bocchi:[77,0,130,115],shadow:[77,0,130,115],misaki:[55,0,150,125],tetsu:[165,40,180,165],haffun:[120,55,185,175],mogaki:[145,10,160,155],tenten:[133,10,145,145],mattsuan:[130,0,130,110]};
- const b=boxes[type];if(!b)return;c.save();if(type==='shadow')c.filter='brightness(.42) saturate(.2) hue-rotate(170deg)';c.drawImage(im,...b,0,0,canvas.width,canvas.height);c.restore();
+ const b=concept?.[1]||boxes[type];if(!b)return;c.save();if(type==='shadow')c.filter='brightness(.42) saturate(.2) hue-rotate(170deg)';c.drawImage(im,...b,0,0,canvas.width,canvas.height);c.restore();
 }
 function arcChoose(type){
  if(!arcSelection?.challenger||arcSelection.sent||!ARC_CHARACTERS.includes(type))return;
