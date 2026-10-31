@@ -455,7 +455,7 @@ const BATTLE_LOGOS={"round1": "assets/image-028.webp", "round2": "assets/image-0
 const MISAKI_BGM="assets/audio-005.mp3", BATTLE_BGM=MISAKI_BGM;
 function battleBgmSource(mode){if(!['fight','boss','boss2'].includes(mode))return null;if(kingsActive&&!net.active&&kingsIndex===2)return 'assets/audio-006.mp3';if(!net.active&&!freeMode&&stageIndex===2)return MISAKI_BGM;return net.active||freeMode||stageIndex>=1?BATTLE_BGM:null;}
 const battleLogoPreloads=Object.values(BATTLE_LOGOS).map(src=>{const img=new Image();img.src=src;return img;});
-const EFFECT_AUDIO={"shinVoice56":"assets/audio-007.mp3","parry":"assets/audio-008.mp3","shopWin":"assets/audio-009.mp3","shopStop":"assets/audio-010.mp3","shopSpin":"assets/audio-011.mp3","shopPeka":"assets/audio-012.mp3","haffun":"assets/audio-013.mp3","punchWhoosh": "assets/audio-014.mp3", "punchImpact": "assets/audio-015.mp3", "heavyImpact": "assets/audio-016.mp3", "kickWhoosh": "assets/audio-017.mp3", "kickImpact": "assets/audio-018.mp3", "block": "assets/audio-019.mp3", "laserCharge": "assets/audio-020.mp3", "laserFire": "assets/audio-021.mp3", "laserBeam": "assets/audio-022.mp3", "laserDamage": "assets/audio-023.mp3", "laserTick": "assets/audio-024.mp3", "laserStop": "assets/audio-025.mp3"};
+const EFFECT_AUDIO={"shinVoice56":"assets/audio-007.mp3","parry":"assets/audio-008.mp3","shopWin":"assets/audio-009.mp3","shopStop":"assets/audio-010.mp3","shopSpin":"assets/audio-011.mp3","shopPeka":"assets/audio-012.mp3","haffun":"assets/audio-013.mp3","mogakiTune":"assets/mogaki-special-latter.mp3","punchWhoosh": "assets/audio-014.mp3", "punchImpact": "assets/audio-015.mp3", "heavyImpact": "assets/audio-016.mp3", "kickWhoosh": "assets/audio-017.mp3", "kickImpact": "assets/audio-018.mp3", "block": "assets/audio-019.mp3", "laserCharge": "assets/audio-020.mp3", "laserFire": "assets/audio-021.mp3", "laserBeam": "assets/audio-022.mp3", "laserDamage": "assets/audio-023.mp3", "laserTick": "assets/audio-024.mp3", "laserStop": "assets/audio-025.mp3"};
 const effectShots=new Set(),effectLoops=new Map();let laserWasVisible=false,effectFocusPaused=false;
 function effectAudio(name,loop=false){
  if(!audioEnabled||document.hidden||effectFocusPaused||!EFFECT_AUDIO[name])return null;
@@ -2052,7 +2052,7 @@ function cues43(c){
  const once=(at,name)=>{if(prev<at&&t>=at)sfx(name);};
  const pulse=(start,end,step,name)=>{if(t>=start&&t<end&&Math.floor((t-start)/step)>Math.floor((prev-start)/step))sfx(name);};
  if(type==='tenten'){once(0,'shopPeka');[1.25,1.475,1.7].forEach(at=>once(at,'shopStop'));once(1.7,'shopWin');once(2.15,'fall');}
- if(type==='mogaki'){once(.15,'toastGlass');pulse(.225,1.325,.16,'gulp');once(1.35,'toastGlass');}
+ if(type==='mogaki'){once(.15,'toastGlass');pulse(.225,1.325,.16,'gulp');once(.8,'mogakiTune');once(1.35,'toastGlass');}
  if(type==='haffun'){pulse(.1,1.3,.13,'run');once(1.8,'land');}
  if(type==='mattsuan')once(3.5,'grow');
  if(type==='shinbocchi'){once(0,'shinVoice56');once(2.05,'beamRecoil');}
