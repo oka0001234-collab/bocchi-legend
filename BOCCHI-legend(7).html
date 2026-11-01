@@ -209,6 +209,25 @@ button{font:inherit}.app{position:relative;width:100vw;height:var(--app-h,100dvh
 @keyframes challengerSlam{0%{opacity:0;transform:scale(2.6) rotate(-8deg)}55%{opacity:1;transform:scale(.96) rotate(1deg)}75%{transform:scale(1.04) rotate(-1deg)}100%{opacity:1;transform:scale(1) rotate(0)}}@keyframes challengerSweep{0%{transform:translateX(-120%);opacity:0}25%{opacity:1}100%{transform:translateX(120%);opacity:0}}@keyframes challengerRays{from{transform:rotate(0)}to{transform:rotate(24deg)}}
 @media(prefers-reduced-motion:reduce){#arcadeIntro .challengerLogo,#arcadeIntro::before,#arcadeIntro::after{animation:none!important}#arcadeIntro::after{display:none}}
 
+/* Character select: keep the roster image-led and celebrate each new pick with an image-only cut-in. */
+#freeBattleScreen .freeNote,#freeBattleScreen .portraitHelp,#freeBattleScreen .selectBox>label,#freeBattleScreen .portraitPick strong,#freeBattleScreen .portraitSummary,#freeBattleScreen>.card>div:first-child{display:none!important}
+#freeBattleScreen .portraitPick,#netScreen .portraitPick{padding:0;border-radius:14px}
+#freeBattleScreen .portraitPick canvas,#netScreen .portraitPick canvas{aspect-ratio:1.18;object-fit:cover}
+#netScreen .netCard>h2,#netScreen .netCard>p:not(#netStatus),#netScreen .portraitPick strong,#netScreen .portraitSummary{display:none!important}
+#arcSelectTitle,#arcSelectNote,#arcSelectTimer,#arcSelectGrid strong,#arcChoiceName,#arcChoiceMove{display:none!important}
+#arcSelectGrid{margin:12px auto}
+#arcChoicePortrait{width:min(48vw,380px);height:min(40vh,260px);border:0}
+#arcSelectPreview{display:flex;min-height:0;margin:4px auto}
+#portraitCutin{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;overflow:hidden;visibility:hidden;pointer-events:none;background:#050711e8}
+#portraitCutin.show{visibility:visible}
+#portraitCutin::before{content:"";position:absolute;inset:-30%;background:linear-gradient(112deg,transparent 34%,#4de9ff 43%,#fff 47%,#ff315d 51%,transparent 60%);transform:translateX(-130%) skewX(-12deg)}
+#portraitCutin canvas{position:relative;width:min(72vw,720px);height:min(72vh,580px);object-fit:contain;opacity:0;filter:drop-shadow(0 0 22px #72eaff) drop-shadow(0 0 48px #ff3366);transform:translateX(105vw) scale(.82) skewX(-9deg)}
+#portraitCutin.show::before{animation:portraitCutinSlash .72s ease-out both}
+#portraitCutin.show canvas{animation:portraitCutinActor .72s cubic-bezier(.15,.8,.25,1) both}
+@keyframes portraitCutinSlash{0%{transform:translateX(-130%) skewX(-12deg);opacity:0}25%{opacity:1}100%{transform:translateX(130%) skewX(-12deg);opacity:0}}
+@keyframes portraitCutinActor{0%{opacity:0;transform:translateX(105vw) scale(.82) skewX(-9deg)}28%{opacity:1}65%{opacity:1;transform:translateX(0) scale(1.08) skewX(0)}100%{opacity:0;transform:translateX(-20vw) scale(1.02)}}
+@media(prefers-reduced-motion:reduce){#portraitCutin.show::before,#portraitCutin.show canvas{animation-duration:.01ms!important}}
+
 
 .assetProgressBox{max-width:420px;margin:12px auto 18px;text-align:left;font-size:13px;color:#ffe9b6}.assetProgressBox small{display:block;font-size:11px;color:#d6d8df;margin-top:5px}.assetProgressBox button{margin-top:8px;border:1px solid #ffc361;border-radius:8px;padding:8px 12px;background:#362015;color:#fff;cursor:pointer}progress{display:block;width:100%;height:12px;margin-top:7px;accent-color:#ffd05b;border:0;border-radius:8px;overflow:hidden;background:#252735}progress::-webkit-progress-bar{background:#252735}progress::-webkit-progress-value{background:linear-gradient(90deg,#ff7140,#ffe287);border-radius:8px}progress::-moz-progress-bar{background:#ffd05b}#bgmLoading{position:absolute;z-index:25;left:50%;bottom:24%;transform:translateX(-50%);width:min(280px,70%);padding:10px 14px;border:1px solid #75d8ff66;border-radius:10px;background:#080e1bec;color:#d8f5ff;pointer-events:none;font-size:12px}#bgmLoading[hidden]{display:none!important}
 
@@ -242,6 +261,7 @@ button{font:inherit}.app{position:relative;width:100vw;height:var(--app-h,100dvh
 </style>
 </head>
 <body>
+<div id="portraitCutin" aria-hidden="true"><canvas width="720" height="580"></canvas></div>
 <div class="app">
   <section id="controlPanel50" hidden aria-label="ボタン調整"><div><h2>ボタン調整</h2><p>設定は自動保存。対戦画面で反映されます。</p><label>大きさ（%） <output id="value50_size"></output><input id="control50_size" type="range" min="80" max="120" step="1"></label><label>不透明度（%） <output id="value50_opacity"></output><input id="control50_opacity" type="range" min="35" max="100" step="1"></label><label>移動ボタン 左右（px） <output id="value50_left"></output><input id="control50_left" type="range" min="-20" max="20" step="1"></label><label>攻撃ボタン 左右（px） <output id="value50_right"></output><input id="control50_right" type="range" min="-20" max="20" step="1"></label><label>上下（px） <output id="value50_height"></output><input id="control50_height" type="range" min="-20" max="20" step="1"></label><div id="controlPreview50" aria-label="ボタン配置プレビュー"><div id="padPreview50">◀　▲　▶<br>↓ BLOCK</div><div id="atkPreview50">A　 S　 D<br>PUNCH　KICK　必殺</div></div><p>大きさは画面幅に収まるよう調整します。</p><button id="resetControls50">初期設定</button><button id="closeControls50">完了</button></div></section>
 <div id="gameViewport" class="gameViewport">
@@ -1703,9 +1723,17 @@ function arcPortrait(type,id){
  const boxes={shinbocchi:[145,12,120,115],bocchi:[77,0,130,115],shadow:[77,0,130,115],misaki:[55,0,150,125],tetsu:[165,40,180,165],haffun:[120,55,185,175],mogaki:[145,10,160,155],tenten:[133,10,145,145],mattsuan:[130,0,130,110]};
  const b=concept?.[1]||boxes[type];if(!b)return;c.save();if(type==='shadow')c.filter='brightness(.42) saturate(.2) hue-rotate(170deg)';c.drawImage(im,...b,0,0,canvas.width,canvas.height);c.restore();
 }
+let portraitCutinTimer=null,portraitCutinToken=0;
+function showPortraitCutin(type,group='freePlayer'){
+ const overlay=$('portraitCutin'),target=overlay?.querySelector('canvas');if(!overlay||!target)return;
+ const key=type==='bocchi3'?'bocchi':type,source=$(group+'Face-'+type)||$('freePlayerFace-'+type)||$('netCharacterFace-'+type)||$('arcFace-'+type);
+ if(!source)return;const c=target.getContext('2d');c.clearRect(0,0,target.width,target.height);c.save();if(type==='shadow')c.filter='brightness(.42) saturate(.2) hue-rotate(170deg)';c.drawImage(source,0,0,target.width,target.height);c.restore();
+ const token=++portraitCutinToken;clearTimeout(portraitCutinTimer);overlay.classList.remove('show');void overlay.offsetWidth;overlay.classList.add('show');portraitCutinTimer=setTimeout(()=>{if(token===portraitCutinToken)overlay.classList.remove('show');},760);
+}
 function arcChoose(type){
  if(!arcSelection?.challenger||arcSelection.sent||!ARC_CHARACTERS.includes(type))return;
  arcSelection.choice=type;
+ showPortraitCutin(type,'arc');
  for(const t of ARC_CHARACTERS){const b=$('arcPick-'+t);b.setAttribute('aria-pressed',String(t===type));b.classList.toggle('selected',t===type);}
  $('arcChoiceName').textContent=charName(type);$('arcChoiceMove').textContent={shinbocchi:'真ボッチ砲：全画面ビーム（SP100）',bocchi:'パンチ → キック → ボッチ砲',shadow:'影の拳とボッチ砲',misaki:'必殺技：ヘリコプター砲',tetsu:'フライパン・キック・鳳凰水晶',haffun:'ハッフン！／突撃ハッフン',mogaki:'ビール3秒飲み：SP100・HP30回復',tenten:'成功買い物！ ルーレットで落下＆大破（SP100）',mattsuan:'まっつぁんのいいとこ：15秒間・身長10倍・天からの蹴り'}[type];arcPortrait(type,'arcChoicePortrait');
 }
@@ -1917,7 +1945,7 @@ function refreshPortraitGroup(group){
 }
 function choosePortrait(group,type){
  if(!PORTRAIT_GROUPS.includes(group)||$(group).disabled||!portraitTypes(group).includes(type))return;
- $(group).value=type;refreshPortraitGroup(group);
+ if($(group).value===type)return;$(group).value=type;refreshPortraitGroup(group);showPortraitCutin(type,group);
 }
 for(const group of PORTRAIT_GROUPS){
  for(const type of portraitTypes(group)){
