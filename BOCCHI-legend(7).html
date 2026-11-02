@@ -304,6 +304,67 @@ button{font:inherit}.app{position:relative;width:100vw;height:var(--app-h,100dvh
 #netScreen .fighterShowcase{height:clamp(140px,20vw,230px)}
 #netScreen .netCard{max-height:94dvh;overflow:auto}
 @media(max-width:650px){#arcSelectScreen{padding:10px}#arcSelectTitle{margin:2px 0!important}.arcVersus{gap:5px;width:100%;margin:8px auto}.arcFighter{height:clamp(150px,40vw,220px);border-width:2px}.arcFighter>span{top:4px;left:4px;padding:2px 8px}.arcFighter>strong{left:6px;bottom:22px}.arcFighter>small{left:6px;bottom:4px}.arcVs{font-size:clamp(20px,6vw,34px)}#arcSelectGrid{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;width:100%;margin:8px auto}#arcSelectGrid button{padding:2px}#arcSelectGrid strong{font-size:clamp(8px,2.1vw,11px)}#arcSelectActions{gap:6px;margin:6px 0}#arcSelectActions button{padding:9px 12px;font-size:13px}}
+/* Use the supplied select screen art as the actual full-screen board. */
+#arcSelectScreen{inset:auto;top:50%;left:50%;width:min(100vw,177.7vh);height:min(100vh,56.3vw);transform:translate(-50%,-50%);padding:0;overflow:hidden;background:#09090f url('assets/character-select-bg.png') center/100% 100% no-repeat!important}
+#arcSelectScreen::before,#arcSelectScreen::after{display:none}
+#arcSelectScreen>*{z-index:auto}
+#arcSelectTitle{position:absolute!important;left:-10000px;top:0;opacity:0}
+#arcSelectNote{position:absolute;z-index:5;top:14.5%;left:12%;right:12%;margin:0!important;color:#fff2cd!important;font-size:clamp(11px,1.2vw,20px);font-weight:900;text-shadow:0 2px 5px #000;text-align:center}
+#arcSelectTimer{position:absolute;z-index:5;top:16%;right:3%;padding:3px 11px;border:1px solid #ffe2a2;border-radius:999px;background:#100d11dd;color:#fff1cb;font-size:clamp(10px,1vw,15px)}
+#arcVersus{display:contents}
+#arcVersus .arcVs,#netScreen .netVersusShowcase>.versusFlash{display:none}
+.arcFighter{position:absolute;z-index:2;top:19%;width:25.5%;height:35.3%;min-width:0;overflow:hidden;border:0;border-radius:0;background:transparent;box-shadow:none;transform:none;clip-path:polygon(22% 0,100% 0,78% 100%,0 100%)}
+.arcFighter.p1{left:24.7%}
+.arcFighter.p2{left:48.1%;width:25%;clip-path:polygon(21% 0,100% 0,79% 100%,0 100%)}
+.arcFighter::after{background:linear-gradient(180deg,transparent 58%,#08080bd9)}
+.arcFighter canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:none}
+.arcFighter.p2 canvas{filter:none}
+.arcFighter>span{display:none}
+.arcFighter>strong{bottom:9%;left:8%;right:8%;font-size:clamp(15px,2.4vw,36px);line-height:1.05}
+.arcFighter>small{bottom:3%;left:8%;right:8%;font-size:clamp(9px,1.1vw,16px)}
+.arcVs{position:absolute;z-index:3;left:43.2%;top:56%;width:13.5%;text-align:center;font-size:clamp(30px,5.5vw,88px);transform:rotate(-9deg)}
+#arcSelectGrid{position:absolute;z-index:4;left:14.1%;top:73.4%;width:72.2%;height:22.7%;max-width:none;margin:0;grid-template-columns:repeat(10,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:3px 5px}
+#arcSelectGrid button{display:flex;min-width:0;min-height:0;flex-direction:column;align-items:center;justify-content:space-between;overflow:hidden;padding:4px 3px 2px;border:1px solid transparent;border-radius:0;background:transparent;color:#fff;transform:none}
+#arcSelectGrid button.selected,#arcSelectGrid button.remote-selected{border:2px solid #ffd62a;background:#ffd21b18;box-shadow:0 0 13px #ffd21aaa;transform:none}
+#arcSelectGrid button.remote-selected{border-color:#ff398e;box-shadow:0 0 13px #ff3288aa}
+#arcSelectGrid button:disabled{opacity:1;cursor:default}
+#arcSelectGrid canvas{flex:1;width:100%;min-height:0;aspect-ratio:auto;object-fit:contain;background:none}
+#arcSelectGrid strong{display:block!important;flex:0 0 auto;margin:2px 0 0;color:white;font-size:clamp(8px,.9vw,14px);line-height:1.05;text-align:center;text-shadow:0 2px 3px #000}
+#arcSelectPreview{display:none!important}
+#arcSelectActions{position:absolute;z-index:6;top:96.1%;left:50%;transform:translate(-50%,-50%);display:flex;gap:9px;margin:0;white-space:nowrap}
+#arcSelectActions button{min-height:30px;padding:5px 14px;border:1px solid #fff6;border-radius:8px;background:#11131df0;color:#fff;font-size:clamp(10px,1vw,15px)}
+#arcSelectActions #arcSelectConfirm{border:0;background:linear-gradient(110deg,#ed4962,#f58b35);box-shadow:0 0 14px #ff722e77}
+#netScreen .netCard{position:absolute;inset:auto;top:50%;left:50%;width:min(100vw,177.7vh);height:min(100vh,56.3vw);transform:translate(-50%,-50%);max-height:none;overflow:hidden;padding:0;border:0;border-radius:0;background:#09090f url('assets/character-select-bg.png') center/100% 100% no-repeat;box-shadow:none}
+#netScreen .netCard>h2{position:absolute!important;left:-10000px;top:0;opacity:0}
+#netScreen .netVersusShowcase{display:contents}
+#netScreen .fighterShowcase{position:absolute;z-index:2;top:19%;width:25.5%;height:35.3%;min-width:0;overflow:hidden;border:0;border-radius:0;background:transparent;box-shadow:none}
+#netScreen .fighterShowcase.playerShowcase{left:24.7%;clip-path:polygon(22% 0,100% 0,78% 100%,0 100%)}
+#netScreen .fighterShowcase.enemyShowcase{left:48.1%;width:25%;clip-path:polygon(21% 0,100% 0,79% 100%,0 100%)}
+#netScreen .fighterShowcase::after{background:linear-gradient(180deg,transparent 58%,#08080bd9)}
+#netScreen .fighterShowcase canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:none}
+#netScreen .fighterShowcase .showcaseSlot{display:none}
+#netScreen .fighterShowcase>strong{bottom:9%;left:8%;right:8%;font-size:clamp(15px,2.4vw,36px);line-height:1.05}
+#netScreen .fighterShowcase>small{bottom:3%;left:8%;right:8%;font-size:clamp(9px,1.1vw,16px)}
+#netScreen .netVersusShowcase>.versusFlash{position:absolute;z-index:3;left:43.2%;top:56%;width:13.5%;text-align:center;font-size:clamp(30px,5.5vw,88px)}
+#netScreen .opponentWaiting{inset:0;background:#0b0910bb}
+#netScreen #netCharacterRoster{position:absolute;z-index:4;left:14.1%;top:73.4%;width:72.2%;height:22.7%;margin:0;grid-template-columns:repeat(10,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:3px 5px}
+#netScreen .portraitPick{display:flex;min-width:0;min-height:0;flex-direction:column;align-items:center;justify-content:space-between;overflow:hidden;padding:4px 3px 2px;border:1px solid transparent;border-radius:0;background:transparent}
+#netScreen .portraitPick canvas{flex:1;width:100%;min-height:0;aspect-ratio:auto;object-fit:contain}
+#netScreen .portraitPick strong{flex:0 0 auto;margin:2px 0 0;color:white;font-size:clamp(8px,.9vw,14px);line-height:1.05;text-shadow:0 2px 3px #000}
+#netScreen .portraitPick[aria-pressed="true"]{border:2px solid #ff398e;background:#ff328818;box-shadow:0 0 13px #ff3288aa}
+#netScreen .portraitPick:disabled{opacity:1;cursor:default}
+#netScreen .netCard>p#netStatus{position:absolute;z-index:7;top:15.5%;left:18%;width:64%;margin:0;padding:4px;color:#fff2cd;font-size:clamp(10px,1.1vw,16px);font-weight:850;text-align:center;text-shadow:0 2px 5px #000}
+#netScreen .netCard>.netRoom{position:static}
+#netScreen #netCreate{position:absolute;z-index:7;left:18%;top:60%;padding:7px 12px;border:1px solid #ffc31e;background:#21190c;color:#fff;font-size:clamp(10px,1vw,15px)}
+#netScreen #netCode{position:absolute;z-index:7;left:18%;top:65%;color:white;font-size:clamp(12px,1.4vw,20px)}
+#netScreen #netCopy{position:absolute;z-index:7;left:27%;top:64%;padding:5px 9px;font-size:clamp(9px,.9vw,13px)}
+#netScreen #netJoinCode{position:absolute;z-index:7;right:28%;top:60%;width:19%;min-width:90px;padding:8px;border:1px solid #ff55a4;background:#160d16e8;color:white;font-size:clamp(10px,1vw,14px)}
+#netScreen #netJoin{position:absolute;z-index:7;right:17%;top:60%;padding:7px 10px;border:1px solid #ff55a4;background:#24101e;color:white;font-size:clamp(10px,1vw,14px)}
+#netScreen #netReady{position:absolute;z-index:8;left:50%;top:68.2%;transform:translateX(-50%);padding:7px 17px}
+#netScreen #netBack{position:absolute;z-index:8;left:5%;top:67.5%;padding:6px 12px}
+#netScreen .netNote,#netScreen .portraitSummary,#netScreen .netCard>label{display:none!important}
+@media(max-width:650px){#arcSelectNote{top:15.5%;left:5%;right:5%;font-size:clamp(9px,2.7vw,14px)}#arcSelectTimer{top:17.4%;right:2%;font-size:9px;padding:2px 7px}.arcFighter,#netScreen .fighterShowcase{top:20.5%;height:31%;width:27%}.arcFighter.p1,#netScreen .fighterShowcase.playerShowcase{left:22.7%}.arcFighter.p2,#netScreen .fighterShowcase.enemyShowcase{left:50%;width:26%}.arcVs,#netScreen .netVersusShowcase>.versusFlash{top:53%;font-size:clamp(22px,6vw,46px)}#arcSelectGrid,#netScreen #netCharacterRoster{left:8%;width:84%;top:73%;height:22%;gap:2px 3px}#arcSelectGrid strong,#netScreen .portraitPick strong{font-size:clamp(7px,2vw,11px)}#arcSelectActions{top:97%;gap:4px}#arcSelectActions button{padding:4px 7px;font-size:9px}#netScreen #netStatus{top:17%!important;left:5%!important;width:90%!important;font-size:9px!important}#netScreen #netCreate{left:5%;top:59%;padding:4px 6px}#netScreen #netCode{left:5%;top:63%;font-size:10px}#netScreen #netCopy{left:18%;top:63%;padding:3px 5px}#netScreen #netJoinCode{right:22%;top:59%;width:20%;min-width:0;padding:4px}#netScreen #netJoin{right:5%;top:59%;padding:4px 6px}#netScreen #netReady{top:68%;padding:5px 10px;font-size:10px}#netScreen #netBack{left:3%;top:67%;padding:4px 7px;font-size:10px}}
+@media(orientation:portrait){#arcSelectScreen{width:100vw;height:100dvh}#netScreen .netCard{width:100vw;height:100dvh}}
 @media(max-width:650px){#freeBattleScreen>.card{padding:10px}.selectVersusShowcase,.netVersusShowcase{gap:6px;margin:8px auto}.fighterShowcase{height:clamp(138px,39vw,205px);border-radius:10px}.fighterShowcase>strong{left:8px;bottom:25px}.fighterShowcase>small{left:8px;bottom:7px}.fighterShowcase .showcaseSlot{top:5px;left:5px;padding:2px 8px}.versusFlash{font-size:clamp(18px,5vw,28px)}#freeBattleScreen .freeSetup{grid-template-columns:1fr;gap:8px;margin:8px 0}#freeBattleScreen .portraitRoster{grid-template-columns:repeat(4,minmax(0,1fr))}#freeBattleScreen .portraitPick strong{font-size:clamp(8px,2.2vw,11px)}#freeBattleScreen .freeSetup>.selectBox:nth-child(3),#freeBattleScreen .freeSetup>.selectBox:nth-child(4){grid-column:auto}}
 
 
@@ -1823,7 +1884,7 @@ function arcChoose(type){
 }
 function arcShowSelection(challenger,deadline,fixedType='bocchi'){
  const type=arcade.saved.player.type;arcSelection={match:arcade.localMatch,challenger,choice:ARC_CHARACTERS.includes(type)?type:'bocchi',fixedType:ARC_CHARACTERS.includes(fixedType)?fixedType:'bocchi',remoteChoice:null,sent:false,deadline};
- $('arcSelectScreen').hidden=false;$('arcSelectGrid').hidden=!challenger;$('arcSelectConfirm').hidden=!challenger;
+ $('arcSelectScreen').hidden=false;$('arcSelectGrid').hidden=false;$('arcSelectConfirm').hidden=!challenger;$('arcSelectCancel').hidden=!challenger;for(const t of ARC_CHARACTERS)$('arcPick-'+t).disabled=!challenger;
  $('arcSelectTitle').textContent=challenger?'キャラクターセレクト！':'2Pキャラクター選択中…';
  $('arcSelectNote').textContent=challenger?'1P '+(arcade.matchNames[0]||'相手')+' はキャラ固定。あなたは2Pを選んでください。':'1P '+(arcade.matchNames[0]||'あなた')+' は固定。'+(arcade.matchNames[1]||'挑戦者')+' が選択しています。';
  $('arcChoiceName').textContent=charName(type);$('arcChoiceMove').textContent=challenger?'':'使用キャラクターはそのまま';
@@ -1837,7 +1898,7 @@ function arcSelectionTick(){
 }
 function arcConfirmSelection(){
  const s=arcSelection;if(!s?.challenger||s.sent||s.match!==arcade.localMatch)return;
- s.sent=true;$('arcSelectGrid').hidden=true;$('arcSelectConfirm').hidden=true;$('arcSelectTitle').textContent='参戦準備完了！';
+ s.sent=true;for(const t of ARC_CHARACTERS)$('arcPick-'+t).disabled=true;$('arcSelectConfirm').hidden=true;$('arcSelectTitle').textContent='参戦準備完了！';
  arcToHost({a:'prepared',match:s.match,ok:true,char:s.choice});
 }
 function arcCancelSelection(){
@@ -1937,7 +1998,7 @@ function arcReceive(m){
   if(!arcSafe()){arcToHost({a:'prepared',match:m.match,ok:false});return;}
   arcade.localMatch=m.match;arcade.matchNames=m.names.map(arcCleanName);arcSave();const challenger=m.pair[1]===arcade.id;arcShowSelection(challenger,m.deadline||Date.now()+30000,m.fixedChar||arcade.saved.player.type);if(!challenger)arcToHost({a:'prepared',match:m.match,ok:true,char:arcade.saved.player.type,form:!arcade.saved.freeMode&&arcade.saved.stageIndex===0?0:2});return;
  }
- if(m.a==='choice'&&arcSelection?.match===m.match&&!arcSelection.challenger&&ARC_CHARACTERS.includes(m.char)){arcSelection.remoteChoice=m.char;drawArcSelectSlots();$('arcSelectTitle').textContent=charName(m.char)+' がキャラクターを選択中';return;}
+ if(m.a==='choice'&&arcSelection?.match===m.match&&!arcSelection.challenger&&ARC_CHARACTERS.includes(m.char)){arcSelection.remoteChoice=m.char;for(const t of ARC_CHARACTERS){const b=$('arcPick-'+t);b.setAttribute('aria-pressed',String(t===m.char));b.classList.toggle('selected',t===m.char);b.classList.toggle('remote-selected',t===m.char);}drawArcSelectSlots();$('arcSelectTitle').textContent=charName(m.char)+' がキャラクターを選択中';return;}
  if(m.a==='begin'&&arcade.localMatch===m.match&&arcade.saved){arcSelection=null;$('arcSelectScreen').hidden=true;
   arcade.matchNames=m.names.map(arcCleanName);$('arcadeIntro').hidden=false;$('challengerName').textContent='';speak('ニューチャレンジャー！');sfx('phase');
   const otherIndex=m.pair[0]===arcade.id?1:0;arcade.introTimer=setTimeout(()=>{if(arcade.localMatch===m.match)$('challengerName').textContent=arcade.matchNames[otherIndex]+' 参戦！';},800);
@@ -2028,7 +2089,7 @@ function portraitTypes(group){const types=ARC_CHARACTERS.filter(t=>group!=='netC
 function initNetSelectLayout(){const root=document.querySelector('#netScreen .netVersusShowcase');if(!root)return;root.innerHTML='<div class="fighterShowcase playerShowcase"><span class="showcaseSlot">1P</span><canvas id="netP1Portrait" width="480" height="408" aria-hidden="true"></canvas><strong id="netP1Char">BOCCHI</strong><small id="netP1Handle">ホスト</small></div><span class="versusFlash" aria-hidden="true">VS</span><div class="fighterShowcase enemyShowcase"><span class="showcaseSlot">2P</span><canvas id="netP2Portrait" width="480" height="408" aria-hidden="true"></canvas><strong id="netP2Char">相手待ち</strong><small id="netP2Handle">部屋に参加すると選べます</small><div class="opponentWaiting"><b>?</b><small>相手が選択中</small></div></div>';}
 initNetSelectLayout();
 function paintNetSlot(type,canvasId,charId,handleId,handle){const canvas=$(canvasId),label=$(charId),source=type&&$('netCharacterFace-'+type);if(!canvas||!label)return;const c=canvas.getContext('2d');c.clearRect(0,0,canvas.width,canvas.height);if(type&&source){const keys={bocchi:'bocchiConcept',misaki:'misakiConcept',mogaki:'mogakiConcept',haffun:'haffunConcept',tenten:'tentenConcept',mattsuan:'mattsuanConcept'},im=imgs[keys[type]||(type==='shadow'?'bocchi':type)];if(im&&!im.complete)im.addEventListener('load',drawNetSlots,{once:true});arcPortrait(type,'netCharacterFace-'+type);c.drawImage(source,0,0,canvas.width,canvas.height);label.textContent=charName(type);}else label.textContent='相手待ち';const handleEl=$(handleId);if(handleEl)handleEl.textContent=handle||'';}
-function drawNetSlots(){if(!$('netP1Portrait'))return;const localName=arcade.name||safeGet('bocchi_nickname')||'あなた',localIsHost=!net.active||net.host,p1=!net.active?'bocchi':net.connected?(net.host?$('netCharacter').value:net.remoteChar):(net.host?'bocchi':null),p2=net.active&&net.connected?(net.host?net.remoteChar:$('netCharacter').value):null;paintNetSlot(p1,'netP1Portrait','netP1Char','netP1Handle',localIsHost?localName:(net.remoteName||'接続待ち'));paintNetSlot(p2,'netP2Portrait','netP2Char','netP2Handle',net.active?(localIsHost?(net.remoteName||'2P'):localName):'部屋に参加すると選べます');const waiting=document.querySelector('#netScreen .opponentWaiting');if(waiting)waiting.hidden=!!p2;}
+function drawNetSlots(){if(!$('netP1Portrait'))return;const localName=arcade.name||safeGet('bocchi_nickname')||'あなた',localIsHost=!net.active||net.host,p1=!net.active?'bocchi':net.connected?(net.host?$('netCharacter').value:net.remoteChar):(net.host?'bocchi':null),p2=net.active&&net.connected?(net.host?net.remoteChar:$('netCharacter').value):null;paintNetSlot(p1,'netP1Portrait','netP1Char','netP1Handle',localIsHost?localName:(net.remoteName||'接続待ち'));paintNetSlot(p2,'netP2Portrait','netP2Char','netP2Handle',net.active?(localIsHost?(net.remoteName||'2P'):localName):'部屋に参加すると選べます');const waiting=document.querySelector('#netScreen .opponentWaiting');if(waiting)waiting.hidden=!!p2;const picked=net.active?(net.host?(net.connected?net.remoteChar:null):$('netCharacter').value):$('netCharacter').value,locked=net.active?(net.host||!net.connected||net.ready):false;for(const type of portraitTypes('netCharacter')){const button=$('netCharacterPick-'+type);button.setAttribute('aria-pressed',String(type===picked));button.disabled=locked;}}
 function drawCharacterShowcase(group,type){
  if(group==='netCharacter'){drawNetSlots();return;}
  const map={freePlayer:['freePlayerShowcase','freePlayerShowcaseName','freePlayerShowcaseMove'],freeEnemy:['freeEnemyShowcase','freeEnemyShowcaseName','freeEnemyShowcaseMove']}[group];if(!map)return;
