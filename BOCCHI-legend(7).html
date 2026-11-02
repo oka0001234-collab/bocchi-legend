@@ -268,9 +268,42 @@ button{font:inherit}.app{position:relative;width:100vw;height:var(--app-h,100dvh
 #netScreen .netCard>p:not(#netStatus){display:none!important}
 #netScreen .portraitPick strong{display:block!important}
 #netScreen .portraitSummary{display:none!important}
-.opponentWaiting{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#ffd8ea;background:radial-gradient(ellipse,#ff55a433,transparent 65%)}
+.opponentWaiting{position:absolute;inset:0;z-index:4;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#ffd8ea;background:radial-gradient(ellipse,#ff55a433,transparent 65%)}.opponentWaiting[hidden]{display:none!important}
 .opponentWaiting b{font-size:clamp(45px,8vw,88px);line-height:1;color:#ff9aca;text-shadow:0 0 20px #ff449b}
 .opponentWaiting small{font-weight:850;font-size:clamp(10px,1.5vw,15px)}
+#arcSelectScreen{background:radial-gradient(ellipse at 50% 50%,#19131c 0,#09090f 74%)!important}
+#arcSelectScreen::before,#arcSelectScreen::after{content:"";position:fixed;z-index:0;top:-20%;bottom:-20%;width:48%;pointer-events:none;opacity:.48}
+#arcSelectScreen>*{position:relative;z-index:1}
+#arcSelectScreen::before{left:-4%;background:radial-gradient(#ffc323aa 1px,transparent 1.7px) 0 0/12px 12px,linear-gradient(132deg,#ffcb19 0 5%,#f89900 11%,transparent 39%);mask-image:linear-gradient(110deg,#000,transparent 92%)}
+#arcSelectScreen::after{right:-4%;background:radial-gradient(#ff3283bb 1px,transparent 1.7px) 0 0/12px 12px,linear-gradient(228deg,#ff2480 0 5%,#d80c57 11%,transparent 39%);mask-image:linear-gradient(250deg,#000,transparent 92%)}
+#arcSelectTitle{color:#fff!important;font-size:clamp(28px,5vw,54px)!important;font-style:italic;text-shadow:3px 3px #ef214c,0 0 22px #ffad25aa}
+#arcSelectNote{color:#ffe6ad!important;font-weight:800}
+.arcVersus{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:clamp(8px,2vw,26px);width:min(900px,96vw);margin:16px auto 12px}
+.arcFighter{position:relative;min-width:0;height:clamp(190px,28vw,310px);overflow:hidden;border:3px solid #ffc31e;border-radius:4px;background:linear-gradient(140deg,#0a0a0de8,#252019c9);box-shadow:0 0 23px #ffc31e8a,inset 0 0 24px #ffc31e22;transform:skew(-5deg)}
+.arcFighter.p2{border-color:#ff3288;background:linear-gradient(140deg,#111018e8,#2c1020c9);box-shadow:0 0 23px #ff32888a,inset 0 0 24px #ff328822}
+.arcFighter::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 42%,#07070df0)}
+.arcFighter canvas{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 14px #ffc82c99)}
+.arcFighter.p2 canvas{filter:drop-shadow(0 0 14px #ff3d91aa)}
+.arcFighter>span{position:absolute;z-index:2;top:8px;left:8px;padding:2px 14px;background:#ffd21e;color:#17100a;font-weight:1000;font-size:clamp(16px,2.3vw,24px);font-style:italic}
+.arcFighter.p2>span{background:#ff398e;color:#1b0710}
+.arcFighter>strong,.arcFighter>small{position:absolute;z-index:2;left:12px;right:8px;text-align:left;text-shadow:0 2px 8px #000;font-weight:950}
+.arcFighter>strong{bottom:26px;color:white;font-size:clamp(19px,3vw,32px)}
+.arcFighter>small{bottom:6px;color:#ffe9a4;font-size:clamp(10px,1.4vw,15px)}
+.arcFighter.p2>small{color:#ffc2dc}
+.arcVs{color:#fff6c8;font-size:clamp(28px,6vw,68px);font-weight:1000;font-style:italic;text-shadow:0 0 8px #fff,0 0 24px #ff9829,0 0 30px #ff2180;transform:rotate(-9deg)}
+#arcSelectGrid{grid-template-columns:repeat(9,minmax(0,1fr));gap:8px;width:min(1000px,96vw);margin:10px auto 14px}
+#arcSelectGrid button{position:relative;padding:4px;border-radius:3px;border:1px solid #ffdda8;background:#111018d9;transform:skew(-5deg)}
+#arcSelectGrid button.selected{border:2px solid #ffcb20;box-shadow:0 0 16px #ffc31e99;transform:skew(-5deg) translateY(-3px)}
+#arcSelectGrid button.remote-selected{border-color:#ff3288;box-shadow:0 0 16px #ff328899}
+#arcSelectGrid canvas{aspect-ratio:1.22;background:radial-gradient(#ffc4353b,transparent)}
+#arcSelectGrid strong{display:block!important;color:#fff;font-size:clamp(9px,1.3vw,15px);margin-top:3px}
+#arcSelectPreview{display:none!important}
+#arcSelectActions{margin:8px 0}
+#arcSelectTimer{display:inline-block;color:#fff2ce;background:#15131bdc;border:1px solid #ffcc55;border-radius:999px;padding:5px 16px}
+#netScreen .netVersusShowcase{max-width:700px}
+#netScreen .fighterShowcase{height:clamp(140px,20vw,230px)}
+#netScreen .netCard{max-height:94dvh;overflow:auto}
+@media(max-width:650px){#arcSelectScreen{padding:10px}#arcSelectTitle{margin:2px 0!important}.arcVersus{gap:5px;width:100%;margin:8px auto}.arcFighter{height:clamp(150px,40vw,220px);border-width:2px}.arcFighter>span{top:4px;left:4px;padding:2px 8px}.arcFighter>strong{left:6px;bottom:22px}.arcFighter>small{left:6px;bottom:4px}.arcVs{font-size:clamp(20px,6vw,34px)}#arcSelectGrid{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;width:100%;margin:8px auto}#arcSelectGrid button{padding:2px}#arcSelectGrid strong{font-size:clamp(8px,2.1vw,11px)}#arcSelectActions{gap:6px;margin:6px 0}#arcSelectActions button{padding:9px 12px;font-size:13px}}
 @media(max-width:650px){#freeBattleScreen>.card{padding:10px}.selectVersusShowcase,.netVersusShowcase{gap:6px;margin:8px auto}.fighterShowcase{height:clamp(138px,39vw,205px);border-radius:10px}.fighterShowcase>strong{left:8px;bottom:25px}.fighterShowcase>small{left:8px;bottom:7px}.fighterShowcase .showcaseSlot{top:5px;left:5px;padding:2px 8px}.versusFlash{font-size:clamp(18px,5vw,28px)}#freeBattleScreen .freeSetup{grid-template-columns:1fr;gap:8px;margin:8px 0}#freeBattleScreen .portraitRoster{grid-template-columns:repeat(4,minmax(0,1fr))}#freeBattleScreen .portraitPick strong{font-size:clamp(8px,2.2vw,11px)}#freeBattleScreen .freeSetup>.selectBox:nth-child(3),#freeBattleScreen .freeSetup>.selectBox:nth-child(4){grid-column:auto}}
 
 
@@ -1668,23 +1701,23 @@ function combatSound(name){
 }
 
 // Private two-player room; host owns all simulation and scoring.
-const net={active:false,host:false,peer:null,conn:null,connected:false,ready:false,otherReady:false,remoteKeys:{},localKeys:{},actions:[],lastSeen:0,lastSend:0,seq:0,recvSeq:-1,epoch:0,remoteChar:'misaki',result:null,roundDelay:0,paused:false,remoteHidden:false,token:0,rtt:0};
-const NET_VERSION='bocchi-room-7';
+const net={active:false,host:false,peer:null,conn:null,connected:false,ready:false,otherReady:false,remoteKeys:{},localKeys:{},actions:[],lastSeen:0,lastSend:0,seq:0,recvSeq:-1,epoch:0,remoteChar:'bocchi',remoteName:'',result:null,roundDelay:0,paused:false,remoteHidden:false,token:0,rtt:0};
+const NET_VERSION='bocchi-room-8';
 function netStatus(t){$('netStatus').textContent=t;}
 function netSend(m){if(net.conn?.open&&net.conn.bufferSize<8){try{net.conn.send(m);}catch(e){netFail('通信が途切れました。部屋を作り直してください。');}}}
-function netClose(){stopAnnouncer();net.token++;net.active=false;net.connected=false;net.ready=false;net.otherReady=false;net.actions=[];net.localKeys={};net.remoteKeys={};const c=net.conn,p=net.peer;net.conn=null;net.peer=null;if(c)c.close();if(p)p.destroy();superCutin=null;clearInput();$('netBadge').hidden=true;$('netReady').hidden=true;$('netCharacter').disabled=false;refreshPortraitGroup('netCharacter');$('netCreate').disabled=false;$('netJoin').disabled=false;}
+function netClose(){stopAnnouncer();net.token++;net.active=false;net.connected=false;net.ready=false;net.otherReady=false;net.actions=[];net.localKeys={};net.remoteKeys={};net.remoteChar='bocchi';net.remoteName='';const c=net.conn,p=net.peer;net.conn=null;net.peer=null;if(c)c.close();if(p)p.destroy();superCutin=null;clearInput();$('netBadge').hidden=true;$('netReady').hidden=true;$('netCharacter').disabled=false;refreshPortraitGroup('netCharacter');$('netCreate').disabled=false;$('netJoin').disabled=false;}
 function netFail(t){netClose();scene='online';$('hud').classList.remove('show');$('touch').style.opacity='0';$('resultBanner').classList.remove('show');$('netScreen').classList.add('show');netStatus(t);}
 function showOnline(){goTitle();refreshPortraitGroup('netCharacter');scene='online';$('titleScreen').classList.remove('show');$('netScreen').classList.add('show');$('netCode').textContent='—';netStatus('部屋を作るか、相手の部屋番号を入力してください。');music.ensure();}
 function netBind(conn,token){
  if(net.conn){conn.on('open',()=>{conn.send({type:'busy'});setTimeout(()=>conn.close(),100);});return;}
- net.conn=conn;setTimeout(()=>{if(token===net.token&&!net.connected)netFail('接続を確認できませんでした。部屋を作り直してください。');},20000);conn.on('open',()=>{if(token!==net.token)return;net.lastSeen=performance.now();netSend({type:'hello',version:NET_VERSION,char:$('netCharacter').value});netStatus('接続確認中…');});
+ net.conn=conn;setTimeout(()=>{if(token===net.token&&!net.connected)netFail('接続を確認できませんでした。部屋を作り直してください。');},20000);conn.on('open',()=>{if(token!==net.token)return;net.lastSeen=performance.now();netSend({type:'hello',version:NET_VERSION,char:$('netCharacter').value,name:arcade.name||safeGet('bocchi_nickname')||'プレイヤー'});netStatus('接続確認中…');});
  conn.on('data',m=>{if(token!==net.token)return;netReceive(m);});
  conn.on('close',()=>{if(token===net.token)netFail('相手との接続が終了しました。');});conn.on('error',()=>{if(token===net.token)netFail('対戦相手に接続できませんでした。');});
 }
 function netOpen(host){
  const code=$('netJoinCode').value.trim().toUpperCase();if(!host&&!/^[A-Z2-9]{8}$/.test(code)){netStatus('8文字の部屋番号を入力してください。');return;}
  netClose();net.host=host;net.active=true;net.epoch=0;net.recvSeq=-1;net.seq=0;const token=net.token;
- $('netCharacter').disabled=true;refreshPortraitGroup('netCharacter');$('netCreate').disabled=$('netJoin').disabled=true;netStatus('接続しています…');
+ if(host)$('netCharacter').value='bocchi';$('netCharacter').disabled=host;refreshPortraitGroup('netCharacter');$('netCreate').disabled=$('netJoin').disabled=true;netStatus(host?'1PはBOCCHI固定です。相手を待っています…':'キャラクターを選んで相手の部屋に接続します…');
  const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',bytes=crypto.getRandomValues(new Uint8Array(8)),room=Array.from(bytes,b=>alphabet[b%32]).join('');
  try{net.peer=new Peer((host?'bocchi-room-':'bocchi-guest-')+room,{debug:0});}catch(e){netFail('このブラウザでは通信対戦を開始できません。Chromeなどで開いてください。');return;}
  net.peer.on('open',()=>{if(token!==net.token)return;if(host){$('netCode').textContent=room;netStatus('部屋番号を相手に伝えてください。参加を待っています。');}else netBind(net.peer.connect('bocchi-room-'+code,{reliable:true,serialization:'json'}),token);});
@@ -1695,7 +1728,8 @@ function netOpen(host){
 function netReceive(m){
  if(!m||typeof m!=='object')return;net.lastSeen=performance.now();
  if(m.type==='busy'){netFail('この部屋は満員です。');return;}
- if(m.type==='hello'){if(m.version!==NET_VERSION||!['bocchi','misaki','tetsu','haffun','mogaki','tenten','mattsuan','shinbocchi'].includes(m.char)){netFail('同じ最新版のHTMLを使用してください。');return;}net.remoteChar=m.char;net.connected=true;$('netCharacter').disabled=true;refreshPortraitGroup('netCharacter');$('netReady').hidden=false;netStatus('接続しました。あなたは'+(net.host?'左側':'右側')+'です。準備ができたら対戦開始！');return;}
+ if(m.type==='hello'){if(m.version!==NET_VERSION||!['bocchi','misaki','tetsu','haffun','mogaki','tenten','mattsuan','shinbocchi'].includes(m.char)){netFail('同じ最新版のHTMLを使用してください。');return;}net.remoteChar=m.char;net.remoteName=arcCleanName(m.name)||'プレイヤー';net.connected=true;$('netCharacter').disabled=net.host;refreshPortraitGroup('netCharacter');drawNetSlots();$('netReady').hidden=false;netStatus(net.host?net.remoteName+' さんが接続。2Pキャラを選択できます。':'接続しました。あなたは2Pです。キャラクターを選んで準備してください。');return;}
+ if(m.type==='character'){if(net.host&&['bocchi','misaki','tetsu','haffun','mogaki','tenten','mattsuan','shinbocchi'].includes(m.char)){net.remoteChar=m.char;drawNetSlots();netStatus(net.remoteName+' さんが「'+charName(m.char)+'」を選択中');}return;}
  if(!net.connected)return;
  if(m.type==='voiceDone'&&net.host&&announcer?.id===m.id){announcer.remoteDone=true;finishAnnouncementIfReady();return;}
  if(m.type==='ready'){net.otherReady=true;netMaybeStart();return;}
@@ -1742,7 +1776,7 @@ const netBaseGlass=triggerGlassShatter;triggerGlassShatter=function(f){netBaseGl
 const netBaseTitle=goTitle;goTitle=function(){netClose();$('netScreen').classList.remove('show');netBaseTitle();};
 ['titleBtn','continueTitleBtn','freeTitleBtn','freeBackBtn','netBack'].forEach(id=>$(id).onclick=goTitle);
 $('onlineBtn').onclick=showOnline;$('netCreate').onclick=()=>netOpen(true);$('netJoin').onclick=()=>netOpen(false);
-$('netReady').onclick=()=>{if(!net.connected)return;net.ready=true;$('netReady').hidden=true;netStatus('相手の準備を待っています…');netSend({type:'ready'});netMaybeStart();};
+ $('netReady').onclick=()=>{if(!net.connected)return;net.ready=true;$('netCharacter').disabled=true;refreshPortraitGroup('netCharacter');$('netReady').hidden=true;netStatus('相手の準備を待っています…');netSend({type:'ready'});netMaybeStart();};
 $('netCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('netCode').textContent);netStatus('部屋番号をコピーしました。');}catch(e){netStatus('表示中の部屋番号を選択してコピーしてください。');}};
 function netKey(code,down){if(!net.active||scene!=='fight')return false;if(!['KeyA','KeyD','KeyW','KeyS','KeyJ','KeyK','KeyL','KeyI'].includes(code))return false;if(announcerLocked())return true;const before=net.localKeys[code];net.localKeys[code]=down;if(down&&!before&&['KeyJ','KeyK','KeyL','KeyS'].includes(code)){const key=code.slice(3);if(net.host)net.actions.push({side:0,key});else netSend({type:'action',epoch:net.epoch,key});}return true;}
 window.addEventListener('keydown',e=>{if(netKey(keyboardCode(e),true)){e.preventDefault();e.stopImmediatePropagation();}},true);window.addEventListener('keyup',e=>{if(netKey(keyboardCode(e),false)){e.preventDefault();e.stopImmediatePropagation();}},true);
@@ -1756,19 +1790,22 @@ setInterval(()=>{if(!net.active||!net.connected)return;const age=performance.now
 // The first browser coordinates queue/admission and relays match packets.
 const arcade={on:false,leader:false,peer:null,link:null,links:new Map(),members:new Map(),id:'',queue:[],match:null,saved:null,generation:0,lastSeen:0,ready:false,finishing:false,cooldown:0,name:'',enabled:false,fightSince:0,retryAt:0,pairHistory:new Map(),introTimer:null};
 function arcRandomId(){return Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join('');}
-const ARCADE_VERSION='bocchi-arcade-36';
-const ARCADE_ID='bocchi-legend-6accf4cb33a88191-arcade36';
+const ARCADE_VERSION='bocchi-arcade-37';
+const ARCADE_ID='bocchi-legend-6accf4cb33a88191-arcade37';
 const ARC_CHARACTERS=['bocchi','misaki','tetsu','haffun','mogaki','tenten','mattsuan','shinbocchi','shadow'];
 let arcSelection=null;
 function arcPortrait(type,id){
  const canvas=$(id);if(!canvas)return;const c=canvas.getContext('2d');if(!c)return;
  const concepts={bocchi:['bocchiConcept',[275,55,320,340]],misaki:['misakiConcept',[12,738,365,400]],mogaki:['mogakiConcept',[410,0,360,350]],haffun:['haffunConcept',[0,70,400,360]],tenten:['tentenConcept',[320,0,340,300]],mattsuan:['mattsuanConcept',[105,25,380,380]]};
  const concept=concepts[type],key=concept?.[0]||(type==='shadow'?'bocchi':type),im=imgs[key];
- c.clearRect(0,0,canvas.width,canvas.height);if(!im?.complete||!im.naturalWidth){if(im)im.addEventListener('load',()=>arcPortrait(type,id),{once:true});return;}
+ c.clearRect(0,0,canvas.width,canvas.height);if(!im?.complete||!im.naturalWidth){if(im)im.addEventListener('load',()=>{arcPortrait(type,id);drawArcSelectSlots();drawNetSlots();},{once:true});return;}
  // Existing first-pose face crops: no extra image downloads and no enlarged atlas neighbors.
  const boxes={shinbocchi:[145,12,120,115],bocchi:[77,0,130,115],shadow:[77,0,130,115],misaki:[55,0,150,125],tetsu:[165,40,180,165],haffun:[120,55,185,175],mogaki:[145,10,160,155],tenten:[133,10,145,145],mattsuan:[130,0,130,110]};
  const b=concept?.[1]||boxes[type];if(!b)return;c.save();if(type==='shadow')c.filter='brightness(.42) saturate(.2) hue-rotate(170deg)';c.drawImage(im,...b,0,0,canvas.width,canvas.height);c.restore();
 }
+function initArcSelectLayout(){const grid=$('arcSelectGrid');if(!grid||$('arcVersus'))return;const panel=document.createElement('div');panel.id='arcVersus';panel.className='arcVersus';panel.innerHTML='<div class="arcFighter p1"><span>1P</span><canvas id="arcP1Portrait" width="480" height="408" aria-hidden="true"></canvas><strong id="arcP1Char"></strong><small id="arcP1Handle"></small></div><b class="arcVs" aria-hidden="true">VS</b><div class="arcFighter p2"><span>2P</span><canvas id="arcP2Portrait" width="480" height="408" aria-hidden="true"></canvas><strong id="arcP2Char"></strong><small id="arcP2Handle"></small></div>';grid.before(panel);}
+initArcSelectLayout();
+function drawArcSelectSlots(){if(!arcSelection)return;const draw=(type,canvasId,nameId,handleId,placeholder)=>{const canvas=$(canvasId),name=$(nameId),handle=$(handleId);if(!canvas||!name)return;const c=canvas.getContext('2d');c.clearRect(0,0,canvas.width,canvas.height);if(type){arcPortrait(type,'arcFace-'+type);const source=$('arcFace-'+type);if(source)c.drawImage(source,0,0,canvas.width,canvas.height);name.textContent=charName(type);}else name.textContent=placeholder;};draw(arcSelection.fixedType,'arcP1Portrait','arcP1Char','arcP1Handle','BOCCHI');draw(arcSelection.challenger?arcSelection.choice:arcSelection.remoteChoice,'arcP2Portrait','arcP2Char','arcP2Handle','相手が選択中');$('arcP1Handle').textContent=(arcade.matchNames?.[0]||'1P')+' · 固定';$('arcP2Handle').textContent=(arcade.matchNames?.[1]||'2P')+(arcSelection.challenger?' · 選択中':' · 相手が選択中');}
 let portraitCutinTimer=null,portraitCutinToken=0;
 function showPortraitCutin(type,group='freePlayer'){
  const overlay=$('portraitCutin'),target=overlay?.querySelector('canvas');if(!overlay||!target)return;
@@ -1782,15 +1819,16 @@ function arcChoose(type){
  showPortraitCutin(type,'arc');
  for(const t of ARC_CHARACTERS){const b=$('arcPick-'+t);b.setAttribute('aria-pressed',String(t===type));b.classList.toggle('selected',t===type);}
  $('arcChoiceName').textContent=charName(type);$('arcChoiceMove').textContent={shinbocchi:'真ボッチ砲：全画面ビーム（SP100）',bocchi:'パンチ → キック → ボッチ砲',shadow:'影の拳とボッチ砲',misaki:'必殺技：ヘリコプター砲',tetsu:'フライパン・キック・鳳凰水晶',haffun:'ハッフン！／突撃ハッフン',mogaki:'ビール3秒飲み：SP100・HP30回復',tenten:'成功買い物！ ルーレットで落下＆大破（SP100）',mattsuan:'まっつぁんのいいとこ：15秒間・身長10倍・天からの蹴り'}[type];arcPortrait(type,'arcChoicePortrait');
+ drawArcSelectSlots();if(arcSelection.challenger)arcToHost({a:'choice',match:arcSelection.match,char:type});
 }
-function arcShowSelection(challenger,deadline){
- const type=arcade.saved.player.type;arcSelection={match:arcade.localMatch,challenger,choice:ARC_CHARACTERS.includes(type)?type:'bocchi',sent:false,deadline};
+function arcShowSelection(challenger,deadline,fixedType='bocchi'){
+ const type=arcade.saved.player.type;arcSelection={match:arcade.localMatch,challenger,choice:ARC_CHARACTERS.includes(type)?type:'bocchi',fixedType:ARC_CHARACTERS.includes(fixedType)?fixedType:'bocchi',remoteChoice:null,sent:false,deadline};
  $('arcSelectScreen').hidden=false;$('arcSelectGrid').hidden=!challenger;$('arcSelectConfirm').hidden=!challenger;
- $('arcSelectTitle').textContent=challenger?'挑戦するキャラクターを選べ！':'挑戦者が準備中…';
- $('arcSelectNote').textContent=challenger?'顔を選んで、参戦！':'今使っているキャラクターで迎え撃つ。';
+ $('arcSelectTitle').textContent=challenger?'キャラクターセレクト！':'2Pキャラクター選択中…';
+ $('arcSelectNote').textContent=challenger?'1P '+(arcade.matchNames[0]||'相手')+' はキャラ固定。あなたは2Pを選んでください。':'1P '+(arcade.matchNames[0]||'あなた')+' は固定。'+(arcade.matchNames[1]||'挑戦者')+' が選択しています。';
  $('arcChoiceName').textContent=charName(type);$('arcChoiceMove').textContent=challenger?'':'使用キャラクターはそのまま';
- for(const t of ARC_CHARACTERS){arcPortrait(t,'arcFace-'+t);const im=imgs[t==='shadow'?'bocchi':t];if(im&&!im.complete)im.addEventListener('load',()=>{arcPortrait(t,'arcFace-'+t);if(arcSelection)arcPortrait(arcSelection.choice,'arcChoicePortrait');},{once:true});}
- if(challenger){arcChoose(arcSelection.choice);$('arcPick-'+arcSelection.choice).focus();}else arcPortrait(type,'arcChoicePortrait');
+ for(const t of ARC_CHARACTERS){arcPortrait(t,'arcFace-'+t);const im=imgs[t==='shadow'?'bocchi':t];if(im&&!im.complete)im.addEventListener('load',()=>{arcPortrait(t,'arcFace-'+t);if(arcSelection){arcPortrait(arcSelection.choice,'arcChoicePortrait');drawArcSelectSlots();}},{once:true});}
+ if(challenger){arcChoose(arcSelection.choice);$('arcPick-'+arcSelection.choice).focus();}else{arcPortrait(type,'arcChoicePortrait');drawArcSelectSlots();}
  arcSelectionTick();
 }
 function arcSelectionTick(){
@@ -1833,9 +1871,12 @@ function arcStatus(){
 function arcHost(id,m){
  if(!arcade.leader||!m||typeof m!=='object')return;
  const person=arcade.members.get(id);if(!person)return;person.seen=Date.now();
- if(m.a==='status'){person.available=!!m.available;if(person.available&&!arcade.match?.pair.includes(id)&&!arcade.queue.includes(id))arcade.queue.push(id);}
+ if(m.a==='status'){person.available=!!m.available;if(ARC_CHARACTERS.includes(m.char))person.character=m.char;if(person.available&&!arcade.match?.pair.includes(id)&&!arcade.queue.includes(id))arcade.queue.push(id);}
  else if(m.a==='queue'){
   if(!arcade.match?.pair.includes(id)){if(arcade.queue.includes(id))arcade.queue=arcade.queue.filter(x=>x!==id);else arcade.queue.push(id);}
+ }
+ else if(m.a==='choice'&&arcade.match?.id===m.match&&arcade.match.pair[1]===id&&ARC_CHARACTERS.includes(m.char)){
+  arcade.match.choice=m.char;arcTo(arcade.match.pair[0],{a:'choice',match:m.match,char:m.char});
  }
  else if(m.a==='prepared'&&arcade.match?.id===m.match&&arcade.match.pair.includes(id)){
   if(!m.ok){arcEnd('');return;}if(arcade.match.started||arcade.match.prepared.has(id))return;if(!ARC_CHARACTERS.includes(m.char))return;
@@ -1863,7 +1904,7 @@ function arcSchedule(){
   const names=pair.map(pid=>arcade.members.get(pid).name);
   arcade.match={id,pair,names,prepared:new Set(),chars:{},forms:{},started:false,created:Date.now()};
   for(const pid of pair)arcade.members.get(pid).available=false;
-  arcPublish();for(const pid of pair){if(arcade.match?.id===id)arcTo(pid,{a:'prepare',match:id,pair,names,deadline:arcade.match.created+30000});}return;
+  arcPublish();for(const pid of pair){if(arcade.match?.id===id)arcTo(pid,{a:'prepare',match:id,pair,names,deadline:arcade.match.created+30000,fixedChar:arcade.members.get(pair[0])?.character||'bocchi'});}return;
  }
 }
 function arcEnd(message){
@@ -1894,8 +1935,9 @@ function arcReceive(m){
  }
  if(m.a==='prepare'){
   if(!arcSafe()){arcToHost({a:'prepared',match:m.match,ok:false});return;}
-  arcade.localMatch=m.match;arcade.matchNames=m.names.map(arcCleanName);arcSave();const challenger=m.pair[1]===arcade.id;arcShowSelection(challenger,m.deadline||Date.now()+30000);if(!challenger)arcToHost({a:'prepared',match:m.match,ok:true,char:arcade.saved.player.type,form:!arcade.saved.freeMode&&arcade.saved.stageIndex===0?0:2});return;
+  arcade.localMatch=m.match;arcade.matchNames=m.names.map(arcCleanName);arcSave();const challenger=m.pair[1]===arcade.id;arcShowSelection(challenger,m.deadline||Date.now()+30000,m.fixedChar||arcade.saved.player.type);if(!challenger)arcToHost({a:'prepared',match:m.match,ok:true,char:arcade.saved.player.type,form:!arcade.saved.freeMode&&arcade.saved.stageIndex===0?0:2});return;
  }
+ if(m.a==='choice'&&arcSelection?.match===m.match&&!arcSelection.challenger&&ARC_CHARACTERS.includes(m.char)){arcSelection.remoteChoice=m.char;drawArcSelectSlots();$('arcSelectTitle').textContent=charName(m.char)+' がキャラクターを選択中';return;}
  if(m.a==='begin'&&arcade.localMatch===m.match&&arcade.saved){arcSelection=null;$('arcSelectScreen').hidden=true;
   arcade.matchNames=m.names.map(arcCleanName);$('arcadeIntro').hidden=false;$('challengerName').textContent='';speak('ニューチャレンジャー！');sfx('phase');
   const otherIndex=m.pair[0]===arcade.id?1:0;arcade.introTimer=setTimeout(()=>{if(arcade.localMatch===m.match)$('challengerName').textContent=arcade.matchNames[otherIndex]+' 参戦！';},800);
@@ -1973,7 +2015,7 @@ const namedHud=updateHud;updateHud=function(){namedHud();if(arcade.saved&&net.ac
 window.addEventListener('pagehide',()=>{arcade.enabled=false;arcLeave('');});
 setInterval(()=>{
  if(!arcade.on){if(arcade.enabled&&!document.hidden&&['fight','tutorial','encounter'].includes(scene)&&Date.now()>arcade.retryAt)arcJoin();return;}
- if(arcade.ready){arcToHost({a:'status',available:arcStatus()});
+ if(arcade.ready){arcToHost({a:'status',available:arcStatus(),char:arcade.saved?.player?.type||player?.type||'bocchi'});
   if(arcade.leader){for(const [id,p]of arcade.members){if(id!==arcade.id&&Date.now()-p.seen>12000)arcDrop(id);}if(arcade.match&&!arcade.match.started&&Date.now()-arcade.match.created>35000)arcEnd('乱入の接続確認ができませんでした。');}
   else if(Date.now()-arcade.lastSeen>12000)arcLeave('受付との通信が途切れました。再入場してください。');
  }arcRender();
@@ -1983,8 +2025,13 @@ setInterval(()=>{
 const PORTRAIT_GROUPS=['freePlayer','freeEnemy','netCharacter'];
 const PORTRAIT_MOVES={shinbocchi:'真ボッチ砲：全画面ビーム（SP100）',bocchi:'パンチ → キック → ボッチ砲',bocchi3:'第3戦版：赤い特大ボッチ砲',shadow:'影の拳とボッチ砲',misaki:'ヘリコプター砲',tetsu:'フライパン（4F）・キック（25F）・鳳凰水晶',haffun:'クシャミ（60F）・突撃ハッフン（自傷60）',mogaki:'ビール3秒飲み：HP30回復',tenten:'成功買い物！ 失敗買い物スロット',mattsuan:'まっつぁんのいいとこ：身長10倍・15秒'};
 function portraitTypes(group){const types=ARC_CHARACTERS.filter(t=>group!=='netCharacter'||t!=='shadow');return group==='freePlayer'||group==='freeEnemy'?types.flatMap(t=>t==='bocchi'?[t,'bocchi3']:[t]):types;}
+function initNetSelectLayout(){const root=document.querySelector('#netScreen .netVersusShowcase');if(!root)return;root.innerHTML='<div class="fighterShowcase playerShowcase"><span class="showcaseSlot">1P</span><canvas id="netP1Portrait" width="480" height="408" aria-hidden="true"></canvas><strong id="netP1Char">BOCCHI</strong><small id="netP1Handle">ホスト</small></div><span class="versusFlash" aria-hidden="true">VS</span><div class="fighterShowcase enemyShowcase"><span class="showcaseSlot">2P</span><canvas id="netP2Portrait" width="480" height="408" aria-hidden="true"></canvas><strong id="netP2Char">相手待ち</strong><small id="netP2Handle">部屋に参加すると選べます</small><div class="opponentWaiting"><b>?</b><small>相手が選択中</small></div></div>';}
+initNetSelectLayout();
+function paintNetSlot(type,canvasId,charId,handleId,handle){const canvas=$(canvasId),label=$(charId),source=type&&$('netCharacterFace-'+type);if(!canvas||!label)return;const c=canvas.getContext('2d');c.clearRect(0,0,canvas.width,canvas.height);if(type&&source){const keys={bocchi:'bocchiConcept',misaki:'misakiConcept',mogaki:'mogakiConcept',haffun:'haffunConcept',tenten:'tentenConcept',mattsuan:'mattsuanConcept'},im=imgs[keys[type]||(type==='shadow'?'bocchi':type)];if(im&&!im.complete)im.addEventListener('load',drawNetSlots,{once:true});arcPortrait(type,'netCharacterFace-'+type);c.drawImage(source,0,0,canvas.width,canvas.height);label.textContent=charName(type);}else label.textContent='相手待ち';const handleEl=$(handleId);if(handleEl)handleEl.textContent=handle||'';}
+function drawNetSlots(){if(!$('netP1Portrait'))return;const localName=arcade.name||safeGet('bocchi_nickname')||'あなた',localIsHost=!net.active||net.host,p1=!net.active?'bocchi':net.connected?(net.host?$('netCharacter').value:net.remoteChar):(net.host?'bocchi':null),p2=net.active&&net.connected?(net.host?net.remoteChar:$('netCharacter').value):null;paintNetSlot(p1,'netP1Portrait','netP1Char','netP1Handle',localIsHost?localName:(net.remoteName||'接続待ち'));paintNetSlot(p2,'netP2Portrait','netP2Char','netP2Handle',net.active?(localIsHost?(net.remoteName||'2P'):localName):'部屋に参加すると選べます');const waiting=document.querySelector('#netScreen .opponentWaiting');if(waiting)waiting.hidden=!!p2;}
 function drawCharacterShowcase(group,type){
- const map={freePlayer:['freePlayerShowcase','freePlayerShowcaseName','freePlayerShowcaseMove'],freeEnemy:['freeEnemyShowcase','freeEnemyShowcaseName','freeEnemyShowcaseMove'],netCharacter:['netCharacterShowcase','netCharacterShowcaseName','netCharacterShowcaseMove']}[group];if(!map)return;
+ if(group==='netCharacter'){drawNetSlots();return;}
+ const map={freePlayer:['freePlayerShowcase','freePlayerShowcaseName','freePlayerShowcaseMove'],freeEnemy:['freeEnemyShowcase','freeEnemyShowcaseName','freeEnemyShowcaseMove']}[group];if(!map)return;
  const [canvasId,nameId,moveId]=map,canvas=$(canvasId),source=$(group+'Face-'+type);if(!canvas||!source)return;
  const c=canvas.getContext('2d');c.clearRect(0,0,canvas.width,canvas.height);c.drawImage(source,0,0,canvas.width,canvas.height);
  $(nameId).textContent=charName(type);$(moveId).textContent=PORTRAIT_MOVES[type]||'';
@@ -1999,6 +2046,7 @@ function refreshPortraitGroup(group){
 function choosePortrait(group,type){
  if(!PORTRAIT_GROUPS.includes(group)||$(group).disabled||!portraitTypes(group).includes(type))return;
  if($(group).value===type)return;$(group).value=type;refreshPortraitGroup(group);showPortraitCutin(type,group);
+ if(group==='netCharacter'&&net.active&&!net.host&&net.connected&&!net.ready)netSend({type:'character',char:type});
 }
 for(const group of PORTRAIT_GROUPS){
  for(const type of portraitTypes(group)){
