@@ -1942,7 +1942,7 @@ function arcHost(id,m){
  }
  else if(m.a==='prepared'&&arcade.match?.id===m.match&&arcade.match.pair.includes(id)){
   if(!m.ok){arcEnd('');return;}if(arcade.match.started||arcade.match.prepared.has(id))return;if(!ARC_CHARACTERS.includes(m.char))return;
-  arcade.match.chars[id]=['bocchi','shadow','misaki','tetsu','haffun','mogaki','tenten','mattsuan','shinbocchi'].includes(m.char)?m.char:'bocchi';arcade.match.forms[id]=id===arcade.match.pair[0]&&m.form===0?0:2;arcade.match.prepared.add(id);
+  const selectedChar=id===arcade.match.pair[1]?(arcade.match.choice||m.char):m.char;arcade.match.chars[id]=['bocchi','shadow','misaki','tetsu','haffun','mogaki','tenten','mattsuan','shinbocchi'].includes(selectedChar)?selectedChar:'bocchi';arcade.match.forms[id]=id===arcade.match.pair[0]&&m.form===0?0:2;arcade.match.prepared.add(id);
   if(arcade.match.prepared.size===2&&!arcade.match.started){arcade.match.started=true;for(const pid of arcade.match.pair)arcTo(pid,{a:'begin',match:arcade.match.id,pair:arcade.match.pair,names:arcade.match.names,chars:arcade.match.pair.map(id=>arcade.match.chars[id]||'bocchi'),forms:arcade.match.pair.map(id=>arcade.match.forms[id]??2)});}
  }
  else if(m.a==='game'&&arcade.match?.id===m.match&&arcade.match.started&&arcade.match.pair.includes(id)){
@@ -2074,6 +2074,7 @@ $('nameForm').onsubmit=e=>{
 };
 $('nameCancel').onclick=()=>{$('nameScreen').hidden=true;$('startBtn').focus();};
 const namedHud=updateHud;updateHud=function(){namedHud();if(arcade.saved&&net.active&&arcade.matchNames){$('pName').textContent=arcade.matchNames[0];$('eName').textContent=arcade.matchNames[1];}else if(arcade.name&&storyMode&&player){$('pName').textContent=arcade.name;} };
+const localMoveHud=updateHud;updateHud=function(){localMoveHud();if(!net.active)return;const f=net.host?player:enemy;if(!f)return;$('kickLabel').textContent=f.type==='haffun'?'ハッフン！':'KICK';$('punchLabel').textContent=f.type==='haffun'?'ハッフン！':f.type==='tetsu'?'フライパン':'PUNCH';$('specialLabel').textContent=f.type==='shinbocchi'?'ボッチ砲':f.type==='mattsuan'?'まっつぁんのいいとこ':f.type==='tenten'?'成功買い物！':f.type==='mogaki'?'ビール3秒飲み':f.type==='haffun'?'突撃ハッフン':f.type==='tetsu'?'鳳凰水晶':f.type==='misaki'?'ヘリコプター砲':'BOCCHI砲';};
 window.addEventListener('pagehide',()=>{arcade.enabled=false;arcLeave('');});
 setInterval(()=>{
  if(!arcade.on){if(arcade.enabled&&!document.hidden&&['fight','tutorial','encounter'].includes(scene)&&Date.now()>arcade.retryAt)arcJoin();return;}
