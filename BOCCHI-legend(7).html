@@ -29,6 +29,11 @@ button{font:inherit}.app{position:relative;width:100vw;height:var(--app-h,100dvh
 /* Keep touch controls visible on wide touchscreens, including landscape phones. */
 @media (any-pointer:coarse){#touch{display:flex}}
 @media(max-width:820px){#touch{display:flex}.topbar{top:6px;left:6px;right:6px}.iconBtn{padding:7px 10px;font-size:12px}#hud{padding:14px 12px;height:100px}.fighterHud{width:39vw}.timer{font-size:30px}.fighterName{font-size:13px}.bar{height:18px}.romanceHead{align-items:flex-start;flex-direction:column;gap:7px}.stats{gap:5px}.stat{font-size:11px}.sceneBox{min-height:calc(var(--app-h,100dvh) - 150px);margin-top:8px;border-radius:16px}.sceneArt{opacity:.12}.romChar{width:70%;height:auto;aspect-ratio:1/1;bottom:20%}.romBocchi{left:-17%;transform:scale(.92)}.romMisaki{right:-14%;transform:scale(1.04)}.dialog{left:8px;right:8px;bottom:8px;padding:12px 13px;border-radius:13px}.speaker{font-size:16px}.line{font-size:16px;min-height:46px;line-height:1.45}.choices{grid-template-columns:1fr;gap:6px;margin-top:8px}.choice{padding:9px 10px;font-size:13px}.romanceTitle{font-size:25px}#romance{padding:10px 8px 16px}}
+/* Touch controls belong to active fights only, including the joining 2P player. */
+@media (any-pointer:coarse), (max-width:820px){
+  #touch{display:none!important}
+  body:has(#hud.show) #touch{display:flex!important;visibility:visible!important;opacity:1!important}
+}
 
 .titleActions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.secondary{border:1px solid #ffffff35;border-radius:14px;background:#171b27;color:#fff;padding:14px 24px;font-weight:950;font-size:17px;cursor:pointer}.secondary:hover{background:#232a3d}.secondary[hidden]{display:none!important}
 .freeSetup{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}.selectBox{padding:14px;border:1px solid #ffffff22;background:#ffffff08;border-radius:14px;text-align:left}.selectBox label{display:block;color:#bfc5d4;font-size:12px;font-weight:900;margin-bottom:7px}.selectBox select{width:100%;border:1px solid #ffffff28;background:#0e1119;color:#fff;border-radius:9px;padding:10px;font-weight:850}.freeNote{color:#c8ccda;font-size:13px;line-height:1.7;margin:10px 0 20px}
