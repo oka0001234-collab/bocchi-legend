@@ -883,7 +883,7 @@ function showCinematic(text='',ms=800,dark=false){const el=$('cinematic'),tx=$('
 function triggerBlockFx(def){const fx=$('blockFx'),vr=$('gameViewport').getBoundingClientRect();if(!fx)return;const bx=vr.left+(def.x/W)*vr.width,by=vr.top+((def.y-120)/H)*vr.height;fx.style.setProperty('--bx',bx+'px');fx.style.setProperty('--by',by+'px');fx.classList.remove('show');void fx.offsetWidth;fx.classList.add('show');clearTimeout(triggerBlockFx.tm);triggerBlockFx.tm=setTimeout(()=>fx.classList.remove('show'),540);music.duck(.30);sfx('parry');if(navigator.vibrate)try{navigator.vibrate([35,20,65]);}catch(e){}}
 function syncSpecialControl(){
  const btn=$('specialBtn'),armor=$('armorBtn'),atk=btn?btn.parentElement:null;
- const show=!!(freeMode||currentConfig().special);
+ const show=!!(net.active||freeMode||currentConfig().special);
  const showArmor=!!(((!freeMode&&stageIndex===2&&armorTakeoffUnlocked)||(kingsActive&&!net.active&&kingsArmor57)));
  if(btn)btn.style.display=show?'':'none';
  if(armor)armor.style.display=showArmor?'':'none';
@@ -1969,7 +1969,7 @@ function netReceive(m){
   if(m.type==='action'&&m.epoch===net.epoch&&['J','K','L','S'].includes(m.key)&&net.actions.length<16)net.actions.push({side:1,key:m.key});
   return;
  }
- if(m.type==='start'){net.epoch=m.epoch;netStart(m.p,m.e,m.forms);return;}
+ if(m.type==='start'){if(net.epoch!==m.epoch||scene!=='fight'){net.epoch=m.epoch;netStart(m.p,m.e,m.forms);}return;}
  if(m.type==='state'&&Number.isInteger(m.seq)&&m.seq>net.recvSeq&&m.p&&m.e){net.recvSeq=m.seq;net.epoch=m.epoch;player=m.p;enemy=m.e;projectiles=(m.projectiles||[]).map(p=>({...p,owner:p.owner===0?player:enemy}));particles=m.particles||[];roundWins=m.wins;roundTime=m.time;roundBusy=m.busy;scene=m.scene;syncAnnouncement(m.voice);superCutin=m.cut?{f:m.cut.side===0?player:enemy,t:m.cut.t,duration:m.cut.duration||1}:null;screenFlash=m.flash;shake=m.shake;net.paused=m.paused;net.result=m.result;netDrawResult();updateHud();}
  if(m.type==='sound'&&typeof m.name==='string'&&['punchWhoosh','kickWhoosh','punchImpact','kickImpact','heavyImpact','cannon','block','parry','helicopter','phase','glass','win','damage','haffun','laserCharge','laserFire','laserTick',...Object.keys(EFFECT_AUDIO),...Object.keys(SFX43)].includes(m.name))netBaseSfx(m.name);
  if(m.type==='glass')netBaseGlass(m.side===0?player:enemy);
@@ -1977,7 +1977,7 @@ function netReceive(m){
 function netMaybeStart(){if(!net.host||!net.ready||!net.otherReady)return;net.ready=net.otherReady=false;net.epoch++;netSend({type:'start',epoch:net.epoch,p:$('netCharacter').value,e:net.remoteChar});netStart($('netCharacter').value,net.remoteChar);}
 function netStart(p,e,forms=null){net.forms=forms;
  freeMode=true;storyMode=false;stageIndex=2;freePlayerType=p;freeEnemyType=e;freeDifficulty='normal';scene='fight';roundWins=[0,0];net.result=null;net.roundDelay=0;net.actions=[];net.remoteKeys={};net.localKeys={};net.paused=false;net.lastSeen=performance.now();
- $('netScreen').classList.remove('show');$('netReady').hidden=true;$('hud').classList.add('show');$('touch').style.opacity='1';$('netBadge').hidden=false;resetRound();music.set(p==='misaki'||e==='misaki'?'boss':'fight');toast(net.host?'あなたは左側':'あなたは右側',1500);
+ $('netScreen').classList.remove('show');$('netReady').hidden=true;$('hud').classList.add('show');$('touch').style.opacity='1';$('netBadge').hidden=false;syncSpecialControl();resetRound();music.set(p==='misaki'||e==='misaki'?'boss':'fight');toast(net.host?'あなたは左側':'あなたは右側',1500);
 }
 function netDrawResult(){
  const r=net.result;if(!r){$('resultBanner').classList.remove('show');return;}const won=r.winner===(net.host?0:1);$('resultWord').textContent=r.winner<0?'DRAW':won?'YOU WIN':'YOU LOSE';$('resultBanner').classList.toggle('loss',r.winner>=0&&!won);$('resultBanner').classList.add('show');
@@ -2195,7 +2195,10 @@ function arcReceive(m){
   arcade.matchNames=m.names.map(arcCleanName);$('arcadeIntro').hidden=true;$('challengerName').textContent='';
   net.active=true;net.host=m.pair[0]===arcade.id;net.connected=true;net.peer=null;net.seq=0;net.recvSeq=-1;net.epoch=0;net.lastSeen=performance.now();net.result=null;
   net.conn={open:true,bufferSize:0,close(){},send(data){arcToHost({a:'game',match:m.match,data});}};
-  if(net.host){net.epoch++;const chars=Array.isArray(m.chars)?m.chars:['bocchi','bocchi'];netSend({type:'start',epoch:net.epoch,p:chars[0],e:chars[1],forms:m.forms});netStart(chars[0],chars[1],m.forms);}return;
+  const chars=Array.isArray(m.chars)?m.chars:['bocchi','bocchi'];
+  if(net.host){net.epoch++;netSend({type:'start',epoch:net.epoch,p:chars[0],e:chars[1],forms:m.forms});netStart(chars[0],chars[1],m.forms);}
+  else{net.epoch=1;netStart(chars[0],chars[1],m.forms);}
+  return;
  }
  if(m.a==='game'&&arcade.localMatch===m.match&&net.active){netReceive(m.data);return;}
  if(m.a==='end'&&arcade.localMatch===m.match){arcade.localMatch=null;arcRestore(m.message);return;}
