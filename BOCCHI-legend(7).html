@@ -219,8 +219,8 @@ button{font:inherit}.app{position:relative;width:100vw;height:var(--app-h,100dvh
 #freeBattleScreen .portraitPick,#netScreen .portraitPick{padding:0;border-radius:14px}
 #freeBattleScreen .portraitPick canvas,#netScreen .portraitPick canvas{aspect-ratio:1.18;object-fit:cover}
 #freeBattleScreen .portraitPick .arcNameLogo,#netScreen .portraitPick .arcNameLogo{position:absolute;z-index:2;left:5%;bottom:7%;width:90%;height:22%;object-fit:contain;filter:drop-shadow(0 2px 3px #000);pointer-events:none}
-#freeBattleScreen .portraitPick.hasNameLogo strong,#netScreen .portraitPick.hasNameLogo strong{display:none!important}
-#netScreen .netCard>h2,#netScreen .netCard>p:not(#netStatus),#netScreen .portraitPick strong,#netScreen .portraitSummary{display:none!important}
+#freeBattleScreen .portraitPick.hasNameLogo strong{display:none!important}
+#netScreen .netCard>h2,#netScreen .netCard>p:not(#netStatus),#netScreen .portraitSummary{display:none!important}
 #arcSelectGrid strong,#arcChoiceName,#arcChoiceMove{display:none!important}
 #arcSelectGrid{margin:12px auto}
 #arcChoicePortrait{width:min(48vw,380px);height:min(40vh,260px);border:0}
@@ -361,8 +361,9 @@ button{font:inherit}.app{position:relative;width:100vw;height:var(--app-h,100dvh
 #netScreen .opponentWaiting{inset:0;background:#0b0910bb}
 #netScreen #netCharacterRoster{position:absolute;z-index:4;left:14.1%;top:73.4%;width:72.2%;height:22.7%;margin:0;grid-template-columns:repeat(10,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:3px 5px}
 #netScreen .portraitPick{display:flex;min-width:0;min-height:0;flex-direction:column;align-items:center;justify-content:space-between;overflow:hidden;padding:4px 3px 2px;border:1px solid transparent;border-radius:0;background:transparent}
+#netScreen .portraitPick .arcNameLogo{display:none!important}
 #netScreen .portraitPick canvas{flex:1;width:100%;min-height:0;aspect-ratio:auto;object-fit:contain}
-#netScreen .portraitPick strong{flex:0 0 auto;margin:2px 0 0;color:white;font-size:clamp(8px,.9vw,14px);line-height:1.05;text-shadow:0 2px 3px #000}
+#netScreen .portraitPick strong{display:block!important;flex:0 0 auto;max-width:100%;margin:2px 0 0;padding:1px 3px;border-radius:3px;background:#090810c9;color:white;font-size:clamp(8px,.9vw,14px);line-height:1.05;text-align:center;text-shadow:0 2px 3px #000;overflow-wrap:anywhere}
 #netScreen .portraitPick[aria-pressed="true"]{border:2px solid #ff398e;background:#ff328818;box-shadow:0 0 13px #ff3288aa}
 #netScreen .portraitPick:disabled{opacity:1;cursor:default}
 #netScreen .netCard>p#netStatus{position:absolute;z-index:7;top:15.5%;left:18%;width:64%;margin:0;padding:4px;color:#fff2cd;font-size:clamp(10px,1.1vw,16px);font-weight:850;text-align:center;text-shadow:0 2px 5px #000}
