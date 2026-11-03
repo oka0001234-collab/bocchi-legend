@@ -625,7 +625,7 @@ button{font:inherit}.app{position:relative;width:100vw;height:var(--app-h,100dvh
       </div>
       <div id="timer" class="timer">60</div>
       <div class="fighterHud right">
-        <div id="eName" class="fighterName right">SHADOW BOCCHI</div>
+        <div id="eName" class="fighterName right">BOCCHI</div>
         <div class="bar"><div id="eHP" class="fill"></div></div>
         <div class="spbar"><div id="eSP" class="spfill"></div></div>
         <canvas id="eArtHud" class="artHud" width="2172" height="1000" role="img" aria-label="HP・SP"></canvas><div id="eRounds" class="roundPips"></div>
@@ -1664,7 +1664,8 @@ const BOCCHI_WALK61=[
  [0,580,365,613,180,548],[365,580,300,613,134,546],
  [665,580,285,613,133,546],[950,580,368,613,172,548]
 ];
-function usesBocchiWalk61(f){return f?.type==='bocchi'&&f.arcVisualForm!==0&&(net.active||freeMode||kingsActive||(!freeMode&&stageIndex>=2));}
+function isClassicBocchiForm61(f){if(f?.type!=='bocchi')return false;if(f.shoboForm||Number(f.arcVisualForm)===0)return true;if(net.active&&Array.isArray(net.forms)){const form=net.forms[f===player?0:1];if(Number(form)===0)return true;if(arcade.localMatch&&arcade.saved&&!arcade.saved.freeMode&&arcade.saved.stageIndex===0&&f===player)return true;}return !freeMode&&!net.active&&stageIndex===0;}
+function usesBocchiWalk61(f){return f?.type==='bocchi'&&!isClassicBocchiForm61(f)&&(net.active||freeMode||kingsActive||(!freeMode&&stageIndex>=2));}
 function drawBocchiWalk61(f){
  if(!usesBocchiWalk61(f)||!f.onGround||f.guard||f.ko||f.hurtT>0||f.freezeT>0||f.stateT>0||f.state==='victory'||Math.abs(f.vx)<=15)return false;
  const im=imgs.bocchiWalk61;if(!im?.complete||!im.naturalWidth||im._fallback)return false;
@@ -1701,7 +1702,7 @@ function drawFighter(f){if(f.type==='shinbocchi'){drawShin(f);return;}if(f.type=
  if(f.armorActive&&(f.type==='bocchi'||f.type==='shadow')){drawArmorBocchi(f,f.type==='shadow');return;}
  if(drawBocchiAction61(f))return;
  if(drawBocchiWalk61(f))return;
- if((f.arcVisualForm===0||(!freeMode&&stageIndex===0))&&(f.type==='bocchi'||f.type==='shadow')){drawV1Bocchi(f,f.type==='shadow');return;}
+ if(isClassicBocchiForm61(f)&&(f.type==='bocchi'||f.type==='shadow')){drawV1Bocchi(f,f.type==='shadow');return;}
  if((f.type==='bocchi'||f.type==='shadow')&&f.state==='kick'&&f.stateT>0){drawIllustratedKick(f);return;}
  if((f.type==='bocchi'||f.type==='shadow')&&!f.onGround&&f.state!=='punch'&&f.state!=='kick'){drawBocchiJump(f);return;}
  let face=f.face,filter=f.type==='shadow'?'brightness(.30) saturate(.25) hue-rotate(180deg)':'none';if(f.type==='bocchi'||f.type==='shadow'){let img=imgs.bocchi,idx=f.state==='victory'?4:0,size=300;if(f.state==='punch'){idx=1+Math.min(3,Math.floor((.28-f.stateT)/.07));}else if(f.state==='kick'){img=imgs.kick;const prog=clamp((.48-f.stateT)/.48,0,.999);idx=Math.floor(prog*15);size=310;}else if(!f.onGround){idx=22+Math.min(2,Math.floor(Math.abs(f.vy)/230));}else if(f.guard){idx=5;}else if(f.state==='hurt'){idx=24;}drawAtlas(img,5,img===imgs.kick?3:5,idx,f.x,f.y+18,face,size,filter);}else{let idx=f.state==='victory'?4:0;if(f.state==='punch')idx=1+Math.min(3,Math.floor((.28-f.stateT)/.07));else if(f.state==='kick'){const prog=clamp((.48-f.stateT)/.48,0,.999);idx=10+Math.floor(prog*5);}else if(!f.onGround)idx=22+Math.min(2,Math.floor(Math.abs(f.vy)/230));else if(f.guard)idx=5;else if(f.state==='hurt')idx=24;drawAtlas(imgs.misaki,5,5,idx,f.x,f.y+12,face,300);}
@@ -1978,7 +1979,7 @@ function netReceive(m){
  if(m.type==='glass')netBaseGlass(m.side===0?player:enemy);
 }
 function netMaybeStart(){if(!net.host||!net.ready||!net.otherReady)return;net.ready=net.otherReady=false;net.epoch++;netSend({type:'start',epoch:net.epoch,p:$('netCharacter').value,e:net.remoteChar});netStart($('netCharacter').value,net.remoteChar);}
-function netStart(p,e,forms=null){net.forms=forms;
+function netStart(p,e,forms=null){net.forms=Array.isArray(forms)?forms:(arcade.localMatch&&arcade.saved&&!arcade.saved.freeMode&&arcade.saved.stageIndex===0?[0,2]:null);
  freeMode=true;storyMode=false;stageIndex=2;freePlayerType=p;freeEnemyType=e;freeDifficulty='normal';scene='fight';roundWins=[0,0];net.result=null;net.roundDelay=0;net.actions=[];net.remoteKeys={};net.localKeys={};net.paused=false;net.lastSeen=performance.now();
  $('netScreen').classList.remove('show');$('netReady').hidden=true;$('hud').classList.add('show');$('touch').style.opacity='1';$('netBadge').hidden=false;syncSpecialControl();resetRound();music.set(p==='misaki'||e==='misaki'?'boss':'fight');toast(net.host?'あなたは左側':'あなたは右側',1500);
 }
@@ -2021,8 +2022,8 @@ setInterval(()=>{if(!net.active||!net.connected)return;const age=performance.now
 // The first browser coordinates queue/admission and relays match packets.
 const arcade={on:false,leader:false,peer:null,link:null,links:new Map(),members:new Map(),id:'',queue:[],match:null,saved:null,generation:0,lastSeen:0,ready:false,finishing:false,cooldown:0,name:'',enabled:false,fightSince:0,retryAt:0,pairHistory:new Map(),introTimer:null};
 function arcRandomId(){return Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join('');}
-const ARCADE_VERSION='bocchi-arcade-38';
-const ARCADE_ID='bocchi-legend-6accf4cb33a88191-arcade38';
+const ARCADE_VERSION='bocchi-arcade-39';
+const ARCADE_ID='bocchi-legend-6accf4cb33a88191-arcade39';
 const ARC_CHARACTER_DATA=[
  {id:'bocchi',name:'BOCCHI',icon:'assets/character-select-icons/bocchi.webp',art:'assets/select-bocchi.webp',color:'#fa3448'},
  {id:'misaki',name:'美咲',icon:'assets/character-select-icons/misaki.webp',art:'assets/select-misaki.webp',color:'#fa2887'},
@@ -2143,7 +2144,7 @@ function arcHost(id,m){
  }
  else if(m.a==='prepared'&&arcade.match?.id===m.match&&arcade.match.pair.includes(id)){
   if(!m.ok){arcEnd('');return;}if(arcade.match.started||arcade.match.prepared.has(id))return;if(!ARC_CHARACTERS.includes(m.char))return;
-  const selectedChar=id===arcade.match.pair[1]?(arcade.match.choice||m.char):m.char;arcade.match.chars[id]=['bocchi','shobobocchi','shadow','misaki','tetsu','haffun','mogaki','tenten','mattsuan','shinbocchi'].includes(selectedChar)?selectedChar:'bocchi';arcade.match.forms[id]=id===arcade.match.pair[0]&&m.form===0?0:2;arcade.match.prepared.add(id);
+  const selectedChar=id===arcade.match.pair[1]?(arcade.match.choice||m.char):m.char;arcade.match.chars[id]=['bocchi','shobobocchi','misaki','tetsu','haffun','mogaki','tenten','mattsuan','shinbocchi'].includes(selectedChar)?selectedChar:'bocchi';arcade.match.forms[id]=id===arcade.match.pair[0]&&m.form===0?0:2;arcade.match.prepared.add(id);
   if(arcade.match.prepared.size===2&&!arcade.match.started){arcade.match.started=true;for(const pid of arcade.match.pair)arcTo(pid,{a:'begin',match:arcade.match.id,pair:arcade.match.pair,names:arcade.match.names,chars:arcade.match.pair.map(id=>arcade.match.chars[id]||'bocchi'),forms:arcade.match.pair.map(id=>arcade.match.forms[id]??2)});}
  }
  else if(m.a==='game'&&arcade.match?.id===m.match&&arcade.match.started&&arcade.match.pair.includes(id)){
