@@ -883,7 +883,7 @@ function showCinematic(text='',ms=800,dark=false){const el=$('cinematic'),tx=$('
 function triggerBlockFx(def){const fx=$('blockFx'),vr=$('gameViewport').getBoundingClientRect();if(!fx)return;const bx=vr.left+(def.x/W)*vr.width,by=vr.top+((def.y-120)/H)*vr.height;fx.style.setProperty('--bx',bx+'px');fx.style.setProperty('--by',by+'px');fx.classList.remove('show');void fx.offsetWidth;fx.classList.add('show');clearTimeout(triggerBlockFx.tm);triggerBlockFx.tm=setTimeout(()=>fx.classList.remove('show'),540);music.duck(.30);sfx('parry');if(navigator.vibrate)try{navigator.vibrate([35,20,65]);}catch(e){}}
 function syncSpecialControl(){
  const btn=$('specialBtn'),armor=$('armorBtn'),atk=btn?btn.parentElement:null;
- const show=!!(net.active||freeMode||currentConfig().special);
+ const show=!!(freeMode||currentConfig().special);
  const showArmor=!!(((!freeMode&&stageIndex===2&&armorTakeoffUnlocked)||(kingsActive&&!net.active&&kingsArmor57)));
  if(btn)btn.style.display=show?'':'none';
  if(armor)armor.style.display=showArmor?'':'none';
