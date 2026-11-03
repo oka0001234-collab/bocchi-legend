@@ -2152,6 +2152,10 @@ function arcSave(){stopBattleEffects();
  arcade.saved={player,enemy,projectiles,particles,stageIndex,roundTime,accSec,roundWins,roundBusy,storyMode,freeMode,freePlayerType,freeEnemyType,freeDifficulty,bossPhase2,hitStopT,slowMoT,screenFlash,heliDramaT,shake,stage3ContinueCount,armorTakeoffUnlocked};
  clearInput();scene='arcadeIntro';$('touch').style.opacity='0';$('arcadeIntro').hidden=true;
 }
+function arcPlayChallengerIntro(match,name,onDone){
+ clearTimeout(arcade.introTimer);$('arcSelectScreen').hidden=true;$('arcadeIntro').hidden=false;$('challengerName').textContent='';speak('ニューチャレンジャー！');sfx('phase');
+ arcade.introTimer=setTimeout(()=>{if(arcade.localMatch!==match||!arcade.saved)return;$('challengerName').textContent=(name||'友達')+' 参戦！';arcade.introTimer=setTimeout(()=>{if(arcade.localMatch!==match||!arcade.saved)return;$('arcadeIntro').hidden=true;arcade.introTimer=null;onDone?.();},1700);},650);
+}
 function arcRestore(message){arcSelection=null;$('arcSelectScreen').hidden=true;stopAnnouncer();
  clearTimeout(arcade.introTimer);netClose();$('netScreen').classList.remove('show');$('arcadeIntro').hidden=true;$('resultBanner').classList.remove('show');
  const s=arcade.saved;arcade.saved=null;arcade.finishing=false;arcade.cooldown=Date.now()+90000;arcade.fightSince=0;
@@ -2166,16 +2170,14 @@ function arcReceive(m){
  }
  if(m.a==='prepare'){
   if(!arcSafe()){arcToHost({a:'prepared',match:m.match,ok:false});return;}
-  arcade.localMatch=m.match;arcade.matchNames=m.names.map(arcCleanName);arcSave();const challenger=m.pair[1]===arcade.id;arcShowSelection(challenger,m.deadline||Date.now()+30000,m.fixedChar||arcade.saved.player.type);if(!challenger)arcToHost({a:'prepared',match:m.match,ok:true,char:arcade.saved.player.type,form:!arcade.saved.freeMode&&arcade.saved.stageIndex===0?0:2});return;
+  arcade.localMatch=m.match;arcade.matchNames=m.names.map(arcCleanName);arcSave();const challenger=m.pair[1]===arcade.id,deadline=m.deadline||Date.now()+30000;arcPlayChallengerIntro(m.match,arcade.matchNames[1]||'友達',()=>{if(arcade.localMatch===m.match&&arcade.saved)arcShowSelection(challenger,deadline,m.fixedChar||arcade.saved.player.type);});if(!challenger)arcToHost({a:'prepared',match:m.match,ok:true,char:arcade.saved.player.type,form:!arcade.saved.freeMode&&arcade.saved.stageIndex===0?0:2});return;
  }
  if(m.a==='choice'&&arcSelection?.match===m.match&&!arcSelection.challenger&&ARC_CHARACTERS.includes(m.char)){arcSelection.remoteChoice=m.char;for(const t of ARC_CHARACTERS){const b=$('arcPick-'+t);b.setAttribute('aria-pressed',String(t===m.char));b.classList.toggle('selected',t===m.char);b.classList.toggle('remote-selected',t===m.char);}drawArcSelectSlots();$('arcSelectTitle').textContent=charName(m.char)+' がキャラクターを選択中';return;}
  if(m.a==='begin'&&arcade.localMatch===m.match&&arcade.saved){arcSelection=null;$('arcSelectScreen').hidden=true;
-  arcade.matchNames=m.names.map(arcCleanName);$('arcadeIntro').hidden=false;$('challengerName').textContent='';speak('ニューチャレンジャー！');sfx('phase');
-  const otherIndex=m.pair[0]===arcade.id?1:0;arcade.introTimer=setTimeout(()=>{if(arcade.localMatch===m.match)$('challengerName').textContent=arcade.matchNames[otherIndex]+' 参戦！';},800);
+  arcade.matchNames=m.names.map(arcCleanName);$('arcadeIntro').hidden=true;$('challengerName').textContent='';
   net.active=true;net.host=m.pair[0]===arcade.id;net.connected=true;net.peer=null;net.seq=0;net.recvSeq=-1;net.epoch=0;net.lastSeen=performance.now();net.result=null;
   net.conn={open:true,bufferSize:0,close(){},send(data){arcToHost({a:'game',match:m.match,data});}};
-  const generation=arcade.generation;
-  setTimeout(()=>{if(!arcade.on||arcade.generation!==generation||arcade.localMatch!==m.match||!arcade.saved)return;$('arcadeIntro').hidden=true;if(net.host){net.epoch++;const chars=Array.isArray(m.chars)?m.chars:['bocchi','bocchi'];netSend({type:'start',epoch:net.epoch,p:chars[0],e:chars[1],forms:m.forms});netStart(chars[0],chars[1],m.forms);}},2800);return;
+  if(net.host){net.epoch++;const chars=Array.isArray(m.chars)?m.chars:['bocchi','bocchi'];netSend({type:'start',epoch:net.epoch,p:chars[0],e:chars[1],forms:m.forms});netStart(chars[0],chars[1],m.forms);}return;
  }
  if(m.a==='game'&&arcade.localMatch===m.match&&net.active){netReceive(m.data);return;}
  if(m.a==='end'&&arcade.localMatch===m.match){arcade.localMatch=null;arcRestore(m.message);return;}
