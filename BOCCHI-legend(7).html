@@ -1960,7 +1960,7 @@ function netReceive(m){
  if(!m||typeof m!=='object')return;net.lastSeen=performance.now();
  if(m.type==='busy'){netFail('この部屋は満員です。');return;}
  if(m.type==='hello'){if(m.version!==NET_VERSION||!['bocchi','misaki','tetsu','haffun','mogaki','tenten','mattsuan','shinbocchi'].includes(m.char)){netFail('同じ最新版のHTMLを使用してください。');return;}net.remoteChar=m.char;net.remoteName=arcCleanName(m.name)||'プレイヤー';net.connected=true;$('netCharacter').disabled=net.host;refreshPortraitGroup('netCharacter');drawNetSlots();$('netReady').hidden=false;netStatus(net.host?net.remoteName+' さんが接続。2Pキャラを選択できます。':'接続しました。あなたは2Pです。キャラクターを選んで準備してください。');return;}
- if(m.type==='character'){if(net.host&&['bocchi','misaki','tetsu','haffun','mogaki','tenten','mattsuan','shinbocchi'].includes(m.char)){if(net.remoteChar!==m.char)playCharacterSelectVoice(m.char);net.remoteChar=m.char;drawNetSlots();netStatus(net.remoteName+' さんが「'+charName(m.char)+'」を選択中');}return;}
+ if(m.type==='character'){if(net.host&&['bocchi','misaki','tetsu','haffun','mogaki','tenten','mattsuan','shinbocchi'].includes(m.char)){playCharacterSelectVoice(m.char);net.remoteChar=m.char;drawNetSlots();netStatus(net.remoteName+' さんが「'+charName(m.char)+'」を選択中');}return;}
  if(!net.connected)return;
  if(m.type==='voiceDone'&&net.host&&announcer?.id===m.id){announcer.remoteDone=true;finishAnnouncementIfReady();return;}
  if(m.type==='ready'){net.otherReady=true;netMaybeStart();return;}
@@ -2204,7 +2204,7 @@ function arcReceive(m){
   if(!arcSafe()){arcToHost({a:'prepared',match:m.match,ok:false});return;}
   arcade.localMatch=m.match;arcade.matchNames=m.names.map(arcCleanName);arcSave();const challenger=m.pair[1]===arcade.id,deadline=m.deadline||Date.now()+30000;arcPlayChallengerIntro(m.match,arcade.matchNames[1]||'友達',()=>{if(arcade.localMatch===m.match&&arcade.saved)arcShowSelection(challenger,deadline,m.fixedChar||arcade.saved.player.type);});if(!challenger)arcToHost({a:'prepared',match:m.match,ok:true,char:arcade.saved.player.type,form:!arcade.saved.freeMode&&arcade.saved.stageIndex===0?0:2});return;
  }
- if(m.a==='choice'&&arcSelection?.match===m.match&&!arcSelection.challenger&&ARC_CHARACTERS.includes(m.char)){arcSelection.remoteChoice=m.char;for(const t of ARC_CHARACTERS){const b=$('arcPick-'+t);b.setAttribute('aria-pressed',String(t===m.char));b.classList.toggle('selected',t===m.char);b.classList.toggle('remote-selected',t===m.char);}drawArcSelectSlots();$('arcSelectTitle').textContent=charName(m.char)+' がキャラクターを選択中';return;}
+ if(m.a==='choice'&&arcSelection?.match===m.match&&!arcSelection.challenger&&ARC_CHARACTERS.includes(m.char)){if(arcSelection.remoteChoice!==m.char)playCharacterSelectVoice(m.char);arcSelection.remoteChoice=m.char;for(const t of ARC_CHARACTERS){const b=$('arcPick-'+t);b.setAttribute('aria-pressed',String(t===m.char));b.classList.toggle('selected',t===m.char);b.classList.toggle('remote-selected',t===m.char);}drawArcSelectSlots();$('arcSelectTitle').textContent=charName(m.char)+' がキャラクターを選択中';return;}
  if(m.a==='begin'&&arcade.localMatch===m.match&&arcade.saved){arcSelection=null;$('arcSelectScreen').hidden=true;
   arcade.matchNames=m.names.map(arcCleanName);$('arcadeIntro').hidden=true;$('challengerName').textContent='';
   net.active=true;net.host=m.pair[0]===arcade.id;net.connected=true;net.peer=null;net.seq=0;net.recvSeq=-1;net.epoch=0;net.lastSeen=performance.now();net.result=null;
@@ -2315,7 +2315,7 @@ function refreshPortraitGroup(group){
 }
 function choosePortrait(group,type){
  if(!PORTRAIT_GROUPS.includes(group)||$(group).disabled||!portraitTypes(group).includes(type))return;
- if($(group).value===type)return;$(group).value=type;playCharacterSelectVoice(type);refreshPortraitGroup(group);showPortraitCutin(type,group);
+ if($(group).value===type){playCharacterSelectVoice(type);if(group==='netCharacter'&&net.active&&!net.host&&net.connected&&!net.ready)netSend({type:'character',char:type});return;}$(group).value=type;playCharacterSelectVoice(type);refreshPortraitGroup(group);showPortraitCutin(type,group);
  if(group==='netCharacter'&&net.active&&!net.host&&net.connected&&!net.ready)netSend({type:'character',char:type});
 }
 for(const group of PORTRAIT_GROUPS){
