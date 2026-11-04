@@ -1858,13 +1858,13 @@ $('freeBattleBtn').onclick=showFreeBattleSetup;$('freeStartBtn').onclick=startFr
 function transitionToRomance(){scene='transition';$('hud').classList.remove('show');$('touch').style.opacity='0';music.duck(.75);sfx('helicopter');$('fadeOverlay').classList.add('show');setTimeout(()=>{beginRomance();$('fadeOverlay').classList.remove('show');},760);}
 refreshUnlockUI();syncSpecialControl();
 
-const MANGA=["assets/image-032.webp", "assets/romance-page2.png", "assets/image-034.webp"];
+const MANGA=["assets/romance-page1.png", "assets/image-033.webp", "assets/image-034.webp"];
 // Existing manga pages are shown one panel at a time, in right-to-left reading order.
 let romanceStep='opening',romStats={heart:0,trust:0,natural:0},romFlags=[],romHistory=[];
 const panels={
  smile:[0,670,0,354,563],phone:[0,324,0,337,563],resolve:[0,0,0,317,563],table:[0,0,574,1024,431],book:[0,0,1018,1024,518],
  herFace:[0,686,200,215,275],hisFace:[0,70,125,240,380],tableFace:[0,580,600,278,335],
- board:[1,668,0,356,563],window:[1,324,0,336,563],ring:[1,0,1018,1024,518],propose:[1,0,1018,1024,518],surprise:[1,0,574,1024,431],no:[1,0,0,317,563],
+ board:[1,539,0,485,522],window:[1,0,0,527,522],ring:[1,756,533,268,490],propose:[1,225,533,520,490],surprise:[1,0,533,214,490],no:[1,0,1034,1024,502],
  listen:[2,514,0,510,398],meaning:[2,0,0,503,398],care:[2,636,408,388,439],reflect:[2,350,408,276,439],laugh:[2,0,408,341,439],cost:[2,0,857,1024,679],soft:[2,645,420,274,327],night:[1,28,198,380,280]
 };
 const N=(panel,speaker,line,next)=>({panel,speaker,line,next});
