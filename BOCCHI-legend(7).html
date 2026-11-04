@@ -1417,7 +1417,10 @@ function hit(att,def,damage,kb,up=0){
  const parry=blockingAvailable()&&def.justBlock>0&&def.lastSDown<.13;
  if(parry){def.justBlock=0;def.sp=clamp(def.sp+30,0,100);def.counterBoostT=1.50;att.freezeT=.56;slowMoT=Math.max(slowMoT,.28);screenFlash=Math.max(screenFlash,.18);shake=Math.max(shake,13);burst(def.x,def.y-120,42,'cyan');triggerBlockFx(def);comboText('COUNTER ×1.5',850);return false;}
  const guarding=def.guard&&def.onGround;const boosted=att.counterBoostT>0;let raw=damage*att.damageScale*(boosted?1.5:1);if(boosted)att.counterBoostT=0;const dealt=Math.max(1,Math.round(raw*(guarding?.30:1)*(def.armorActive?1/3:1)));
- def.hp=clamp(def.hp-dealt,0,def.maxHp);def.hurtT=guarding?.10:.22;def.state='hurt';def.vx=att.face*kb*(guarding?.35:1);def.vy=up;def.onGround=false;def.flash=.08;att.sp=clamp(att.sp+(guarding?7:15),0,100);def.sp=clamp(def.sp+(guarding?9:6),0,100);
+ def.hp=clamp(def.hp-dealt,0,def.maxHp);def.hurtT=guarding?.10:.22;def.state='hurt';def.vx=att.face*kb*(guarding?.35:1);def.vy=up;def.onGround=false;
+ // Keep the full third-round Bocchi hurt pose inside the canvas when hit mid-jump.
+ if(usesBocchiWalk61(def)&&def.y<GROUND-300){def.y=GROUND-300;if(def.vy<0)def.vy=0;}
+ def.flash=.08;att.sp=clamp(att.sp+(guarding?7:15),0,100);def.sp=clamp(def.sp+(guarding?9:6),0,100);
  const heavy=dealt>=13,special=dealt>=25;hitStopT=Math.max(hitStopT,guarding?.025:special?.12:heavy?.085:.060);screenFlash=Math.max(screenFlash,guarding?.035:special?.11:.055);shake=Math.max(shake,guarding?4:special?15:heavy?11:7);burst(def.x,def.y-110,guarding?10:special?30:20,guarding?'cyan':special?'gold':'white');sfx(guarding?'block':att.state==='punch'?'punchImpact':att.state==='kick'?'kickImpact':'heavyImpact');if(!guarding&&att.type==='tetsu'&&att.state==='punch')panImpact();if(boosted)comboText('COUNTER ×1.5',600);registerCombo(att,guarding);
  if(!net.active&&def===enemy&&enemy.type==='misaki'&&def.hp>0&&def.hp<=def.maxHp*.5&&!bossPhase2&&(storyMode||freeDifficulty==='hard'))triggerBossPhase2();
  if(def.hp<=0){def.ko=true;def.state='ko';def.vy=-320;def.vx=att.face*380;finishRound(att===player?0:1);}return true;
