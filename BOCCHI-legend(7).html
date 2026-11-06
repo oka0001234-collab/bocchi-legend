@@ -638,6 +638,7 @@ button{font:inherit}.app{position:relative;width:100vw;height:var(--app-h,100dvh
 @keyframes kingsArtEnter{from{opacity:0;transform:translateX(8%) scale(.94)}to{opacity:1;transform:translateX(0) scale(1)}}
 @media(max-width:650px){.kingsEncounterFrame{width:94%;height:86%;grid-template-columns:1fr;border-width:1px}.kingsEncounterCopy{align-self:start;padding:clamp(16px,5vw,34px);}.kingsEncounterEyebrow{font-size:clamp(11px,3vw,16px)}.kingsEncounterVersus{font-size:clamp(40px,12vw,72px)}#kingsEncounterName{font-size:clamp(24px,7vw,42px)}#kingsEncounterArt{right:-7%;bottom:-6%;width:77%;height:76%;object-position:right bottom;opacity:.94}.kingsEncounterRule{margin:10px 0}.kingsEncounterSub{font-size:11px}#kingsEncounterSkip{right:10px;bottom:10px;padding:7px 12px;font-size:12px}}
 @media(orientation:landscape) and (max-height:520px){.kingsEncounterFrame{height:90%;width:92%}.kingsEncounterCopy{padding:12px 30px}.kingsEncounterEyebrow{font-size:12px}.kingsEncounterVersus{font-size:clamp(36px,8vh,64px)}#kingsEncounterName{font-size:clamp(22px,5vh,38px)}.kingsEncounterRule{margin:8px 0}.kingsEncounterSub{font-size:11px}#kingsEncounterArt{height:116%;width:57%}#kingsEncounterSkip{bottom:6px;right:8px;padding:5px 11px;font-size:11px}}
+#continueScreen button:focus-visible{outline:4px solid #fff;outline-offset:4px;box-shadow:0 0 22px #ffd26c99}
 </style>
 </head>
 <body>
@@ -982,10 +983,8 @@ function updateArtHud(){
   const canvas=$(id+'ArtHud'),key=[Math.ceil(f.hp),f.maxHp,Math.floor(f.sp),imgs.hpFrame.complete&&imgs.hpFrame.naturalWidth,imgs.spFrame.complete&&imgs.spFrame.naturalWidth].join(':');if(canvas._gaugeKey===key)continue;canvas._gaugeKey=key;const c=canvas.getContext('2d');c.clearRect(0,0,2172,1000);
   drawArtGauge(c,imgs.hpFrame,f.hp/f.maxHp,0,-120,2172,724,false);
   drawArtGauge(c,imgs.spFrame,f.sp/100,700,480,1472,491,true);
-  c.textAlign='center';c.font='900 64px system-ui';c.lineWidth=12;c.strokeStyle='#080910';c.fillStyle='#fff';
-  const hp=Math.ceil(Math.max(0,f.hp))+' / '+f.maxHp,sp=Math.floor(Math.max(0,Math.min(100,f.sp)))+' / 100'+(f.sp>=100?'  READY':'');
-  c.strokeText(hp,1370,425);c.fillText(hp,1370,425);c.font='900 61px system-ui';c.fillStyle=f.sp>=100?'#fff3a0':'#d3f9ff';c.strokeText(sp,1610,875);c.fillText(sp,1610,875);
-  canvas.setAttribute('aria-label','HP '+hp+'、SP '+sp);
+  const hp=Math.ceil(Math.max(0,f.hp))+' / '+f.maxHp,sp=Math.floor(Math.max(0,Math.min(100,f.sp)))+' / 100';
+  canvas.setAttribute('aria-label','HPゲージ 残り '+hp+'、SPゲージ 残り '+sp+(f.sp>=100?'、必殺技使用可能':''));
  }
 }
 
@@ -1488,7 +1487,7 @@ function hit(att,def,damage,kb,up=0){
  if(def.hp<=0){def.ko=true;def.state='ko';def.vy=-320;def.vx=att.face*380;finishRound(att===player?0:1);}return true;
 }
 function triggerBossPhase2(){if(bossPhase2)return;bossPhase2=true;enemy.phase2=true;enemy.sp=100;enemy.moveAccel*=1.18;enemy.damageScale*=1.16;enemy.reachScale*=1.08;enemy.freezeT=.78;player.freezeT=.78;slowMoT=Math.max(slowMoT,.60);screenFlash=.22;shake=15;music.set('boss2');sfx('phase');showCinematic('「ここから本気よ」',850,true);updateHud();}
-function showContinue(){scene='continue';$('hud').classList.remove('show');$('touch').style.opacity='0';$('continueScreen').classList.add('show');}
+function showContinue(){scene='continue';$('hud').classList.remove('show');$('touch').style.opacity='0';$('continueScreen').classList.add('show');$('continueBtn').focus({preventScroll:true});}
 function unlockFreeBattle(){safeSet('bocchi_free_unlocked','1');refreshUnlockUI();}
 function victorySequence(stage,cb){
  player.state='victory';player.stateT=1.1;sfx('win');
@@ -1869,6 +1868,17 @@ function showArmorLesson(){
 }
 $('continueBtn').onclick=()=>{if(!freeMode&&stageIndex===2){stage3ContinueCount++;if(stage3ContinueCount>=2)armorTakeoffUnlocked=true;if(armorTakeoffUnlocked){showArmorLesson();return;}}resumeContinueFight();};
 $('continueTitleBtn').onclick=goTitle;
+$('continueScreen').addEventListener('keydown',e=>{
+ if(scene!=='continue')return;
+ const active=document.activeElement;
+ if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.code)){
+  e.preventDefault();(active===$('continueTitleBtn')?$('continueBtn'):$('continueTitleBtn')).focus({preventScroll:true});return;
+ }
+ if(e.code==='Escape'){e.preventDefault();$('continueTitleBtn').click();return;}
+ if(e.code==='Enter'||e.code==='Space'){
+  e.preventDefault();const target=active===$('continueTitleBtn')?$('continueTitleBtn'):$('continueBtn');target.click();
+ }
+});
 $('audioBtn').onclick=()=>{audioEnabled=!audioEnabled;$('audioBtn').textContent=audioEnabled?'🔊 音':'🔇 音';if(audioEnabled){music.ensure();music.set(scene==='romance'?'romance':bossPhase2?'boss2':currentConfig().music)}else {music.stop();stopBattleEffects();if(announcer)announcer.fallback();}};
 function showFreeBattleSetup(){refreshPortraitGroup('freePlayer');refreshPortraitGroup('freeEnemy');scene='freeSetup';storyMode=false;freeMode=true;$('titleScreen').classList.remove('show');$('romance').classList.remove('show');$('freeResultScreen').classList.remove('show');$('hud').classList.remove('show');$('touch').style.opacity='0';$('freeBattleScreen').classList.add('show');music.set('fight');}
 function startFreeBattle(){const pChoice=$('freePlayer').value,eChoice=$('freeEnemy').value;if(!opponentUnlocked54(pChoice)||!opponentUnlocked54(eChoice)){activeFreeSelect=!opponentUnlocked54(pChoice)?'freePlayer':'freeEnemy';syncFreeSelectBoard();toast('まだ倒していないキャラクターは選べません');return;}freePlayerMegaCannon=pChoice==='bocchi3';freeEnemyMegaCannon=eChoice==='bocchi3';freePlayerType=freePlayerMegaCannon?'bocchi':pChoice;freeEnemyType=freeEnemyMegaCannon?'bocchi':eChoice;freeDifficulty=$('freeDifficulty').value;storyMode=false;freeMode=true;scene='fight';syncSpecialControl();$('freeBattleScreen').classList.remove('show');$('hud').classList.add('show');$('touch').style.opacity='1';roundWins=[0,0];resetRound();music.set(currentConfig().music);toast('READY');}
