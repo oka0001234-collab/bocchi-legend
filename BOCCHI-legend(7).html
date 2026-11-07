@@ -2309,14 +2309,14 @@ function arcReceive(m){
  }
  if(m.a==='game'&&arcade.localMatch===m.match&&net.active){netReceive(m.data);return;}
  if(m.a==='end'&&arcade.localMatch===m.match){arcade.localMatch=null;arcRestore(m.message);return;}
- if(m.a==='full'){arcLeave('ただいま満員です（最大4人）。CPU戦を続けられます。');}
+ if(m.a==='full'){arcLeave('ただいま満員です（最大12人）。CPU戦を続けられます。');}
 }
 function arcBind(c,generation){
  let admitted=false;
  c.on('data',m=>{
   if(generation!==arcade.generation||!arcade.on)return;
   if(!admitted){if(m?.a!=='join'||m.version!==ARCADE_VERSION)return;
-   if(arcade.members.size>=4){arcPacket(c,{a:'full'});setTimeout(()=>c.close(),250);return;}
+   if(arcade.members.size>=12){arcPacket(c,{a:'full'});setTimeout(()=>c.close(),250);return;}
    if(arcade.links.has(c.peer))return;
    admitted=true;const name=arcCleanName(m.name)||'BOCCHI';
    arcade.links.set(c.peer,c);arcade.members.set(c.peer,{id:c.peer,name,available:false,seen:Date.now()});arcPacket(c,{a:'welcome',id:c.peer});arcPublish();return;
