@@ -2746,5 +2746,43 @@ const finishRoundUnlock54=finishRound;finishRound=function(winner){
 };
 const netDrawResultUnlock54=netDrawResult;netDrawResult=function(){netDrawResultUnlock54();const result=net.result;if(net.active&&scene==='netResult'&&result?.winner>=0&&result.winner===(net.host?0:1))unlockDefeatedOpponents54(net.host?(enemy?.characterId||enemy?.type):(player?.characterId||player?.type));};
 </script>
+<style>
+@media (hover:hover) and (pointer:fine){button:focus-visible{outline:3px solid #ffe36e!important;outline-offset:3px!important;box-shadow:0 0 18px #ffd54a99!important}}
+</style>
+<script>
+(()=>{
+ const directions=new Set(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown']);
+ const isVisible=el=>!!el&&el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden';
+ const activePanel=()=>{
+  const panels=[...document.querySelectorAll('.screen.show,.extraScreen.show,#kingsEncounter.show,#romance.show,#nameScreen:not([hidden])')].filter(isVisible);
+  return panels.sort((a,b)=>(parseInt(getComputedStyle(a).zIndex)||0)-(parseInt(getComputedStyle(b).zIndex)||0)).at(-1)||null;
+ };
+ const buttonsIn=panel=>panel?[...panel.querySelectorAll('button:not(:disabled),[role="button"]:not([aria-disabled="true"])')].filter(b=>isVisible(b)&&!b.hidden):[];
+ const preferredButton=(panel)=>{
+  if(panel?.id==='nameScreen')return panel.querySelector('button[type="submit"]');
+  const preferred={title:'startBtn',tutorial:'fightBtn',continue:'continueBtn',encounter:'encounterNext',tetsuFinalDialogue:'tetsuFinalNext',shinBocchiDialogue:'tetsuFinalNext',kingsIntro:'kingsFight',kingsEncounter:'kingsEncounterSkip',kingsClear:'kingsFight'}[scene];
+  const first=preferred&&$(preferred);return first&&panel?.contains(first)&&isVisible(first)&&!first.disabled?first:buttonsIn(panel)[0];
+ };
+ window.addEventListener('keydown',e=>{
+  if(e.isComposing||e.ctrlKey||e.metaKey||e.altKey||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName||''))return;
+  if(scene==='fight'||scene==='skyRumble'||scene==='romance')return;
+  const panel=activePanel();if(!panel)return;
+  const roster=e.target?.closest?.('.portraitRoster,#arcSelectGrid');
+  if(directions.has(e.key)){
+   if(roster)return; // Character grids keep their existing directional selection logic.
+   const buttons=buttonsIn(panel);if(!buttons.length)return;
+   e.preventDefault();e.stopImmediatePropagation();
+   const current=buttons.indexOf(document.activeElement),delta=(e.key==='ArrowRight'||e.key==='ArrowDown')?1:-1;
+   if(current<0){(preferredButton(panel)||buttons[0]).focus({preventScroll:true});return;}
+   buttons[(current+delta+buttons.length)%buttons.length].focus({preventScroll:true});
+   return;
+  }
+  if(e.key==='Enter'){
+   const buttons=buttonsIn(panel),current=buttons.includes(document.activeElement)?document.activeElement:(preferredButton(panel)||buttons[0]);
+   if(current){e.preventDefault();e.stopImmediatePropagation();current.click();}
+  }
+ },true);
+})();
+</script>
 <canvas id="glassShatter" aria-hidden="true"></canvas>
 </body></html>
