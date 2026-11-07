@@ -1102,7 +1102,8 @@ function drawTenten(f){
  drawTentenCell(tentenPose(f),f.x,f.y,f.face);
 }
 function updateShoppingCutin(c){if(c?.f.type!=='tenten')return;const id=c.f.shoppingPrize,target=c.f===player?enemy:player,times=id===3?[2.55,2.85,3.15]:[2.55];c.shopHits47??=0;
- while(c.shopHits47<times.length&&c.t>=times[c.shopHits47]){c.shopHits47++;sfx('glass');sfx('heavyImpact');c.lastLanded47=multiHit47(c.f,target,id===3?16:SHOPPING_PRIZES[id].damage,160,id===3,true);}
+ const damage=Math.round((id===3?16:SHOPPING_PRIZES[id].damage)/2);
+ while(c.shopHits47<times.length&&c.t>=times[c.shopHits47]){c.shopHits47++;sfx('glass');sfx('heavyImpact');c.lastLanded47=multiHit47(c.f,target,damage,160,true,true);}
 }
 
 // Canvas props keep the selected purchase and its broken fragments visually identical.
@@ -2619,9 +2620,9 @@ function defenseTick47(c){
   if(id!==3&&next!==undefined&&next-c.t>0&&next-c.t<.10&&c.aiAttempt47!==next){c.aiAttempt47=next;if(Math.random()<.3){f.justBlock=.13;f.lastSDown=0;}}}
 }
 const sync47=syncCutinFront40;syncCutinFront40=function(){sync47();$('gameViewport').classList.toggle('defense47',scene==='fight'&&!!superCutin&&['tenten','shinbocchi'].includes(superCutin.f.type)&&!(superCutin.f.type==='tenten'&&superCutin.f.shoppingPrize===3));};
-const draw47=drawSuperCutin;drawSuperCutin=function(){draw47();const c=superCutin;if(!c||!['tenten','shinbocchi'].includes(c.f.type))return;if(c.f.type==='tenten'&&(c.f.shoppingPrize!==3||c.t<1.7))return;ctx.save();ctx.textAlign='center';ctx.font='900 30px sans-serif';ctx.fillStyle='#07121eee';ctx.fillRect(240,4,800,56);ctx.fillStyle='#8cf5ff';
+const draw47=drawSuperCutin;drawSuperCutin=function(){draw47();const c=superCutin;if(!c||!['tenten','shinbocchi'].includes(c.f.type))return;if(c.f.type==='tenten'&&c.t<1.7)return;ctx.save();ctx.textAlign='center';ctx.font='900 30px sans-serif';ctx.fillStyle='#07121eee';ctx.fillRect(240,4,800,56);ctx.fillStyle='#8cf5ff';
  const rare=c.f.type==='tenten'&&c.f.shoppingPrize===3&&c.t>=1.7;
- ctx.fillText(rare?'ダメージ確定！ 16 × 3連撃':'↓ を3回！ 各ヒットをブロッキング',W/2,43);
+ ctx.fillText(rare?'必中！ 8 × 3連撃':'必中！ ダメージ半分',W/2,43);
  if(rare&&c.t>=2.55){ctx.fillStyle='#fff';ctx.font='900 48px sans-serif';ctx.fillText(Math.min(3,1+Math.floor((c.t-2.55)/.3))+' HIT',W/2,520);}ctx.restore();};
 const syncAudio47=syncBattleEffects;syncBattleEffects=function(){syncAudio47();effectLoop('shopSpin',audioEnabled&&!document.hidden&&!effectFocusPaused&&scene==='fight'&&!roundBusy&&(!net.active||!net.paused)&&superCutin?.f.type==='tenten'&&superCutin.t>=0&&superCutin.t<1.7);};
 const finish47=finishRound;finishRound=function(w){if(superCutin?.f.type==='tenten'){superCutin.koWinner=w;return;}return finish47(w);};
