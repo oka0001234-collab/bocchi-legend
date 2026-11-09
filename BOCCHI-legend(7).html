@@ -2429,7 +2429,7 @@ const shinBaseFinish=finishRound;finishRound=function(w){if(superCutin?.f.type==
 // Post-credits campaign. Keep the flag during a raid; net.active isolates PvP rules.
 
 const KINGS=['mattsuan','mogaki','tenten','shinbocchi','tetsu','haffun'];
-const KINGS_CUTIN_ART={mattsuan:'assets/select-mattsuan.webp',mogaki:'assets/select-mogaki.webp',tenten:'assets/select-tenten.webp',shinbocchi:'assets/shinbocchi-cutin.png',tetsu:'assets/select-tetsu-portrait.webp',haffun:'assets/select-haffun.webp'};
+const KINGS_CUTIN_ART={mattsuan:'assets/select-mattsuan.webp',mogaki:'assets/select-mogaki.webp',tenten:'assets/select-tenten.webp',shinbocchi:'assets/shinbocchi-cutin.png',tetsu:'assets/select-tetsu-portrait.webp',haffun:'assets/haffun-final-cutin.png'};
 let kingsEncounterTimer=0,kingsEncounterToken=0;
 let tetsuFinalDialogueStep=0,spaceDialogueStep=0,skyRumbleCleared=false;
 function showSkyRumbleIntermission(){dismissResult();stopBattleEffects();clearInput();$('skyRumbleFrame').src='assets/bocchi-sky-rumble.html?campaign='+Date.now();scene='skyRumble';for(const id of ['kingsScreen','kingsEncounter','tetsuFinalScreen','hud','titleScreen','freeResultScreen','tutorialScreen','continueScreen'])$(id).classList.remove('show');$('touch').style.opacity='0';$('skyRumbleScreen').classList.add('show');music.stop();}
@@ -2458,7 +2458,7 @@ function kingsIntro(retry=false){
 }
 function startKingsFight(){
  clearTimeout(kingsEncounterTimer);const token=++kingsEncounterToken,type=KINGS[kingsIndex];
- $('kingsScreen').classList.remove('show');$('kingsEncounterName').textContent=charName(type);$('kingsEncounter').querySelector('.kingsEncounterEyebrow').textContent=kingsIndex===4?'てっちゃん戦':kingsIndex===5?'裏ボス戦':'BOCCHI LEGEND ・ 四天王戦';$('kingsEncounterArt').src=KINGS_CUTIN_ART[type];$('kingsEncounterArt').alt=charName(type)+'のカットイン';
+ $('kingsScreen').classList.remove('show');$('kingsEncounterName').textContent=charName(type);$('kingsEncounter').querySelector('.kingsEncounterEyebrow').textContent=kingsIndex===4?'てっちゃん戦':kingsIndex===5?'裏ボス戦':'BOCCHI LEGEND ・ 四天王戦';$('kingsEncounter').querySelector('.kingsEncounterSub').textContent=type==='haffun'?'ハッフン「ハッフン伝説のはじまりだ！」':'次の挑戦者が立ちはだかる！';$('kingsEncounterArt').src=KINGS_CUTIN_ART[type];$('kingsEncounterArt').alt=charName(type)+'のカットイン';
  $('kingsEncounter').classList.add('show');scene='kingsEncounter';clearInput();
  kingsEncounterTimer=setTimeout(()=>launchKingsFight(token),2300);
 }
