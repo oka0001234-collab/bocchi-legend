@@ -896,9 +896,9 @@ const HELICOPTER_BASE_DAMAGE=34, HELICOPTER_DAMAGE=HELICOPTER_BASE_DAMAGE*2;
 const ARMOR_TAKEOFF_DURATION=12,ARMOR_SPEED_MULT=2.65;
 
 const stages=[
- {title:'はじまりの拳',diff:'難易度：やさしい',enemy:'shobobocchi',main:'パンチとキックで倒せ！',tips:['← / →：移動　↑：ジャンプ　↓：ガード','A：パンチ','S：キック'],special:false,ai:'easy',music:'fight'},
+ {title:'はじまりのBOCCHIマオシン',diff:'難易度：やさしい',enemy:'shobobocchi',main:'パンチとキックで倒せ！',tips:['← / →：移動　↑：ジャンプ　↓：ガード','A：パンチ','S：キック'],special:false,ai:'easy',music:'fight'},
  {title:'ボッチアップ',diff:'難易度：普通',enemy:'shobobocchi',main:'ボッチ砲を覚えた！',tips:['SPが100になったら D：ボッチ砲','ボッチ砲は相手を貫通する','パンチ・キックでSPをためる'],special:true,ai:'normal',music:'fight'},
- {title:'美咲参戦',diff:'難易度：強い',enemy:'misaki',main:'攻撃を読んで切り返せ！',tips:['ブロッキング：攻撃が当たる直前に ↓ → 成功後の反撃1.5倍','コンボ：A → S → D','D：ボッチ砲（SP100）','美咲はHP50%以下で本気になる'],special:true,ai:'hard',music:'boss'}
+ {title:'美咲参戦',diff:'難易度：強い',enemy:'misaki',main:'BOCCHIの恋の行方は！？',tips:['ブロッキング：攻撃が当たる直前に ↓　成功後の反撃1.5倍','コンボ：A → S → D','D：ボッチ砲（SP100）','美咲はHP50%以下で本気になる'],special:true,ai:'hard',music:'boss'}
 ];
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
 const charName=t=>t==='bocchi3'?'BOCCHI（第3戦）':t==='shobobocchi'?'ショボボッチ':t==='shadow'?'ショボボッチ':t==='shinbocchi'?'真ボッチ':t==='mattsuan'?'まっつぁん':t==='tenten'?'てんてん':t==='mogaki'?'もがきお兄さん':t==='haffun'?'ハッフン':t==='tetsu'?'てっちゃん':t==='misaki'?'美咲':'BOCCHI';
@@ -1103,7 +1103,7 @@ function drawTenten(f){
 }
 function updateShoppingCutin(c){if(c?.f.type!=='tenten')return;const id=c.f.shoppingPrize,target=c.f===player?enemy:player,times=id===3?[2.55,2.85,3.15]:[2.55];c.shopHits47??=0;
  const damage=Math.round((id===3?16:SHOPPING_PRIZES[id].damage)/2);
- while(c.shopHits47<times.length&&c.t>=times[c.shopHits47]){c.shopHits47++;sfx('glass');sfx('heavyImpact');c.lastLanded47=multiHit47(c.f,target,damage,160,true,true);}
+ while(c.shopHits47<times.length&&c.t>=times[c.shopHits47]){c.shopHits47++;sfx('glass');sfx('heavyImpact');c.lastLanded47=multiHit47(c.f,target,damage,160,true,true,true);}
 }
 
 // Canvas props keep the selected purchase and its broken fragments visually identical.
@@ -1578,7 +1578,7 @@ function cpu(f,o,dt){
  if(f.stateT<=0&&f.onGround){
   let move=dist>range.ideal?dir:dist<65?-dir:0;
   if(f.x<110&&move<0)move=dir;if(f.x>W-110&&move>0)move=dir;
-  const tetsuFinal=kingsActive&&kingsIndex===4&&f===enemy,pace=tetsuFinal?3:1,maxSpeed=tetsuFinal?1320:440;
+  const bossSpeed3x=kingsActive&&(kingsIndex===4||kingsIndex===5)&&f===enemy,pace=bossSpeed3x?3:1,maxSpeed=bossSpeed3x?1320:440;
   f.vx=clamp(f.vx+move*f.moveAccel*dt*(elite?1.85:hard?1.55:1.25)*pace,-maxSpeed,maxSpeed);
  }
  if(f.type==='shinbocchi'&&f.cancel39>0&&f.aiQueue.length){const next=f.aiQueue.shift();keyAttack(f,next,false);return;}
@@ -2429,22 +2429,25 @@ const shinBaseFinish=finishRound;finishRound=function(w){if(superCutin?.f.type==
 const KINGS=['mattsuan','mogaki','tenten','shinbocchi','tetsu','haffun'];
 const KINGS_CUTIN_ART={mattsuan:'assets/select-mattsuan.webp',mogaki:'assets/select-mogaki.webp',tenten:'assets/select-tenten.webp',shinbocchi:'assets/shinbocchi-cutin.png',tetsu:'assets/select-tetsu-portrait.webp',haffun:'assets/select-haffun.webp'};
 let kingsEncounterTimer=0,kingsEncounterToken=0;
-let tetsuFinalDialogueStep=0,skyRumbleCleared=false;
+let tetsuFinalDialogueStep=0,spaceDialogueStep=0,skyRumbleCleared=false;
 function showSkyRumbleIntermission(){dismissResult();stopBattleEffects();clearInput();$('skyRumbleFrame').src='assets/bocchi-sky-rumble.html?campaign='+Date.now();scene='skyRumble';for(const id of ['kingsScreen','kingsEncounter','tetsuFinalScreen','hud','titleScreen','freeResultScreen','tutorialScreen','continueScreen'])$(id).classList.remove('show');$('touch').style.opacity='0';$('skyRumbleScreen').classList.add('show');music.stop();}
 window.addEventListener('message',event=>{if(event.source!==$('skyRumbleFrame').contentWindow||event.data?.type!=='bocchi-sky-rumble-clear'||scene!=='skyRumble')return;skyRumbleCleared=true;$('skyRumbleScreen').classList.remove('show');kingsIntro();});
 const SHIN_DIALOGUE=[['真ボッチ','俺は……すべてを捨てた。'],['BOCCHI','何を捨てたんだ？'],['真ボッチ','ヘリコプター、そして花火……'],['BOCCHI','それ、捨てたんじゃないだろ！'],['真ボッチ','黙れぇぇ！！ 真ボッチ砲！！']];
 let shinDialogueStep=0;
 function showShinBocchiDialogue(){clearInput();scene='shinBocchiDialogue';$('kingsScreen').classList.remove('show');$('kingsEncounter').classList.remove('show');$('hud').classList.remove('show');$('touch').style.opacity='0';$('tetsuFinalEyebrow').textContent='BOCCHI LEGEND ・ 真ボッチ戦';$('tetsuFinalScreen').querySelector('img').src='assets/shinbocchi-cutin.png';$('tetsuFinalScreen').querySelector('img').alt='真ボッチ';shinDialogueStep=0;$('tetsuFinalSpeaker').textContent=SHIN_DIALOGUE[0][0];$('tetsuFinalLine').textContent=SHIN_DIALOGUE[0][1];$('tetsuFinalNext').textContent='次へ ▶';$('tetsuFinalScreen').classList.add('show');music.set('boss');}
-function advanceShinBocchiDialogue(){shinDialogueStep++;if(shinDialogueStep<SHIN_DIALOGUE.length){$('tetsuFinalSpeaker').textContent=SHIN_DIALOGUE[shinDialogueStep][0];$('tetsuFinalLine').textContent=SHIN_DIALOGUE[shinDialogueStep][1];return;}$('tetsuFinalScreen').classList.remove('show');$('tetsuFinalEyebrow').textContent='BOCCHI LEGEND ・ 最終決戦';$('tetsuFinalScreen').querySelector('img').src='assets/select-tetsu-portrait.webp';$('tetsuFinalScreen').querySelector('img').alt='てっちゃん';$('tetsuFinalNext').textContent='次へ ▶';startKingsFight();}function showTetsuFinalDialogue(){clearTimeout(kingsEncounterTimer);clearInput();scene='tetsuFinalDialogue';$('kingsScreen').classList.remove('show');$('kingsEncounter').classList.remove('show');$('hud').classList.remove('show');$('touch').style.opacity='0';tetsuFinalDialogueStep=0;$('tetsuFinalSpeaker').textContent='BOCCHI';$('tetsuFinalLine').textContent='伝説のレストラン　フランドルか・・・\nここに伝説の厨具が・・・';$('tetsuFinalScreen').classList.add('show');music.set('boss');}
-function advanceTetsuFinalDialogue(){if(tetsuFinalDialogueStep===0){tetsuFinalDialogueStep=1;$('tetsuFinalSpeaker').textContent='てっちゃん';$('tetsuFinalLine').textContent='門前払いだ！！！';return;}$('tetsuFinalScreen').classList.remove('show');kingsIntro();}
-$('tetsuFinalNext').onclick=()=>scene==='shinBocchiDialogue'?advanceShinBocchiDialogue():advanceTetsuFinalDialogue;
+function advanceShinBocchiDialogue(){shinDialogueStep++;if(shinDialogueStep<SHIN_DIALOGUE.length){$('tetsuFinalSpeaker').textContent=SHIN_DIALOGUE[shinDialogueStep][0];$('tetsuFinalLine').textContent=SHIN_DIALOGUE[shinDialogueStep][1];return;}$('tetsuFinalScreen').classList.remove('show');$('tetsuFinalEyebrow').textContent='BOCCHI LEGEND ・ 最終決戦';$('tetsuFinalScreen').querySelector('img').src='assets/select-tetsu-portrait.webp';$('tetsuFinalScreen').querySelector('img').alt='てっちゃん';$('tetsuFinalNext').textContent='次へ ▶';startKingsFight();}function showTetsuFinalDialogue(){clearTimeout(kingsEncounterTimer);clearInput();scene='tetsuFinalDialogue';$('kingsScreen').classList.remove('show');$('kingsEncounter').classList.remove('show');$('hud').classList.remove('show');$('touch').style.opacity='0';tetsuFinalDialogueStep=0;$('tetsuFinalSpeaker').textContent='BOCCHI';$('tetsuFinalLine').textContent='伝説のレストラン　フランドルか・・・\nここに伝説の厨具が・・・';$('tetsuFinalNext').textContent='次へ ▶';$('tetsuFinalScreen').classList.add('show');music.set('boss');}
+function advanceTetsuFinalDialogue(){if(tetsuFinalDialogueStep===0){tetsuFinalDialogueStep=1;$('tetsuFinalSpeaker').textContent='てっちゃん';$('tetsuFinalLine').textContent='いくぞ・・・';return;}$('tetsuFinalScreen').classList.remove('show');kingsIntro();}
+function showSpaceDialogue(){clearInput();scene='spaceDialogue';$('kingsScreen').classList.remove('show');$('kingsEncounter').classList.remove('show');$('hud').classList.remove('show');$('touch').style.opacity='0';spaceDialogueStep=0;$('tetsuFinalEyebrow').textContent='BOCCHI LEGEND ・ 星の向こうへ';$('tetsuFinalScreen').querySelector('img').src='assets/select-misaki.webp';$('tetsuFinalScreen').querySelector('img').alt='美咲';$('tetsuFinalSpeaker').textContent='美咲';$('tetsuFinalLine').textContent='かずくん・・・ヘリコプターで花火を見に行こう・・・\n先に宇宙でまってるね';$('tetsuFinalNext').textContent='次へ ▶';$('tetsuFinalScreen').classList.add('show');music.set('romance');}
+function advanceSpaceDialogue(){if(spaceDialogueStep===0){spaceDialogueStep=1;$('tetsuFinalSpeaker').textContent='BOCCHI';$('tetsuFinalLine').textContent='追いかける！';return;}$('tetsuFinalScreen').classList.remove('show');showSkyRumbleIntermission();}
+$('tetsuFinalNext').onclick=()=>scene==='shinBocchiDialogue'?advanceShinBocchiDialogue():scene==='spaceDialogue'?advanceSpaceDialogue():advanceTetsuFinalDialogue();
 function kingsIntro(retry=false){
  dismissResult();clearInput();scene='kingsIntro';freeMode=true;storyMode=false;stageIndex=2;
  for(const id of ['creditsScreen','romance','titleScreen','freeResultScreen','tutorialScreen','skyRumbleScreen','hud'])$(id).classList.remove('show');
  $('touch').style.opacity='0';$('kingsScreen').classList.add('show');
- $('kingsRank').textContent=kingsIndex===0?'独身四天王最弱':kingsIndex===4?'伝説の料理人':kingsIndex===5?'裏ボス':'独身四天王';
+ $('kingsRank').textContent=kingsIndex===4?'伝説の料理人':kingsIndex===5?'裏ボス':'独身四天王';
  $('kingsName').textContent=charName(KINGS[kingsIndex]);
- $('kingsInfo').textContent=(retry?'敗北しても、挑戦は終わらない。':'')+(kingsIndex===4?' HP 600 ／ 移動速度 3倍 ／ てっちゃん':kingsIndex===5?' HP 300 ／ 裏ボス':' HP 300 ／ 超強敵')+' ／ 2本先取';
+ const introLines={mattsuan:'凄いとこ見せてやる！',mogaki:'スピードでは負けん！',tenten:'いつでも大成功！！！',shinbocchi:'これが本気',tetsu:'HP 600 ／ 移動速度 3倍 ／ 2本先取',haffun:'俺は伝説 ／ 移動速度 3倍'};
+ $('kingsInfo').textContent=(retry?'敗北しても、挑戦は終わらない。 ':'')+(introLines[KINGS[kingsIndex]]||'')+(kingsIndex===4?'':' ／ HP 300 ／ 2本先取');
  $('kingsFace').hidden=false;arcPortrait(KINGS[kingsIndex],'kingsFace');
  $('kingsFight').textContent=retry?'再挑戦':'FIGHT';$('kingsFight').onclick=()=>KINGS[kingsIndex]==='shinbocchi'?showShinBocchiDialogue():startKingsFight();music.set('boss');
  safeSet('bocchi_kings_progress',String(kingsIndex));
@@ -2464,7 +2467,7 @@ function launchKingsFight(token=kingsEncounterToken){
 $('kingsEncounterSkip').onclick=()=>launchKingsFight();
 function kingsResult(won){
  if(!won){kingsLosses57++;if(kingsLosses57>=2&&!kingsArmor57){kingsArmor57=true;showArmorLesson();$('tDiff').textContent=kingsIndex===4?'てっちゃんに再挑戦':kingsIndex===5?'ハッフンに再挑戦':'独身四天王に再挑戦';$('fightBtn').onclick=()=>{$('tutorialScreen').classList.remove('show');startKingsFight();};return;}kingsIntro(true);return;}
- kingsIndex++;if(kingsIndex<KINGS.length){if(KINGS[kingsIndex]==='tetsu')showTetsuFinalDialogue();else if(KINGS[kingsIndex]==='haffun'&&!skyRumbleCleared)showSkyRumbleIntermission();else kingsIntro();return;}
+ kingsIndex++;if(kingsIndex<KINGS.length){if(KINGS[kingsIndex]==='tetsu')showTetsuFinalDialogue();else if(KINGS[kingsIndex]==='haffun'&&!skyRumbleCleared)showSpaceDialogue();else kingsIntro();return;}
  kingsActive=false;safeSet('bocchi_kings_clear','1');safeSet('bocchi_kings_progress','0');clearInput();scene='kingsClear';
  $('hud').classList.remove('show');$('touch').style.opacity='0';$('kingsScreen').classList.add('show');$('kingsFace').hidden=true;
  $('kingsRank').textContent='最終ボス 制覇';$('kingsName').textContent='BOCCHI伝説';$('kingsInfo').textContent='独身四天王、てっちゃん、ハッフンを倒した。その拳で、伝説を刻め。';
@@ -2582,17 +2585,20 @@ const projectile43=updateProjectiles;updateProjectiles=function(dt){const r=proj
 // Equal 95% ordinary prizes, rare guaranteed 5% supplement.
 function shoppingDraw47(r){return r<.05?3:Math.min(2,Math.floor((r-.05)/(.95/3)));}
 function split47(total,i,n){return Math.round(total*(i+1)/n)-Math.round(total*i/n);}
-function multiHit47(att,def,damage,kb,guaranteed=false,cinematic=false){
+function multiHit47(att,def,damage,kb,guaranteed=false,cinematic=false,blockHalf=false){
  const pulse=att.beamPulse50;delete att.beamPulse50;
  if(def.ko)return false;
+ const guarding=def.guard&&def.onGround,parry=blockingAvailable()&&def.justBlock>0&&def.lastSDown<.13,wasBlocked=blockHalf&&(guarding||parry);
+ if(wasBlocked)damage=Math.max(1,Math.round(damage/2));
  def.hurtT=0;const saved={guard:def.guard,justBlock:def.justBlock,lastSDown:def.lastSDown,armorActive:def.armorActive,damageScale:att.damageScale,counterBoostT:att.counterBoostT};
- if(guaranteed){def.guard=false;def.justBlock=0;def.lastSDown=99;def.armorActive=false;att.damageScale=1;att.counterBoostT=0;}
+ if(guaranteed||wasBlocked){def.guard=false;def.justBlock=0;def.lastSDown=99;def.armorActive=false;att.damageScale=1;att.counterBoostT=0;}
  const canParry=!guaranteed&&!roundBusy&&blockingAvailable()&&def.justBlock>0&&def.lastSDown<.13;
  const landed=hit(att,def,damage,kb,0);
  if(pulse){const seq=pulse.sequence;seq.parries50=(seq.parries50||0)+(canParry&&!landed?1:0);if(pulse.index===(pulse.total||5)-1&&landed&&!saved.guard){sfx('finish50');hitStopT=Math.max(hitStopT,.12);shake=Math.max(shake,16);burst(def.x,def.y-120,24,'gold');}if(pulse.index===(pulse.total||5)-1&&seq.parries50===(pulse.total||5)){comboText('完全ブロッキング！',1000);sfx('perfect50');def.perfect50=Date.now();}}
- if(guaranteed){def.guard=saved.guard;def.justBlock=saved.justBlock;def.lastSDown=saved.lastSDown;def.armorActive=saved.armorActive;att.damageScale=saved.damageScale;att.counterBoostT=saved.counterBoostT;}
+ if(guaranteed||wasBlocked){def.guard=saved.guard;def.justBlock=wasBlocked&&parry?0:saved.justBlock;def.lastSDown=saved.lastSDown;def.armorActive=saved.armorActive;att.damageScale=saved.damageScale;att.counterBoostT=saved.counterBoostT;}
  // Keep feet on the floor for repeated guard/parry; knockback continues horizontally.
  def.onGround=true;def.vy=0;def.y=GROUND;
+ if(wasBlocked&&landed){if(parry){def.sp=clamp(def.sp+30,0,100);def.counterBoostT=1.5;att.freezeT=.56;slowMoT=Math.max(slowMoT,.28);screenFlash=Math.max(screenFlash,.18);shake=Math.max(shake,13);burst(def.x,def.y-120,42,'cyan');triggerBlockFx(def);comboText('COUNTER ×1.5',850);}else{sfx('block');burst(def.x,def.y-110,18,'cyan');}}
  if(landed){sfx('laserTick');if(cinematic&&att.type!=='shinbocchi')def.x=clamp(def.x+att.face*25,90,W-90);}
  return landed;
 }
@@ -2622,7 +2628,7 @@ function defenseTick47(c){
 const sync47=syncCutinFront40;syncCutinFront40=function(){sync47();$('gameViewport').classList.toggle('defense47',scene==='fight'&&!!superCutin&&['tenten','shinbocchi'].includes(superCutin.f.type)&&!(superCutin.f.type==='tenten'&&superCutin.f.shoppingPrize===3));};
 const draw47=drawSuperCutin;drawSuperCutin=function(){draw47();const c=superCutin;if(!c||!['tenten','shinbocchi'].includes(c.f.type))return;if(c.f.type==='tenten'&&c.t<1.7)return;ctx.save();ctx.textAlign='center';ctx.font='900 30px sans-serif';ctx.fillStyle='#07121eee';ctx.fillRect(240,4,800,56);ctx.fillStyle='#8cf5ff';
  const rare=c.f.type==='tenten'&&c.f.shoppingPrize===3&&c.t>=1.7;
- ctx.fillText(rare?'必中！ 8 × 3連撃':'必中！ ダメージ半分',W/2,43);
+ ctx.fillText(rare?'必中！ 8 × 3連撃、ブロックで半減':'必中！ブロッキング成功でさらに半減',W/2,43);
  if(rare&&c.t>=2.55){ctx.fillStyle='#fff';ctx.font='900 48px sans-serif';ctx.fillText(Math.min(3,1+Math.floor((c.t-2.55)/.3))+' HIT',W/2,520);}ctx.restore();};
 const syncAudio47=syncBattleEffects;syncBattleEffects=function(){syncAudio47();effectLoop('shopSpin',audioEnabled&&!document.hidden&&!effectFocusPaused&&scene==='fight'&&!roundBusy&&(!net.active||!net.paused)&&superCutin?.f.type==='tenten'&&superCutin.t>=0&&superCutin.t<1.7);};
 const finish47=finishRound;finishRound=function(w){if(superCutin?.f.type==='tenten'){superCutin.koWinner=w;return;}return finish47(w);};
