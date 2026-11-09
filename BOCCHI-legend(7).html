@@ -935,7 +935,7 @@ Music.prototype.tick=function(){if(!audioEnabled||document.hidden)return;const b
 
 function sfx(name){if(!audioEnabled)return;if(SFX43[name]){synth43(name);return;}if(EFFECT_AUDIO[name]){effectAudio(name);return;}if(['punchWhoosh','kickWhoosh','punchImpact','kickImpact','heavyImpact'].includes(name)){combatSound(name);return;}if(customAudio[name]){const a=new Audio(customAudio[name]);a.volume=.8;a.play().catch(()=>{});return;}music.ensure();const A=music;if(name==='haffun'){A.tone(180,.08,'sawtooth',.06);A.noise(.26,.18);A.tone(95,.20,'triangle',.10,.04);return;}if(name==='punch'){A.tone(130,.06,'square',.12);A.noise(.04,.04)}else if(name==='kick'){A.tone(88,.09,'sawtooth',.14);A.noise(.05,.05)}else if(name==='kick3'){A.noise(.09,.09);A.tone(58,.13,'sawtooth',.17);A.tone(116,.10,'square',.08,.018);A.tone(520,.055,'triangle',.05,.035)}else if(name==='cannon'){A.tone(330,.18,'sawtooth',.12);A.tone(165,.32,'square',.08,.05)}else if(name==='block'){A.tone(620,.045,'square',.055);A.tone(980,.07,'triangle',.04,.015)}else if(name==='parry'){A.noise(.16,.12);A.tone(72,.20,'sawtooth',.16);A.tone(1760,.055,'square',.11,.008);A.tone(2470,.07,'triangle',.09,.025);A.tone(3520,.10,'sine',.075,.055);A.tone(880,.22,'sawtooth',.05,.075)}else if(name==='damage'){A.tone(65,.08,'square',.11)}else if(name==='helicopter'){A.tone(55,.22,'sawtooth',.15);A.noise(.2,.06)}else if(name==='win'){A.tone(523,.1,'square',.07);A.tone(659,.1,'square',.06,.1);A.tone(784,.25,'square',.06,.2)}else if(name==='combo10'){A.tone(784,.08,'square',.07);A.tone(988,.08,'square',.06,.07);A.tone(1318,.18,'sawtooth',.06,.14)}else if(name==='phase'){A.noise(.18,.08);A.tone(92,.45,'sawtooth',.09);A.tone(184,.35,'square',.05,.08)}else if(name==='glass'){A.noise(.18,.13);A.tone(1880,.045,'square',.08);A.tone(1320,.07,'triangle',.06,.03);A.tone(820,.11,'sawtooth',.04,.05)}else if(name==='armor'){A.noise(.22,.08);A.tone(110,.20,'sawtooth',.12);A.tone(220,.18,'square',.09,.05);A.tone(440,.16,'sawtooth',.08,.11);A.tone(880,.18,'triangle',.09,.18);A.tone(1760,.24,'sine',.075,.26)}}
 
-function fighter(type,x,face){const shobo=type==='shobobocchi',characterId=shobo?'shobobocchi':type;if(shobo)type='bocchi';return{mattsuanLock55:type==='mattsuan'?5:0,type,characterId,shoboForm:shobo,arcVisualForm:shobo?0:undefined,x,y:GROUND,vx:0,vy:0,face,hp:100,maxHp:100,sp:0,onGround:true,state:'idle',stateT:0,attackHit:false,hurtT:0,freezeT:0,guard:false,guardT:0,justBlock:0,lastSDown:99,comboStep:0,comboT:0,hitCount:0,hitChainT:0,counterBoostT:0,aiT:0,aiQueue:[],aiQueueT:0,specialT:0,ko:false,flash:0,moveAccel:1800,jumpPower:650,damageScale:1,reachScale:1,phase2:false,armorActive:false,armorBoostT:0,armorUsed:false,baseMoveAccel:1800,baseJumpPower:650};}
+function fighter(type,x,face){const shobo=type==='shobobocchi',characterId=shobo?'shobobocchi':type;if(shobo)type='bocchi';return{mattsuanLock55:type==='mattsuan'?5:0,type,characterId,shoboForm:shobo,arcVisualForm:shobo?0:undefined,x,y:GROUND,vx:0,vy:0,face,hp:100,maxHp:100,sp:0,onGround:true,state:'idle',stateT:0,attackHit:false,hurtT:0,freezeT:0,guard:false,guardT:0,justBlock:0,lastSDown:99,comboStep:0,comboT:0,hitCount:0,hitChainT:0,counterBoostT:0,aiT:0,aiQueue:[],aiQueueT:0,specialT:0,ko:false,flash:0,moveAccel:1800,jumpPower:650,damageScale:1,reachScale:1,phase2:false,armorActive:false,armorBoostT:0,armorUsed:false,takeoffShin:false,takeoffTransformT:0,takeoffCannonT:0,baseMoveAccel:1800,baseJumpPower:650};}
 function configureFighter(f,isPlayer){
  if(freeMode){f.moveAccel=f.type==='misaki'?1900:1800;f.jumpPower=650;f.damageScale=1;f.reachScale=1;return;}
  if(isPlayer&&stageIndex===0){f.moveAccel=1150;f.jumpPower=500;f.damageScale=.80;f.reachScale=.82;}
@@ -964,7 +964,7 @@ function triggerBlockFx(def){const fx=$('blockFx'),vr=$('gameViewport').getBound
 function syncSpecialControl(){
  const btn=$('specialBtn'),armor=$('armorBtn'),atk=btn?btn.parentElement:null;
  const show=!!(freeMode||currentConfig().special);
- const shinFight=!!(enemy?.type==='shinbocchi'&&!net.active),showArmor=!!(((!freeMode&&stageIndex===2&&armorTakeoffUnlocked)||(kingsActive&&!net.active&&kingsArmor57)||shinFight));
+ const showArmor=!!(((!freeMode&&stageIndex===2&&armorTakeoffUnlocked)||(kingsActive&&!net.active&&kingsArmor57))&&player?.type==='bocchi');
  if(btn)btn.style.display=show?'':'none';
  if(armor)armor.style.display=showArmor?'':'none';
  if(atk){atk.classList.toggle('twoCol',!show&&!showArmor);atk.classList.toggle('fourCol',show&&showArmor);}
@@ -992,11 +992,9 @@ function updateArtHud(){
  }
 }
 
-function shinTakeoffEligible(f){return !!(f===player&&enemy?.type==='shinbocchi'&&!net.active&&enemy.hp<=enemy.maxHp*.5&&!f.armorUsed);}
-function updateHud(){if(!player||!enemy)return;updateArtHud();syncSpecialControl();$('pHP').style.width=(player.hp/player.maxHp*100)+'%';$('eHP').style.width=(enemy.hp/enemy.maxHp*100)+'%';$('pSP').style.width=player.sp+'%';$('eSP').style.width=enemy.sp+'%';$('timer').textContent=String(roundTime).padStart(2,'0');$('pName').textContent=charName(player.characterId||player.type);$('eName').textContent=charName(enemy.characterId||enemy.type)+(bossPhase2?'  ◆':'');$('kickLabel').textContent=player.type==='haffun'?'ハッフン！':'KICK';$('punchLabel').textContent=player.type==='haffun'?'ハッフン！':player.type==='tetsu'?'フライパン':'PUNCH';$('specialLabel').textContent=player.takeoffShin&&player.armorActive?'真ボッチ砲':player.type==='shinbocchi'?'ボッチ砲':player.type==='mattsuan'?'まっつぁんのいいとこ':player.type==='tenten'?'成功買い物！':player.type==='mogaki'?'ビール3秒飲み':player.type==='haffun'?'突撃ハッフン':player.type==='tetsu'?'鳳凰水晶':player.type==='misaki'?'ヘリコプター砲':(!freeMode&&stageIndex===2?'メガBOCCHI砲':'BOCCHI砲');const ab=$('armorBtn'),al=$('armorLabel');if(ab&&al){const oldCan=!!(((!freeMode&&stageIndex===2&&armorTakeoffUnlocked)||(kingsActive&&!net.active&&kingsArmor57))&&player.type==='bocchi'),shinFight=!!(enemy.type==='shinbocchi'&&!net.active),can=oldCan||shinFight,available=shinFight?shinTakeoffEligible(player):can&&!player.armorUsed;ab.disabled=!available&&!player.armorActive;ab.classList.toggle('ready',available&&!player.armorActive);if(player.takeoffShin&&player.armorActive)al.innerHTML=player.takeoffTransformT>0?'変身中…':('速度・防御 ×3<br>'+Math.max(0,player.armorBoostT).toFixed(1)+'秒');else if(shinFight)al.innerHTML=player.armorUsed?'使用済み':available?'発動可能！':'真ボッチHP50%以下';else al.innerHTML=player.armorActive?('SPEED ×2.6<br>'+Math.max(0,player.armorBoostT).toFixed(1)+'s'):(player.armorUsed?'USED':'ARMOR<br>TAKEOFF');}$('pRounds').textContent='●'.repeat(roundWins[0])+'○'.repeat(2-roundWins[0]);$('eRounds').textContent='●'.repeat(2-roundWins[1])+'○'.repeat(2-roundWins[1]);}
+function updateHud(){if(!player||!enemy)return;updateArtHud();syncSpecialControl();$('pHP').style.width=(player.hp/player.maxHp*100)+'%';$('eHP').style.width=(enemy.hp/enemy.maxHp*100)+'%';$('pSP').style.width=player.sp+'%';$('eSP').style.width=enemy.sp+'%';$('timer').textContent=String(roundTime).padStart(2,'0');$('pName').textContent=charName(player.characterId||player.type);$('eName').textContent=charName(enemy.characterId||enemy.type)+(bossPhase2?'  ◆':'');$('kickLabel').textContent=player.type==='haffun'?'ハッフン！':'KICK';$('punchLabel').textContent=player.type==='haffun'?'ハッフン！':player.type==='tetsu'?'フライパン':'PUNCH';$('specialLabel').textContent=player.type==='shinbocchi'?'ボッチ砲':player.type==='mattsuan'?'まっつぁんのいいとこ':player.type==='tenten'?'成功買い物！':player.type==='mogaki'?'ビール3秒飲み':player.type==='haffun'?'突撃ハッフン':player.type==='tetsu'?'鳳凰水晶':player.type==='misaki'?'ヘリコプター砲':(!freeMode&&stageIndex===2?'メガBOCCHI砲':'BOCCHI砲');const ab=$('armorBtn'),al=$('armorLabel');if(ab&&al){const can=!!(((!freeMode&&stageIndex===2&&armorTakeoffUnlocked)||(kingsActive&&!net.active&&kingsArmor57))&&player.type==='bocchi'),available=can&&!player.armorUsed;ab.disabled=!available&&!player.armorActive;ab.classList.toggle('ready',available&&!player.armorActive);al.innerHTML=player.armorActive?('SPEED ×2.6<br>'+Math.max(0,player.armorBoostT).toFixed(1)+'s'):(player.armorUsed?'USED':'ARMOR<br>TAKEOFF');}const pips=n=>'●'.repeat(clamp(n|0,0,2))+'○'.repeat(2-clamp(n|0,0,2));$('pRounds').textContent=pips(roundWins[0]);$('eRounds').textContent=pips(roundWins[1]);}
 function activateArmorTakeoff(f){
  if(scene!=='fight'||announcerLocked()||roundBusy||f!==player||f.ko||f.hurtT>0||f.freezeT>0||f.armorUsed)return;
- if(enemy?.type==='shinbocchi'&&!net.active){if(enemy.hp>enemy.maxHp*.5)return;f.takeoffShin=true;f.takeoffTransformT=SHIN_TAKEOFF_TRANSFORM;f.armorUsed=true;f.armorActive=true;f.armorBoostT=SHIN_TAKEOFF_DURATION+SHIN_TAKEOFF_TRANSFORM;f.baseMoveAccel=f.moveAccel;f.baseJumpPower=f.jumpPower;f.moveAccel=f.baseMoveAccel*SHIN_TAKEOFF_SPEED;f.jumpPower=f.baseJumpPower;f.state='special';f.stateT=SHIN_TAKEOFF_TRANSFORM;f.vx=0;f.vy=0;f.onGround=true;f.y=GROUND;f.freezeT=.12;enemy.freezeT=Math.max(enemy.freezeT,.18);screenFlash=.30;shake=Math.max(shake,15);burst(f.x,f.y-100,64,'gold');music.duck(.48);sfx('shinArmorTakeoff');comboText('ARMOR TAKEOFF!',1100);showCinematic('アーマーテイクオフ！',1100,true);updateHud();return;}
  if(!((!freeMode&&stageIndex===2&&armorTakeoffUnlocked)||(kingsActive&&!net.active&&kingsArmor57))||f.type!=='bocchi')return;
  f.armorUsed=true;f.armorActive=true;f.armorBoostT=ARMOR_TAKEOFF_DURATION;
  f.moveAccel=f.baseMoveAccel*ARMOR_SPEED_MULT;f.jumpPower=f.baseJumpPower*1.22;f.vx+=f.face*620;
@@ -1004,6 +1002,10 @@ function activateArmorTakeoff(f){
  burst(f.x,f.y-100,64,'cyan');music.duck(.38);sfx('armor');showCinematic('アーマーテイクオフ！',760,true);speak('アーマーテイクオフ！');comboText('SPEED ×2.6',1200);
  if(navigator.vibrate)try{navigator.vibrate([35,25,80,25,120]);}catch(e){}
  updateHud();
+}
+function activateShinTakeoff(f){
+ if(f!==enemy||net.active||f.type!=='shinbocchi'||f.hp>f.maxHp*.5||f.armorUsed||f.ko)return;
+ f.takeoffShin=true;f.takeoffTransformT=SHIN_TAKEOFF_TRANSFORM;f.armorUsed=true;f.armorActive=true;f.armorBoostT=SHIN_TAKEOFF_DURATION+SHIN_TAKEOFF_TRANSFORM;f.baseMoveAccel=f.moveAccel;f.baseJumpPower=f.jumpPower;f.moveAccel=f.baseMoveAccel*SHIN_TAKEOFF_SPEED;f.jumpPower=f.baseJumpPower;f.state='special';f.stateT=SHIN_TAKEOFF_TRANSFORM;f.attackHit=true;f.vx=0;f.vy=0;f.onGround=true;f.y=GROUND;f.freezeT=.12;player.freezeT=Math.max(player.freezeT,.18);screenFlash=.30;shake=Math.max(shake,15);burst(f.x,f.y-100,64,'gold');music.duck(.48);sfx('shinArmorTakeoff');comboText('ARMOR TAKEOFF!',1100);showCinematic('アーマーテイクオフ！',1100,true);updateHud();
 }
 // Tetsu: startup / active / recovery are specified in 60 Hz frames.
 
@@ -1390,9 +1392,10 @@ const SHIN_MOVES={punch:{startup:7,active:6,total:27,damage:8},kick:{startup:15,
 const SHIN_RECTS=[[0,0,384,341,185,337],[384,0,384,341,550,337],[768,0,360,341,925,337],[1128,0,408,341,1310,310],[0,341,390,341,180,665],[390,341,412,341,540,665],[802,341,350,341,960,665],[1152,341,384,284,1345,594],[0,682,384,342,180,991],[384,682,384,342,580,994],[768,682,384,342,945,994],[1152,625,384,399,1360,994]];
 function shinAttack(f,key){
  if(key==='J'||key==='K'){
-  f.state=key==='J'?'punch':'kick';f.stateT=SHIN_MOVES[f.state].total/60;f.attackHit=false;f.vx*=.25;sfx(key==='J'?'punchWhoosh':'kickWhoosh');
+  f.state=key==='J'?'punch':'kick';f.stateT=SHIN_MOVES[f.state].total/60;f.attackHit=false;f.vx*=.25;sfx(key==='J'?'punchWhoosh':'kickWhoosh');if(f.takeoffShin&&f.armorActive)speak(key==='J'?'えい！':'キック！');
   if(key==='J'){f.comboStep=1;f.comboT=.82;}else if(f.comboStep===1&&f.comboT>0){f.comboStep=2;f.comboT=.95;}else f.comboStep=0;
  }else if(key==='L'&&f.sp>=100){
+  if(f===enemy&&f.takeoffShin&&f.armorActive){f.sp=0;f.state='special';f.stateT=.95;f.attackHit=true;f.takeoffCannonT=.95;spawnCannon(f,false,true);showCinematic('真ボッチ砲！',480,true);comboText('真ボッチ砲',700);return;}
   const combo=f.comboStep===2&&f.comboT>0;f.sp=0;f.comboStep=0;f.shinDamage=combo?42:34;f.state='special';f.stateT=0;f.attackHit=true;f.vx=0;f.vy=0;f.y=GROUND;f.onGround=true;
   let cut,resolved=false;startSuperCutin(f,()=>{if(resolved)return;resolved=true;f.state='idle';f.stateT=0;effectLoop('laserBeam',false);if(cut.koWinner!==undefined)finishRound(cut.koWinner);updateHud();});cut=superCutin;cut.duration=2.65;sfx('laserCharge');
  }
@@ -1555,6 +1558,7 @@ function cpuUseSpecial(f,o,dist){
 }
 function cpu(f,o,dt){
  if(roundBusy||superCutin||announcerLocked()||f.ko||f.hurtT>0||f.freezeT>0)return;
+ if(f===enemy&&f.type==='shinbocchi'&&f.hp<=f.maxHp*.5&&!f.armorUsed){activateShinTakeoff(f);return;}
  let mode=currentConfig().ai;if(bossPhase2&&f.type==='misaki')mode='hard2';
  const dist=Math.abs(o.x-f.x),dir=o.x>=f.x?1:-1;
  if(mode==='easy'){
@@ -1584,7 +1588,7 @@ function cpu(f,o,dt){
  if(f.stateT<=0&&f.onGround){
   let move=dist>range.ideal?dir:dist<65?-dir:0;
   if(f.x<110&&move<0)move=dir;if(f.x>W-110&&move>0)move=dir;
-  const bossSpeed3x=kingsActive&&(kingsIndex===4||kingsIndex===5)&&f===enemy,pace=bossSpeed3x?3:1,maxSpeed=bossSpeed3x?1320:440;
+  const shinArmorSpeed=f===enemy&&f.takeoffShin&&f.armorActive,bossSpeed3x=(kingsActive&&(kingsIndex===4||kingsIndex===5)&&f===enemy)||shinArmorSpeed,pace=bossSpeed3x&&!shinArmorSpeed?3:1,maxSpeed=bossSpeed3x?1320:440;
   f.vx=clamp(f.vx+move*f.moveAccel*dt*(elite?1.85:hard?1.55:1.25)*pace,-maxSpeed,maxSpeed);
  }
  if(f.type==='shinbocchi'&&f.cancel39>0&&f.aiQueue.length){const next=f.aiQueue.shift();keyAttack(f,next,false);return;}
