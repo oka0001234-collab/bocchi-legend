@@ -865,10 +865,12 @@ const MISAKI_BGM="assets/audio-005.mp3", BATTLE_BGM=MISAKI_BGM;
 function battleBgmSource(mode){if(!['fight','boss','boss2'].includes(mode))return null;if(kingsActive&&!net.active&&kingsIndex===2)return 'assets/audio-006.mp3';if(kingsActive&&!net.active&&kingsIndex===3)return 'assets/shinbocchi-battle.mp3';if(kingsActive&&!net.active&&kingsIndex===4)return 'assets/tetsu-final-battle.mp3';if(!net.active&&!freeMode&&stageIndex===2)return MISAKI_BGM;return net.active||freeMode||stageIndex>=1?BATTLE_BGM:null;}
 const battleLogoPreloads=Object.values(BATTLE_LOGOS).map(src=>{const img=new Image();img.src=src;return img;});
 const EFFECT_AUDIO={"shinVoice56":"assets/audio-007.mp3","parry":"assets/audio-008.mp3","shopWin":"assets/audio-009.mp3","shopStop":"assets/audio-010.mp3","shopSpin":"assets/audio-011.mp3","shopPeka":"assets/audio-012.mp3","haffun":"assets/audio-013.mp3","haffunImpact":"assets/haffun-impact.mp3","mogakiTune":"assets/mogaki-special-latter.mp3","mattsuanSpecial":"assets/mattsuan-special.mp3","levelUp":"assets/levelup-retro-monster.wav","shinArmorTakeoff":"assets/shin-armor-takeoff.mp3","misakiHeliVoice":"assets/misaki-helicopter-voice.mp3","misakiPunchVoice":"assets/misaki-punch-voice.mp3","misakiKickVoice":"assets/misaki-kick-voice.mp3","punchWhoosh": "assets/audio-014.mp3", "punchImpact": "assets/audio-015.mp3", "heavyImpact": "assets/audio-016.mp3", "kickWhoosh": "assets/audio-017.mp3", "kickImpact": "assets/audio-018.mp3", "block": "assets/audio-019.mp3", "laserCharge": "assets/audio-020.mp3", "laserFire": "assets/audio-021.mp3", "laserBeam": "assets/audio-022.mp3", "laserDamage": "assets/audio-023.mp3", "laserTick": "assets/audio-024.mp3", "laserStop": "assets/audio-025.mp3"};
+const MISAKI_VOICE_KEYS=['misakiPunchVoice','misakiKickVoice','misakiHeliVoice'],effectPreloads=new Map();
+for(const name of MISAKI_VOICE_KEYS){const a=new Audio(EFFECT_AUDIO[name]);a.preload='auto';a.load();effectPreloads.set(name,a);}
 const effectShots=new Set(),effectLoops=new Map();let laserWasVisible=false,effectFocusPaused=false;
 function effectAudio(name,loop=false){
  if(!audioEnabled||document.hidden||effectFocusPaused||!EFFECT_AUDIO[name])return null;
- try{const a=new Audio(EFFECT_AUDIO[name]);a.preload='auto';a.loop=loop;a.volume=loop?.32:.72;
+ try{const a=effectPreloads.has(name)?effectPreloads.get(name).cloneNode(true):new Audio(EFFECT_AUDIO[name]);a.preload='auto';a.loop=loop;a.volume=loop?.32:.72;
  if(!loop){if(effectShots.size>=16){const old=effectShots.values().next().value;old.pause();effectShots.delete(old);}effectShots.add(a);a.addEventListener('ended',()=>effectShots.delete(a),{once:true});}
  a.addEventListener('error',()=>{effectShots.delete(a);if(effectLoops.get(name)===a)effectLoops.delete(name);},{once:true});
  const promise=a.play();promise?.catch(()=>{effectShots.delete(a);if(effectLoops.get(name)===a)effectLoops.delete(name);});return a;
@@ -1479,7 +1481,7 @@ function spawnCannon(f,combo=false,forceMega=false){sfx('laserFire');
  projectiles.push({kind,owner:f,x:f.x+f.face*(mega?150:105),y:f.y-122,vx:f.face*speed,w,h,life:2.05,damage,hasHit:false,classicYellowOrb:!mega&&!freeMode&&stageIndex===1});
 }
 function spawnHelicopter(f){
- music.duck(.78);heliDramaT=.72;showCinematic('ヘリコプター砲',500,true);setTimeout(()=>{sfx('helicopter');if(f.type==='misaki')sfx('misakiHeliVoice');},120);
+ music.duck(.78);heliDramaT=.72;showCinematic('ヘリコプター砲',500,true);sfx('helicopter');if(f.type==='misaki')sfx('misakiHeliVoice');
  const dir=f.face<0?-1:1;
  projectiles.push({kind:'heli',owner:f,x:dir<0?W+520:-520,y:GROUND-145,vx:dir*980,w:760,h:300,life:2.8,damage:HELICOPTER_DAMAGE,hasHit:false,warn:.34});
 }
