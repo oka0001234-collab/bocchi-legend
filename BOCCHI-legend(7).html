@@ -2486,6 +2486,13 @@ function launchKingsFight(token=kingsEncounterToken){
  kingsActive=true;freeMode=true;storyMode=false;stageIndex=2;freePlayerType='bocchi';freeEnemyType=KINGS[kingsIndex];freeDifficulty='hard';
  scene='fight';roundWins=[0,0];clearInput();$('hud').classList.add('show');$('touch').style.opacity='1';resetRound();syncSpecialControl();
 }
+function startShinBocchiDebugFight(){
+ clearTimeout(kingsEncounterTimer);kingsEncounterToken++;
+ for(const id of ['titleScreen','kingsScreen','kingsEncounter','tutorialScreen','continueScreen','freeBattleScreen','freeResultScreen','tetsuFinalScreen','creditsScreen','romance','skyRumbleScreen'])$(id)?.classList.remove('show');
+ kingsActive=true;kingsIndex=3;kingsLosses57=0;kingsArmor57=false;
+ freeMode=true;storyMode=false;stageIndex=2;freePlayerType='bocchi';freeEnemyType='shinbocchi';freeDifficulty='hard';
+ roundWins=[0,0];scene='fight';clearInput();$('hud').classList.add('show');$('touch').style.opacity='1';resetRound();syncSpecialControl();toast('DEBUG：真ボッチ戦',1800);
+}
 $('kingsEncounterSkip').onclick=()=>launchKingsFight();
 function kingsResult(won){
  if(!won){kingsLosses57++;if(kingsLosses57>=2&&!kingsArmor57){kingsArmor57=true;showArmorLesson();$('tDiff').textContent=kingsIndex===4?'てっちゃんに再挑戦':kingsIndex===5?'ハッフンに再挑戦':'独身四天王に再挑戦';$('fightBtn').onclick=()=>{$('tutorialScreen').classList.remove('show');startKingsFight();};return;}kingsIntro(true);return;}
@@ -2774,6 +2781,7 @@ const finishRoundUnlock54=finishRound;finishRound=function(winner){
  return finishRoundUnlock54(winner);
 };
 const netDrawResultUnlock54=netDrawResult;netDrawResult=function(){netDrawResultUnlock54();const result=net.result;if(net.active&&scene==='netResult'&&result?.winner>=0&&result.winner===(net.host?0:1))unlockDefeatedOpponents54(net.host?(enemy?.characterId||enemy?.type):(player?.characterId||player?.type));};
+if(new URLSearchParams(location.search).get('debug')==='shinbocchi')startShinBocchiDebugFight();
 </script>
 <style>
 @media (hover:hover) and (pointer:fine){button:focus-visible{outline:3px solid #ffe36e!important;outline-offset:3px!important;box-shadow:0 0 18px #ffd54a99!important}}
