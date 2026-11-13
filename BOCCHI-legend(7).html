@@ -347,7 +347,7 @@ button{font:inherit}.app{position:relative;width:100vw;height:var(--app-h,100dvh
 #arcSelectActions{position:absolute;z-index:6;top:96.1%;left:50%;transform:translate(-50%,-50%);display:flex;gap:9px;margin:0;white-space:nowrap}
 #arcSelectActions button{min-height:30px;padding:5px 14px;border:1px solid #fff6;border-radius:8px;background:#11131df0;color:#fff;font-size:clamp(10px,1vw,15px)}
 #arcSelectActions #arcSelectConfirm{border:0;background:linear-gradient(110deg,#ed4962,#f58b35);box-shadow:0 0 14px #ff722e77}
-#netScreen .netCard{position:absolute;inset:auto;top:50%;left:50%;width:min(100vw,177.7vh);height:min(100vh,56.3vw);transform:translate(-50%,-50%);max-height:none;overflow:hidden;padding:0;border:0;border-radius:0;background:#09090f url('assets/character-select-bg.png') center/100% 100% no-repeat;box-shadow:none}
+#netScreen .netCard{position:absolute;inset:auto;top:50%;left:50%;width:min(100vw,177.7vh);height:min(100vh,56.3vw);transform:translate(-50%,-50%);max-height:none;overflow:hidden;padding:0;border:0;border-radius:0;background:#09090f url('assets/character-select-bg-optimized.webp') center/100% 100% no-repeat;box-shadow:none}
 #netScreen .netCard>h2{position:absolute!important;left:-10000px;top:0;opacity:0}
 #netScreen .netVersusShowcase{display:contents}
 #netScreen .fighterShowcase{position:absolute;z-index:2;top:19%;width:25.5%;height:35.3%;min-width:0;overflow:hidden;border:0;border-radius:0;background:transparent;box-shadow:none}
@@ -826,20 +826,20 @@ DATA.mountain54='assets/image-022.webp';
 DATA.restaurant48='assets/image-023.webp';
 DATA.rooftop='assets/image-024.webp';DATA.rooftopSky='assets/image-025.webp';
 DATA.hpFrame='assets/image-026.webp';DATA.spFrame='assets/image-027.webp';
-DATA.bocchiWalk61="assets/image-001.png";
-DATA.bocchiCannonPose61="assets/image-002.png";
-DATA.bocchiCannonBeam61="assets/image-003.png";
-DATA.bocchiJumpPunch61="assets/image-004.png";
-DATA.bocchiBlock61="assets/image-005.png";
-DATA.bocchiHurt61="assets/image-006.png";
-DATA.bocchiJumpKick61="assets/image-007.png";
-DATA.bocchiPunch61="assets/image-008.png";
-DATA.bocchiKick61="assets/image-009.png";
+DATA.bocchiWalk61="assets/image-001-optimized.webp";
+DATA.bocchiCannonPose61="assets/image-002-optimized.webp";
+DATA.bocchiCannonBeam61="assets/image-003-optimized.webp";
+DATA.bocchiJumpPunch61="assets/image-004-optimized.webp";
+DATA.bocchiBlock61="assets/image-005-optimized.webp";
+DATA.bocchiHurt61="assets/image-006-optimized.webp";
+DATA.bocchiJumpKick61="assets/image-007-optimized.webp";
+DATA.bocchiPunch61="assets/image-008-optimized.webp";
+DATA.bocchiKick61="assets/image-009-optimized.webp";
 DATA.bocchiConcept='assets/concept-bocchi-misaki.jpg';DATA.misakiConcept='assets/concept-bocchi-misaki.jpg';
-DATA.mogakiConcept='assets/concept-mogaki.png';DATA.haffunConcept='assets/concept-haffun.png';DATA.tentenConcept='assets/concept-tenten.png';
-DATA.mattsuanConcept='assets/concept-mattsuan.png';
-DATA.arcLogos='assets/arc-character-logos.webp';DATA.selectBocchi='assets/select-bocchi.webp';DATA.selectMisaki='assets/select-misaki.webp';DATA.selectHaffun='assets/select-haffun.webp';DATA.selectMattsuan='assets/select-mattsuan.webp';DATA.selectTetsu='assets/select-tetsu-portrait.webp';DATA.selectMogaki='assets/select-mogaki.webp';DATA.selectTenten='assets/select-tenten.webp';DATA.selectBocchiCutin='assets/shinbocchi-poster.png';DATA.tetsuPhoenixCutin='assets/tetsu-phoenix-cutin.webp';
-DATA.shinTakeoff='assets/shin-armor-transform.png';DATA.shinTakeoffPunch='assets/shin-armor-punch.png';DATA.shinTakeoffKick='assets/shin-armor-kick-spaced.webp';DATA.shinTakeoffCannon='assets/shin-armor-cannon.png';
+DATA.mogakiConcept='assets/concept-mogaki-optimized.webp';DATA.haffunConcept='assets/concept-haffun-optimized.webp';DATA.tentenConcept='assets/concept-tenten-optimized.webp';
+DATA.mattsuanConcept='assets/concept-mattsuan-optimized.webp';
+DATA.arcLogos='assets/arc-character-logos.webp';DATA.selectBocchi='assets/select-bocchi.webp';DATA.selectMisaki='assets/select-misaki.webp';DATA.selectHaffun='assets/select-haffun.webp';DATA.selectMattsuan='assets/select-mattsuan.webp';DATA.selectTetsu='assets/select-tetsu-portrait.webp';DATA.selectMogaki='assets/select-mogaki.webp';DATA.selectTenten='assets/select-tenten.webp';DATA.selectBocchiCutin='assets/shinbocchi-poster-optimized.webp';DATA.tetsuPhoenixCutin='assets/tetsu-phoenix-cutin.webp';
+DATA.shinTakeoff='assets/shin-armor-transform-optimized.webp';DATA.shinTakeoffPunch='assets/shin-armor-punch-optimized.webp';DATA.shinTakeoffKick='assets/shin-armor-kick-spaced.webp';DATA.shinTakeoffCannon='assets/shin-armor-cannon-optimized.webp';
 const assetStates=new Map(Object.keys(DATA).map(k=>[k,'pending']));
 function refreshAssetProgress(){const values=[...assetStates.values()],done=values.filter(v=>v!=='pending').length,failed=values.filter(v=>v==='error').length,total=values.length;const get=id=>document.getElementById(id);get('assetProgress').value=Math.round(done/total*100);get('assetProgressText').textContent=done===total?(failed?'画像の読み込み完了（一部失敗）':'画像の読み込み完了！'):('画像をダウンロード・読み込み中 '+done+' / '+total);get('assetProgressNote').textContent=failed?failed+'枚を読み込めませんでした。再読み込みできます。':'読み込み中でもスタートできます。';get('assetRetry').hidden=!failed;}
 const imgs={};for(const [k,v] of Object.entries(DATA)){const im=new Image();imgs[k]=im;
@@ -1908,7 +1908,7 @@ $('freeBattleBtn').onclick=showFreeBattleSetup;$('freeStartBtn').onclick=startFr
 function transitionToRomance(){scene='transition';$('hud').classList.remove('show');$('touch').style.opacity='0';music.duck(.75);sfx('helicopter');$('fadeOverlay').classList.add('show');setTimeout(()=>{beginRomance();$('fadeOverlay').classList.remove('show');},760);}
 refreshUnlockUI();syncSpecialControl();
 
-const MANGA=["assets/romance-page1.png", "assets/image-033.webp", "assets/image-034.webp"];
+const MANGA=["assets/romance-page1-optimized.webp", "assets/image-033.webp", "assets/image-034.webp"];
 // Existing manga pages are shown one panel at a time, in right-to-left reading order.
 let romanceStep='opening',romStats={heart:0,trust:0,natural:0},romFlags=[],romHistory=[];
 const panels={
@@ -2447,14 +2447,14 @@ const shinBaseFinish=finishRound;finishRound=function(w){if(superCutin?.f.type==
 // Post-credits campaign. Keep the flag during a raid; net.active isolates PvP rules.
 
 const KINGS=['mattsuan','mogaki','tenten','shinbocchi','tetsu','haffun'];
-const KINGS_CUTIN_ART={mattsuan:'assets/select-mattsuan.webp',mogaki:'assets/select-mogaki.webp',tenten:'assets/select-tenten.webp',shinbocchi:'assets/shinbocchi-poster.png',tetsu:'assets/select-tetsu-portrait.webp',haffun:'assets/haffun-final-cutin.png'};
+const KINGS_CUTIN_ART={mattsuan:'assets/select-mattsuan.webp',mogaki:'assets/select-mogaki.webp',tenten:'assets/select-tenten.webp',shinbocchi:'assets/shinbocchi-poster-optimized.webp',tetsu:'assets/select-tetsu-portrait.webp',haffun:'assets/haffun-final-cutin-optimized.webp'};
 let kingsEncounterTimer=0,kingsEncounterToken=0;
 let tetsuFinalDialogueStep=0,spaceDialogueStep=0,skyRumbleCleared=false;
 function showSkyRumbleIntermission(){dismissResult();stopBattleEffects();clearInput();$('skyRumbleFrame').src='assets/bocchi-sky-rumble.html?campaign='+Date.now();scene='skyRumble';for(const id of ['kingsScreen','kingsEncounter','tetsuFinalScreen','hud','titleScreen','freeResultScreen','tutorialScreen','continueScreen'])$(id).classList.remove('show');$('touch').style.opacity='0';$('skyRumbleScreen').classList.add('show');music.stop();}
 window.addEventListener('message',event=>{if(event.source!==$('skyRumbleFrame').contentWindow||event.data?.type!=='bocchi-sky-rumble-clear'||scene!=='skyRumble')return;skyRumbleCleared=true;$('skyRumbleScreen').classList.remove('show');kingsIntro();});
 const SHIN_DIALOGUE=[['真ボッチ','俺は……すべてを捨てた。'],['BOCCHI','何を捨てたんだ？'],['真ボッチ','ヘリコプター、そして花火……'],['BOCCHI','それ、捨てたんじゃないだろ！'],['真ボッチ','黙れぇぇ！！ 真ボッチ砲！！']];
 let shinDialogueStep=0;
-function showShinBocchiDialogue(){clearInput();scene='shinBocchiDialogue';$('kingsScreen').classList.remove('show');$('kingsEncounter').classList.remove('show');$('hud').classList.remove('show');$('touch').style.opacity='0';$('tetsuFinalEyebrow').textContent='BOCCHI LEGEND ・ 真ボッチ戦';$('tetsuFinalScreen').querySelector('img').src='assets/shinbocchi-poster.png';$('tetsuFinalScreen').querySelector('img').alt='真ボッチ';shinDialogueStep=0;$('tetsuFinalSpeaker').textContent=SHIN_DIALOGUE[0][0];$('tetsuFinalLine').textContent=SHIN_DIALOGUE[0][1];$('tetsuFinalNext').textContent='次へ ▶';$('tetsuFinalScreen').classList.add('show');music.set('boss');}
+function showShinBocchiDialogue(){clearInput();scene='shinBocchiDialogue';$('kingsScreen').classList.remove('show');$('kingsEncounter').classList.remove('show');$('hud').classList.remove('show');$('touch').style.opacity='0';$('tetsuFinalEyebrow').textContent='BOCCHI LEGEND ・ 真ボッチ戦';$('tetsuFinalScreen').querySelector('img').src='assets/shinbocchi-poster-optimized.webp';$('tetsuFinalScreen').querySelector('img').alt='真ボッチ';shinDialogueStep=0;$('tetsuFinalSpeaker').textContent=SHIN_DIALOGUE[0][0];$('tetsuFinalLine').textContent=SHIN_DIALOGUE[0][1];$('tetsuFinalNext').textContent='次へ ▶';$('tetsuFinalScreen').classList.add('show');music.set('boss');}
 function advanceShinBocchiDialogue(){shinDialogueStep++;if(shinDialogueStep<SHIN_DIALOGUE.length){$('tetsuFinalSpeaker').textContent=SHIN_DIALOGUE[shinDialogueStep][0];$('tetsuFinalLine').textContent=SHIN_DIALOGUE[shinDialogueStep][1];return;}$('tetsuFinalScreen').classList.remove('show');$('tetsuFinalEyebrow').textContent='BOCCHI LEGEND ・ 最終決戦';$('tetsuFinalScreen').querySelector('img').src='assets/select-tetsu-portrait.webp';$('tetsuFinalScreen').querySelector('img').alt='てっちゃん';$('tetsuFinalNext').textContent='次へ ▶';startKingsFight();}function showTetsuFinalDialogue(){clearTimeout(kingsEncounterTimer);clearInput();scene='tetsuFinalDialogue';$('kingsScreen').classList.remove('show');$('kingsEncounter').classList.remove('show');$('hud').classList.remove('show');$('touch').style.opacity='0';tetsuFinalDialogueStep=0;$('tetsuFinalSpeaker').textContent='BOCCHI';$('tetsuFinalLine').textContent='伝説のレストラン　フランドルか・・・\nここに伝説の厨具が・・・';$('tetsuFinalNext').textContent='次へ ▶';$('tetsuFinalScreen').classList.add('show');music.set('boss');}
 function advanceTetsuFinalDialogue(){if(tetsuFinalDialogueStep===0){tetsuFinalDialogueStep=1;$('tetsuFinalSpeaker').textContent='てっちゃん';$('tetsuFinalLine').textContent='いくぞ・・・';return;}$('tetsuFinalScreen').classList.remove('show');kingsIntro();}
 function showSpaceDialogue(){clearInput();scene='spaceDialogue';$('kingsScreen').classList.remove('show');$('kingsEncounter').classList.remove('show');$('hud').classList.remove('show');$('touch').style.opacity='0';spaceDialogueStep=0;$('tetsuFinalEyebrow').textContent='BOCCHI LEGEND ・ 星の向こうへ';$('tetsuFinalScreen').querySelector('img').src='assets/select-misaki.webp';$('tetsuFinalScreen').querySelector('img').alt='美咲';$('tetsuFinalSpeaker').textContent='美咲';$('tetsuFinalLine').textContent='かずくん・・・ヘリコプターで花火を見に行こう・・・\n先に宇宙でまってるね';$('tetsuFinalNext').textContent='次へ ▶';$('tetsuFinalScreen').classList.add('show');music.set('romance');}
