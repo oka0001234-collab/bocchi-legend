@@ -538,12 +538,15 @@ button{font:inherit}.app{position:relative;width:100vw;height:var(--app-h,100dvh
 .freeSelectName{display:block;width:100%;font-size:clamp(9px,.9vw,14px);line-height:1.1;font-weight:900;text-align:center;text-shadow:0 2px 4px #000;overflow-wrap:anywhere}
 .freeSelectOptions{display:flex;gap:7px;justify-content:center}
 .freeSelectOptions .selectBox{display:flex;align-items:center;gap:5px;margin:0;padding:4px 6px;border:1px solid #ffffff50;border-radius:5px;background:#101018dc;color:white}
-.freeSelectOptions label{font-size:clamp(9px,.85vw,12px);font-weight:900;color:#ffe6ab}
-.freeSelectOptions select{max-width:120px;padding:4px 5px;border:1px solid #fff8;border-radius:4px;background:#11131c;color:#fff;font-size:clamp(9px,.85vw,12px)}
+.freeSelectOptions label{font-size:clamp(9px,.85vw,12px);font-weight:900;color:#ffe6ab;white-space:nowrap}
+.freeSelectOptions select{max-width:none;padding:4px 5px;border:1px solid #fff8;border-radius:4px;background:#11131c;color:#fff;font-size:clamp(9px,.85vw,12px);white-space:nowrap}
+.freeSelectOptions #freeDifficultyBox{display:none!important}
+.freeSelectOptions #freeStage54{min-width:180px}
+.freeSelectOptions #freeMusic54{min-width:145px}
 .freeSelectActions{display:flex;justify-content:center;gap:8px}
 .freeSelectActions button{min-height:36px;padding:7px 14px;border-radius:8px;font-size:clamp(11px,1vw,15px);font-weight:950;touch-action:manipulation}
 .freeSelectActions #freeStartBtn{border:0;background:linear-gradient(110deg,#ed4962,#f58b35);box-shadow:0 0 16px #ff722e88;color:white}
-.freeSelectVS{position:absolute;z-index:8;left:50%;top:76%;transform:translate(-50%,-50%) rotate(-9deg);color:#fff6c8;font-size:clamp(35px,7vw,90px);font-weight:1000;font-style:italic;text-shadow:0 0 10px #fff,0 0 32px #ffad24,0 0 50px #ff2689;pointer-events:none}
+.freeSelectVS{position:absolute;z-index:8;left:50%;top:7%;transform:translate(-50%,-50%) rotate(-9deg);color:#fff6c8;font-size:clamp(35px,7vw,90px);font-weight:1000;font-style:italic;text-shadow:0 0 10px #fff,0 0 32px #ffad24,0 0 50px #ff2689;pointer-events:none}
 @media(max-width:760px){
  #freeBattleScreen>.card{background-size:100% auto;background-position:center top}
  #freeBattleScreen>.card::before{content:none}
@@ -561,14 +564,16 @@ button{font:inherit}.app{position:relative;width:100vw;height:var(--app-h,100dvh
  .freeSelectCard{padding:3px;gap:2px}
  .freeSelectCard img,.freeSelectCard.missing-icon::before{width:min(100%,8.6vh);max-height:8.6vh}
  .freeSelectName{font-size:clamp(9px,2.6vw,13px)}
- .freeSelectOptions{gap:4px}
+ .freeSelectOptions{gap:4px;flex-wrap:wrap}
  .freeSelectOptions .selectBox{padding:2px 4px;gap:3px}
  .freeSelectOptions label{font-size:9px}
- .freeSelectOptions select{max-width:112px;font-size:10px}
+ .freeSelectOptions select{font-size:10px}
+ .freeSelectOptions #freeStage54{min-width:126px}
+ .freeSelectOptions #freeMusic54{min-width:132px}
  .freeSelectActions button{min-height:34px;padding:5px 10px;font-size:12px}
- .freeSelectVS{top:25%;font-size:clamp(21px,7vw,38px)}
+ .freeSelectVS{top:7%;font-size:clamp(21px,7vw,38px)}
 }
-@media(orientation:landscape) and (max-height:520px){#freeSelectBoard{inset:13% 1% 3%;grid-template-columns:minmax(0,28fr) minmax(0,44fr) minmax(0,28fr)}.freeSelectHero .fighterShowcase canvas{height:77%}#freeSelectGrid{grid-auto-rows:minmax(50px,1fr);max-height:70%}.freeSelectCard img,.freeSelectCard.missing-icon::before{width:min(100%,11vh);max-height:11vh}.freeSelectVS{top:77%}}
+@media(orientation:landscape) and (max-height:520px){#freeSelectBoard{inset:13% 1% 3%;grid-template-columns:minmax(0,28fr) minmax(0,44fr) minmax(0,28fr)}.freeSelectHero .fighterShowcase canvas{height:77%}#freeSelectGrid{grid-auto-rows:minmax(50px,1fr);max-height:70%}.freeSelectCard img,.freeSelectCard.missing-icon::before{width:min(100%,11vh);max-height:11vh}.freeSelectVS{top:5%}}
 @media(prefers-reduced-motion:reduce){.freeSelectHero::after,.freeSelectHero .fighterShowcase canvas{animation:none!important}}
 /* Keep character names hidden during every character selection flow. */
 #arcSelectScreen .arcStage__name,#arcSelectScreen .arcStage .arcNameLogo,#arcSelectScreen #arcSelectGrid .arcCardName,#arcSelectScreen #arcSelectGrid .arcNameLogo,
@@ -864,7 +869,7 @@ const BATTLE_LOGOS={"round1": "assets/image-028.webp", "round2": "assets/image-0
 const MISAKI_BGM="assets/audio-005.mp3", BATTLE_BGM=MISAKI_BGM;
 function battleBgmSource(mode){if(!['fight','boss','boss2'].includes(mode))return null;if(kingsActive&&!net.active&&kingsIndex===2)return 'assets/audio-006.mp3';if(kingsActive&&!net.active&&kingsIndex===3)return 'assets/shinbocchi-battle.mp3';if(kingsActive&&!net.active&&kingsIndex===4)return 'assets/tetsu-final-battle.mp3';if(!net.active&&!freeMode&&stageIndex===2)return MISAKI_BGM;return net.active||freeMode||stageIndex>=1?BATTLE_BGM:null;}
 const battleLogoPreloads=Object.values(BATTLE_LOGOS).map(src=>{const img=new Image();img.src=src;return img;});
-const EFFECT_AUDIO={"shinVoice56":"assets/audio-007.mp3","parry":"assets/audio-008.mp3","shopWin":"assets/audio-009.mp3","shopStop":"assets/audio-010.mp3","shopSpin":"assets/audio-011.mp3","shopPeka":"assets/audio-012.mp3","haffun":"assets/audio-013.mp3","haffunImpact":"assets/haffun-impact.mp3","mogakiTune":"assets/mogaki-special-latter.mp3","mattsuanSpecial":"assets/mattsuan-special.mp3","levelUp":"assets/levelup-retro-monster.wav","shinArmorTakeoff":"assets/shin-armor-takeoff.mp3","misakiHeliVoice":"assets/misaki-helicopter-voice.mp3","misakiPunchVoice":"assets/misaki-punch-voice.mp3","misakiKickVoice":"assets/misaki-kick-voice.mp3","tetsuPunchVoice":"assets/tetsu-punch-voice.mp3","tetsuKickVoice":"assets/tetsu-kick-voice.mp3","tetsuPhoenixVoice":"assets/tetsu-phoenix-voice.mp3","punchWhoosh": "assets/audio-014.mp3", "punchImpact": "assets/audio-015.mp3", "heavyImpact": "assets/audio-016.mp3", "kickWhoosh": "assets/audio-017.mp3", "kickImpact": "assets/audio-018.mp3", "block": "assets/audio-019.mp3", "laserCharge": "assets/audio-020.mp3", "laserFire": "assets/audio-021.mp3", "laserBeam": "assets/audio-022.mp3", "laserDamage": "assets/audio-023.mp3", "laserTick": "assets/audio-024.mp3", "laserStop": "assets/audio-025.mp3"};
+const EFFECT_AUDIO={"shinVoice56":"assets/audio-007.mp3","parry":"assets/audio-008.mp3","shopWin":"assets/audio-009.mp3","shopStop":"assets/audio-010.mp3","shopSpin":"assets/audio-011.mp3","shopPeka":"assets/audio-012.mp3","haffun":"assets/audio-013.mp3","haffunImpact":"assets/haffun-impact.mp3","haffunDotEyes":"assets/haffun-dot-eyes.mp3","mogakiTune":"assets/mogaki-special-latter.mp3","mattsuanSpecial":"assets/mattsuan-special.mp3","mattsuanGrowth":"assets/mattsuan-growth-sfx.mp3","levelUp":"assets/levelup-retro-monster.wav","shinArmorTakeoff":"assets/shin-armor-takeoff.mp3","misakiHeliVoice":"assets/misaki-helicopter-voice.mp3","misakiPunchVoice":"assets/misaki-punch-voice.mp3","misakiKickVoice":"assets/misaki-kick-voice.mp3","tetsuPunchVoice":"assets/tetsu-punch-voice.mp3","tetsuKickVoice":"assets/tetsu-kick-voice.mp3","tetsuPhoenixVoice":"assets/tetsu-phoenix-voice.mp3","punchWhoosh": "assets/audio-014.mp3", "punchImpact": "assets/audio-015.mp3", "heavyImpact": "assets/audio-016.mp3", "kickWhoosh": "assets/audio-017.mp3", "kickImpact": "assets/audio-018.mp3", "block": "assets/audio-019.mp3", "laserCharge": "assets/audio-020.mp3", "laserFire": "assets/audio-021.mp3", "laserBeam": "assets/audio-022.mp3", "laserDamage": "assets/audio-023.mp3", "laserTick": "assets/audio-024.mp3", "laserStop": "assets/audio-025.mp3"};
 const MISAKI_VOICE_KEYS=['misakiPunchVoice','misakiKickVoice','misakiHeliVoice'],CHARACTER_VOICE_KEYS=[...MISAKI_VOICE_KEYS,'tetsuPunchVoice','tetsuKickVoice','tetsuPhoenixVoice'],effectPreloads=new Map();
 for(const name of CHARACTER_VOICE_KEYS){const a=new Audio(EFFECT_AUDIO[name]);a.preload='auto';a.load();effectPreloads.set(name,a);}
 const effectShots=new Set(),effectLoops=new Map();let laserWasVisible=false,effectFocusPaused=false;
@@ -890,8 +895,8 @@ window.addEventListener('blur',()=>{effectFocusPaused=true;stopBattleEffects();}
 
 const keys={}; let scene='title',stageIndex=0,roundTime=60,last=performance.now(),accSec=0;
 let player=null,enemy=null,projectiles=[],particles=[],shake=0,roundWins=[0,0],roundBusy=false,frameCount=0;
-let customAudio={},customBgm={},audioEnabled=true,currentExternalBgm=null;
-let storyMode=true,freeMode=false,freePlayerType='bocchi',freeEnemyType='misaki',freeDifficulty='normal',freePlayerMegaCannon=false,freeEnemyMegaCannon=false;
+let customAudio={},customBgm={freeDefault:'assets/audio-005.mp3',freeTenten:'assets/audio-006.mp3',freeShin:'assets/shinbocchi-battle.mp3',freeTetsu:'assets/tetsu-final-battle.mp3'},audioEnabled=true,currentExternalBgm=null;
+let storyMode=true,freeMode=false,freePlayerType='bocchi',freeEnemyType='misaki',freeDifficulty='hard',freeBattleMusic='freeDefault',freePlayerMegaCannon=false,freeEnemyMegaCannon=false;
 let bossPhase2=false,hitStopT=0,slowMoT=0,screenFlash=0,heliDramaT=0;
 let stage3ContinueCount=0,armorTakeoffUnlocked=false;
 let kingsActive=false,kingsIndex=0,kingsLosses57=0,kingsArmor57=false;
@@ -908,7 +913,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
 const charName=t=>t==='bocchi3'?'BOCCHI（第3戦）':t==='shobobocchi'?'ショボボッチ':t==='shadow'?'ショボボッチ':t==='shinbocchi'?'真ボッチ':t==='mattsuan'?'まっつぁん':t==='tenten'?'てんてん':t==='mogaki'?'もがきお兄さん':t==='haffun'?'ハッフン':t==='tetsu'?'てっちゃん':t==='misaki'?'美咲':'BOCCHI';
 function currentConfig(){
  if(!freeMode)return stages[stageIndex];
- return {title:'FREE BATTLE',diff:'',enemy:freeEnemyType,main:'',tips:[],special:true,ai:freeDifficulty,music:freeEnemyType==='misaki'?'boss':'fight'};
+ return {title:'FREE BATTLE',diff:'',enemy:freeEnemyType,main:'',tips:[],special:true,ai:'hard',music:freeBattleMusic};
 }
 function blockingAvailable(){return freeMode||stageIndex===2;}
 function bossBattle(){return (enemy&&enemy.type==='misaki')||(!freeMode&&stageIndex===2);}
@@ -1256,9 +1261,10 @@ function updateHaffunSneeze(f){
 }
 function updateHaffunCutin(c){
  defenseTick47(c);updateShinCutin(c);updateShoppingCutin(c);
+ if(c?.f?.type==='mattsuan'&&c.t>=2.65&&!c.growthSfxPlayed){c.growthSfxPlayed=true;sfx('mattsuanGrowth');}
  if(!c||c.f.type!=='haffun'||c.impact||c.t<1.35)return;
  c.impact=true;c.f.hp=Math.max(0,c.f.hp-HAFFUN_CRASH_DAMAGE);c.f.flash=.25;
- sfx('haffunImpact');updateHud();
+ sfx('haffunImpact');sfx('haffunDotEyes');updateHud();
 }
 function haffunPose(f){
  if(f.ko||f.state==='haffunSit')return 11;
@@ -1488,10 +1494,12 @@ function spawnHelicopter(f){
 function registerCombo(att,guarding){if(att!==player||guarding)return;att.hitCount=att.hitChainT>0?att.hitCount+1:1;att.hitChainT=.86;if(att.hitCount>=2){let label=att.hitCount+' HIT';if(att.hitCount>=3)label+='  BOCCHI COMBO!';comboText(label,700);if(att.hitCount===10){sfx('combo10');screenFlash=.16;}}}
 function hit(att,def,damage,kb,up=0,flags={}){
  if(def.ko||def.hurtT>0||roundBusy)return false;
+ const committedHaffunSneeze=def.type==='haffun'&&def.state==='sneeze'&&def.stateT>0;
  const parry=!flags.unblockable&&blockingAvailable()&&def.justBlock>0&&def.lastSDown<.13;
  if(parry){def.justBlock=0;def.sp=clamp(def.sp+30,0,100);def.counterBoostT=1.50;att.freezeT=.56;slowMoT=Math.max(slowMoT,.28);screenFlash=Math.max(screenFlash,.18);shake=Math.max(shake,13);burst(def.x,def.y-120,42,'cyan');triggerBlockFx(def);comboText('COUNTER ×1.5',850);return false;}
  const guarding=def.guard&&def.onGround&&!flags.unblockable;const boosted=att.counterBoostT>0;let raw=damage*att.damageScale*(boosted?1.5:1);if(boosted)att.counterBoostT=0;const armorFactor=def.takeoffShin?1/SHIN_TAKEOFF_DEFENSE:(def.armorActive?1/3:1);const dealt=Math.max(1,Math.round(raw*(guarding?.30:1)*armorFactor));
- def.hp=clamp(def.hp-dealt,0,def.maxHp);def.hurtT=guarding?.10:.22;def.state='hurt';def.vx=att.face*kb*(guarding?.35:1);def.vy=up;def.onGround=false;
+ def.hp=clamp(def.hp-dealt,0,def.maxHp);if(committedHaffunSneeze){def.hurtT=0;}else{def.hurtT=guarding?.10:.22;def.state='hurt';def.vx=att.face*kb*(guarding?.35:1);def.vy=up;def.onGround=false;}
+ if(att.type==='haffun'&&att.state==='sneeze'&&!def.ko){def.haffunFlyDir=att.face|| (def.x>=att.x?1:-1);def.haffunFlyT=.82;def.vx=def.haffunFlyDir*520;def.vy=-390;def.onGround=false;}
  // Keep the full third-round Bocchi hurt pose inside the canvas when hit mid-jump.
  if(usesBocchiWalk61(def)&&def.y<GROUND-300){def.y=GROUND-300;if(def.vy<0)def.vy=0;}
  def.flash=.08;att.sp=clamp(att.sp+(guarding?7:15),0,100);def.sp=clamp(def.sp+(guarding?9:6),0,100);
@@ -1531,7 +1539,7 @@ function updateFighter(f,o,dt,isPlayer){
  const lockShinArmorAttack=f.takeoffShin&&f.armorActive&&(f.state==='punch'||f.state==='kick');if(f.hurtT<=0&&!f.guard&&f.state!=='special'&&!lockShinArmorAttack)f.face=o.x>=f.x?1:-1;
  if(f.stateT>0){f.stateT=Math.max(0,f.stateT-dt);if(f.stateT===0&&!f.ko&&f.state!=='victory')f.state='idle';}
  updateHaffunSneeze(f);updateSkyKickSound(f);
- const previousX=f.x;f.vy+=1650*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=Math.pow(.0005,dt);if(f.y>=GROUND){f.y=GROUND;f.vy=0;f.onGround=true;}f.x=clamp(f.x,f.type==='tetsu'?270:90,W-(f.type==='tetsu'?270:90));if(f.type==='tetsu'&&f.onGround&&f.state==='idle'&&!f.guard&&f.hurtT<=0)f.walkCycle=((f.walkCycle||0)+Math.abs(f.x-previousX)/13)%8;
+ const previousX=f.x;f.vy+=1650*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=Math.pow(.0005,dt);if(f.haffunFlyT>0){f.haffunFlyT=Math.max(0,f.haffunFlyT-dt);f.x+=f.haffunFlyDir*1450*dt;}if(f.y>=GROUND){f.y=GROUND;f.vy=0;f.onGround=true;}f.x=clamp(f.x,f.type==='tetsu'?270:90,W-(f.type==='tetsu'?270:90));if(f.type==='tetsu'&&f.onGround&&f.state==='idle'&&!f.guard&&f.hurtT<=0)f.walkCycle=((f.walkCycle||0)+Math.abs(f.x-previousX)/13)%8;
  if(usesBocchiWalk61(f)&&f.onGround&&!f.guard&&f.hurtT<=0&&f.stateT<=0)f.bocchiWalk61=(((f.bocchiWalk61||0)+(f.x-previousX)*f.face/18)%8+8)%8;
  if((f.type==='shinbocchi'||f.type==='haffun'||f.type==='mogaki'||f.type==='tenten'||f.type==='mattsuan')&&f.onGround&&f.state==='idle')f.walkCycle=((f.walkCycle||0)+Math.abs(f.x-previousX)/26)%2;
  const b=attackBox(f);if(b&&!f.attackHit&&o.hurtT<=0&&!o.ko&&rectHit(b.x,b.y,b.w,b.h,o.x,o.y-120,90,205)){f.attackHit=true;hit(f,o,b.d,b.k,b.u,b);}if((f.state==='punch'||f.state==='kick')&&f.stateT===0)f.attackHit=false;
@@ -1551,8 +1559,8 @@ function cpuUseSpecial(f,o,dist){
  if(f.sp<100||!(freeMode||currentConfig().special))return false;
  if(f.type==='shinbocchi'&&dist<190&&o.hurtT<=0&&!(f.aiQueue?.length))return false;
  if(f.type==='tenten'&&dist<150&&o.hurtT<=0)return false;
- // Haffun's special is intentionally self-damaging: never spend meter to lose the round.
- if(f.type==='haffun')return false;
+ // Haffun may use his special once in the match's opening round.
+ if(f.type==='haffun'){if(f!==enemy||roundWins[0]+roundWins[1]!==0||f.haffunSpecialUsed)return false;f.haffunSpecialUsed=true;}
  if(f.type==='mogaki'&&f.hp>f.maxHp-30)return false;
  if(f.type==='mattsuan'&&f.giantT>0)return false;
  if((f.type==='bocchi'||f.type==='shadow'||f.type==='tetsu')&&(dist<120||!o.onGround))return false;
@@ -1901,7 +1909,7 @@ $('continueScreen').addEventListener('keydown',e=>{
  }
 });
 $('audioBtn').onclick=()=>{audioEnabled=!audioEnabled;$('audioBtn').textContent=audioEnabled?'🔊 音':'🔇 音';if(audioEnabled){music.ensure();music.set(scene==='romance'?'romance':bossPhase2?'boss2':currentConfig().music)}else {music.stop();stopBattleEffects();if(announcer)announcer.fallback();}};
-function showFreeBattleSetup(){refreshPortraitGroup('freePlayer');refreshPortraitGroup('freeEnemy');scene='freeSetup';storyMode=false;freeMode=true;$('titleScreen').classList.remove('show');$('romance').classList.remove('show');$('freeResultScreen').classList.remove('show');$('hud').classList.remove('show');$('touch').style.opacity='0';$('freeBattleScreen').classList.add('show');music.set('fight');}
+function showFreeBattleSetup(){refreshPortraitGroup('freePlayer');refreshPortraitGroup('freeEnemy');scene='freeSetup';storyMode=false;freeMode=true;$('titleScreen').classList.remove('show');$('romance').classList.remove('show');$('freeResultScreen').classList.remove('show');$('hud').classList.remove('show');$('touch').style.opacity='0';$('freeBattleScreen').classList.add('show');music.set(freeBattleMusic);}
 function startFreeBattle(){const pChoice=$('freePlayer').value,eChoice=$('freeEnemy').value;if(!opponentUnlocked54(pChoice)||!opponentUnlocked54(eChoice)){activeFreeSelect=!opponentUnlocked54(pChoice)?'freePlayer':'freeEnemy';syncFreeSelectBoard();toast('まだ倒していないキャラクターは選べません');return;}freePlayerMegaCannon=pChoice==='bocchi3';freeEnemyMegaCannon=eChoice==='bocchi3';freePlayerType=freePlayerMegaCannon?'bocchi':pChoice;freeEnemyType=freeEnemyMegaCannon?'bocchi':eChoice;freeDifficulty=$('freeDifficulty').value;storyMode=false;freeMode=true;scene='fight';syncSpecialControl();$('freeBattleScreen').classList.remove('show');$('hud').classList.add('show');$('touch').style.opacity='1';roundWins=[0,0];resetRound();music.set(currentConfig().music);toast('READY');}
 function showFreeResult(playerWon){scene='freeResult';$('hud').classList.remove('show');$('touch').style.opacity='0';$('freeResultTitle').textContent=playerWon?'YOU WIN!':'YOU LOSE';$('freeResultScreen').classList.add('show');}
 $('freeBattleBtn').onclick=showFreeBattleSetup;$('freeStartBtn').onclick=startFreeBattle;$('freeBackBtn').onclick=goTitle;$('freeRetryBtn').onclick=()=>{$('freeResultScreen').classList.remove('show');startFreeBattle();};$('freeSetupBtn').onclick=showFreeBattleSetup;$('freeTitleBtn').onclick=goTitle;
@@ -2176,6 +2184,9 @@ for(const side of ['P1','P2'])addArcNameLogo($('arc'+side+'Stage'),'arcStageLogo
 function syncFreeSelectBoard(){const player=$('freePlayer')?.value||'bocchi',enemy=$('freeEnemy')?.value||'misaki',active=activeFreeSelect==='freePlayer'?player:enemy;for(const data of FREE_CHARACTER_DATA){const button=$('freeSelectPick-'+data.id);if(!button)continue;const locked=!opponentUnlocked54(data.id);button.classList.toggle('p1-selected',data.id===player);button.classList.toggle('p2-selected',data.id===enemy);button.classList.toggle('active-target',data.id===active);button.classList.toggle('locked',locked);button.disabled=locked;button.setAttribute('aria-pressed',String(data.id===active));button.setAttribute('aria-label',locked?data.name+'・未撃破':data.name);}for(const [id,type]of[['freeSelectPlayer','freePlayer'],['freeSelectEnemy','freeEnemy']]){const panel=$(id),character=FREE_CHARACTER_DATA.find(d=>d.id===$(type)?.value)||arcCharacterById($(type)?.value),showcase=$(type==='freePlayer'?'freePlayerShowcase':'freeEnemyShowcase')?.closest('.fighterShowcase');if(panel&&character){panel.style.setProperty('--char-accent',character.color);panel.dataset.character=character.id;}if(showcase&&character){showcase.style.setProperty('--char-accent',character.color);showcase.dataset.character=character.id;}}$('freeSelectTargetP1')?.setAttribute('aria-pressed',String(activeFreeSelect==='freePlayer'));$('freeSelectTargetP2')?.setAttribute('aria-pressed',String(activeFreeSelect==='freeEnemy'));}
 function initFreeSelectLayout(){const screen=$('freeBattleScreen'),card=screen?.querySelector('.card');if(!card||$('freeSelectBoard'))return;if(screen.parentElement!==document.body)document.body.append(screen);card.querySelector('.selectHeading')?.style.setProperty('display','none','important');const board=document.createElement('div');board.id='freeSelectBoard';board.innerHTML='<section class="freeSelectHero" id="freeSelectPlayer" aria-label="1P キャラクター"><span class="freeSelectBadge">1P</span></section><section class="freeSelectCenter"><div class="freeSelectTargets"><button type="button" id="freeSelectTargetP1" aria-pressed="true">1P を選択</button><button type="button" id="freeSelectTargetP2" aria-pressed="false">2P / CPU を選択</button></div><div id="freeSelectGrid" role="group" aria-label="キャラクター一覧"></div><div class="freeSelectOptions"></div><div class="freeSelectActions"></div></section><section class="freeSelectHero enemy" id="freeSelectEnemy" aria-label="2P または CPU キャラクター"><span class="freeSelectBadge">2P / CPU</span></section><span class="freeSelectVS" aria-hidden="true">VS</span>';card.append(board);const center=board.querySelector('.freeSelectCenter');for(const pair of[['freePlayerShowcase','freeSelectPlayer'],['freeEnemyShowcase','freeSelectEnemy']]){const canvas=$(pair[0]),panel=$(pair[1]),showcase=canvas?.closest('.fighterShowcase');if(showcase&&panel){showcase.classList.add('freeSelectPortrait');panel.append(showcase);}}for(const id of ['freeStage54','freeDifficulty']){const select=$(id),box=select?.closest('.selectBox');if(box)board.querySelector('.freeSelectOptions').append(box);}for(const id of ['freeStartBtn','freeBackBtn']){const button=$(id);if(button)board.querySelector('.freeSelectActions').append(button);}const grid=$('freeSelectGrid');for(const data of FREE_CHARACTER_DATA){const button=document.createElement('button');button.type='button';button.id='freeSelectPick-'+data.id;button.className='freeSelectCard';button.style.setProperty('--char-accent',data.color);button.setAttribute('aria-label',data.name);button.setAttribute('aria-pressed','false');const icon=document.createElement('img');icon.className='freeSelectIcon';icon.src=data.icon;icon.alt='';icon.decoding='async';icon.onerror=()=>{icon.remove();button.classList.add('missing-icon');};const name=document.createElement('span');name.textContent=data.name;name.className='freeSelectName';button.append(icon,name);button.onclick=()=>{choosePortrait(activeFreeSelect,data.id);syncFreeSelectBoard();};grid.append(button);} $('freeSelectTargetP1').onclick=()=>{activeFreeSelect='freePlayer';syncFreeSelectBoard();};$('freeSelectTargetP2').onclick=()=>{activeFreeSelect='freeEnemy';syncFreeSelectBoard();};syncFreeSelectBoard();}
 initFreeSelectLayout();
+// Free-battle setup: strongest CPU only; let the player choose a battle BGM.
+function initFreeBattleOptions(){const difficulty=$('freeDifficulty'),difficultyBox=difficulty?.closest('.selectBox');if(difficulty){difficulty.value='hard';difficulty.disabled=true;}if(difficultyBox)difficultyBox.hidden=true;const stage=$('freeStage54'),options=document.querySelector('#freeSelectBoard .freeSelectOptions');if(!stage||!options||$('freeMusic54'))return;const box=document.createElement('div');box.className='selectBox';const label=document.createElement('label');label.htmlFor='freeMusic54';label.textContent='BGM';const select=document.createElement('select');select.id='freeMusic54';select.setAttribute('aria-label','対戦BGM');select.innerHTML='<option value="freeDefault">ボッチ伝説</option><option value="freeTenten">てんてん戦</option><option value="freeShin">真ボッチ戦</option><option value="freeTetsu">てっちゃん戦</option>';select.value=freeBattleMusic;select.onchange=()=>{freeBattleMusic=select.value;if(scene==='freeSetup')music.set(freeBattleMusic);};box.append(label,select);options.append(box);}
+initFreeBattleOptions();
 for(const data of FREE_CHARACTER_DATA){const button=$('freeSelectPick-'+data.id),logoType=data.id==='bocchi3'?'bocchi':data.id;if(button&&!button.querySelector('.arcNameLogo'))addArcNameLogo(button,'freeSelectLogo-'+data.id);drawArcNameLogo(logoType,'freeSelectLogo-'+data.id);}
 for(const [group,id]of[['freePlayer','freeHeroLogoP1'],['freeEnemy','freeHeroLogoP2']]){const canvas=$(group+'Showcase'),showcase=canvas?.closest('.fighterShowcase');if(showcase)addArcNameLogo(showcase,id);}
 const syncFreeSelectBoardWithHeroLogos=syncFreeSelectBoard;syncFreeSelectBoard=function(){syncFreeSelectBoardWithHeroLogos();for(const [group,id]of[['freePlayer','freeHeroLogoP1'],['freeEnemy','freeHeroLogoP2']]){const type=$(group)?.value;drawArcNameLogo(type==='bocchi3'?'bocchi':type,id);}};
