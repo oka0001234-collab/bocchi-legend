@@ -822,6 +822,7 @@ DATA.armorArt="assets/image-007.webp";DATA.armorMotion60="assets/image-008.webp"
 const cv=document.getElementById('game'),ctx=cv.getContext('2d');
 const W=1280,H=720,GROUND=610;
 DATA.tetsu="assets/image-009.webp";
+DATA.tetsuPhoenixRondo='assets/tetsu-phoenix-rondo-sheet.png';
 DATA.phoenix="assets/image-010.webp";
 DATA.tetsuWalk="assets/image-011.webp";
 DATA.bocchiJump="assets/image-012.webp";
@@ -1327,18 +1328,28 @@ function drawHaffunCutin(){
 }
 
 const TETSU_MOVES={punch:{startup:1,active:4,total:18},kick:{startup:30,active:7,total:46}};
+const TETSU_RONDO={frameDuration:.17,total:1.36,hitFrames:[2,3,4,6],damage:[8,8,8,20]};
+function startTetsuRondo(f){
+ if(f.type!=='tetsu'||f.sp<100||scene!=='fight'||announcerLocked()||roundBusy||superCutin||f.ko||f.hurtT>0||f.freezeT>0)return false;
+ f.sp=0;f.comboStep=0;f.state='special';f.stateT=TETSU_RONDO.total;f.tetsuRondoHits=[];f.attackHit=false;f.tetsuRondoCutin=true;
+ sfx('tetsuPhoenixVoice');startSuperCutin(f,()=>{f.state='special';f.stateT=TETSU_RONDO.total;f.tetsuRondoHits=[];f.attackHit=false;f.tetsuRondoCutin=false;shake=8;screenFlash=.10;burst(f.x,f.y-140,18,'gold');});return true;
+}
 function tetsuAttack(f,key){
+ if(key==='T'){startTetsuRondo(f);return;}
  if(key==='J'||key==='K'){
   const kind=key==='J'?'punch':'kick',m=TETSU_MOVES[kind];
   f.state=kind;f.stateT=m.total/60;f.attackHit=false;
   if(key==='J'){f.comboStep=1;f.comboT=1.3;sfx('punchWhoosh');sfx('tetsuPunchVoice');}
   else {f.comboStep=f.comboStep===1&&f.comboT>0?2:0;f.comboT=1.3;sfx('kickWhoosh');sfx('tetsuKickVoice');}
- }else if(key==='L'&&f.sp>=100){
-  const combo=f.comboStep===2&&f.comboT>0;f.sp=0;f.comboStep=0;f.state='special';f.stateT=.75;f.attackHit=true;
-  sfx('tetsuPhoenixVoice');startSuperCutin(f,()=>{projectiles.push({kind:'phoenix',owner:f,x:f.x+f.face*150,y:f.y-145,vx:f.face*900,w:590,h:260,life:2.2,damage:combo?44:36,hasHit:false});shake=14;screenFlash=.18;burst(f.x,f.y-140,36,'gold');sfx('cannon');crystalSound();});
- }
+ }else if(key==='L'&&f.sp>=100){f.sp=0;f.comboStep=0;f.state='special';f.stateT=.75;f.attackHit=true;sfx('tetsuPhoenixVoice');startSuperCutin(f,()=>{projectiles.push({kind:'phoenix',owner:f,x:f.x+f.face*150,y:f.y-145,vx:f.face*900,w:590,h:260,life:2.2,damage:36,hasHit:false});shake=14;screenFlash=.18;burst(f.x,f.y-140,36,'gold');sfx('cannon');crystalSound();});}
 }
 function tetsuAttackBox(f){
+ if(f.state==='special'&&f.type==='tetsu'){
+  const elapsed=TETSU_RONDO.total-f.stateT,frame=Math.floor(elapsed/TETSU_RONDO.frameDuration);
+  const hitIndex=TETSU_RONDO.hitFrames.indexOf(frame);if(hitIndex<0)return null;
+  const final=hitIndex===3;
+  return{x:f.x+f.face*(final?138:112),y:f.y-(final?150:132),w:final?220:158,h:final?142:104,d:TETSU_RONDO.damage[hitIndex],k:final?640:70,u:final?-235:-35,hitIndex,allowRondoLink:true};
+ }
  const m=TETSU_MOVES[f.state];if(!m)return null;
  const elapsed=m.total-f.stateT*60;
  if(elapsed+1e-7<m.startup||elapsed>=m.startup+m.active)return null;
@@ -1374,6 +1385,7 @@ function drawTetsuWalk(f){
  ctx.restore();return true;
 }
 function drawTetsu(f){
+ if(f.state==='special'&&f.tetsuRondoHits){drawTetsuRondo(f);return;}
  if(f.onGround&&!f.guard&&!f.ko&&f.hurtT<=0&&f.state==='idle'&&Math.abs(f.vx)>12&&drawTetsuWalk(f))return;
  const im=imgs.tetsu;if(!im.complete||!im.naturalWidth)return;
  const p=tetsuPose(f),cw=im.naturalWidth/3,ch=im.naturalHeight/2;
@@ -1385,6 +1397,15 @@ function drawTetsu(f){
  const sy=row?492:0,sh=row?532:512;ctx.drawImage(im,col*cw,sy,cw,sh,col*cw-pivot[p.idx],-feet[p.idx]-(row?20:0),cw,sh);ctx.restore();
  if(f.guard){ctx.save();ctx.strokeStyle='#8ce6ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(f.x+f.face*40,f.y-140,75,-1.3,1.3);ctx.stroke();ctx.restore();}
  if(f.state==='punch'&&p.frame>=4&&p.frame<8){ctx.save();ctx.strokeStyle='#fff3c5cc';ctx.lineWidth=5;ctx.beginPath();ctx.arc(f.x+f.face*85,f.y-130,65,f.face>0?-1.5:1.5,f.face>0?.6:4.7);ctx.stroke();ctx.restore();}
+}
+function drawTetsuRondo(f){
+ const im=imgs.tetsuPhoenixRondo;if(!im?.complete||!im.naturalWidth||im._fallback){const base=imgs.tetsu;if(base?.complete&&base.naturalWidth){const cw=base.naturalWidth/3,ch=base.naturalHeight/2;ctx.save();ctx.translate(f.x,f.y);ctx.scale(f.face,1);ctx.drawImage(base,0,0,cw,ch,-cw*.43,-486,cw,ch);ctx.restore();}return;}
+ const cols=4,cw=im.naturalWidth/cols,ch=im.naturalHeight/2;
+ const elapsed=Math.max(0,TETSU_RONDO.total-f.stateT),frame=Math.min(7,Math.floor(elapsed/TETSU_RONDO.frameDuration));
+ const col=frame%cols,row=Math.floor(frame/cols),sx=Math.floor(col*cw),sy=Math.floor(row*ch),sw=Math.floor((col+1)*cw)-sx,sh=Math.floor((row+1)*ch)-sy;
+ ctx.save();ctx.translate(f.x,f.y);ctx.scale(f.face*.92,.92);if(f.flash>0)ctx.filter='brightness(1.7)';
+ ctx.drawImage(im,sx,sy,sw,sh,-cw/2,-ch,cw,ch);ctx.restore();
+ if(frame===6){ctx.save();ctx.globalCompositeOperation='lighter';ctx.shadowColor='#ffb62e';ctx.shadowBlur=30;ctx.strokeStyle='#ffd967';ctx.lineWidth=5;ctx.beginPath();ctx.arc(f.x+f.face*155,f.y-180,95,-.9,.9);ctx.stroke();ctx.restore();}
 }
 function drawPhoenix(p){
  const im=imgs.phoenix;if(!im.complete||!im.naturalWidth)return;
@@ -1400,7 +1421,7 @@ function drawTetsuCutin(){
  const p=superCutin.t/superCutin.duration,im=imgs.tetsuPhoenixCutin;ctx.save();ctx.fillStyle='#160c08';ctx.fillRect(0,0,W,H);
  if(im?.complete&&im.naturalWidth){const scale=Math.max(W/im.naturalWidth,H/im.naturalHeight),w=im.naturalWidth*scale,h=im.naturalHeight*scale;ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h);}
  ctx.fillStyle='rgba(10,5,8,.58)';ctx.fillRect(0,H-170,W,170);
- ctx.textAlign='right';ctx.fillStyle='#fff4c5';ctx.font='900 30px sans-serif';ctx.fillText('てっちゃん',1210,H-104);ctx.font='900 76px sans-serif';ctx.shadowColor='#ff9b32';ctx.shadowBlur=24;ctx.fillText('鳳凰水晶',1210,H-28);ctx.shadowBlur=0;ctx.fillStyle='#ffe4a0';ctx.fillRect(0,0,W,5);ctx.fillRect(0,H-5,W,5);
+ ctx.textAlign='right';ctx.fillStyle='#fff4c5';ctx.font='900 30px sans-serif';ctx.fillText('てっちゃん',1210,H-104);ctx.font='900 76px sans-serif';ctx.shadowColor='#ff9b32';ctx.shadowBlur=24;ctx.fillText(superCutin.f.tetsuRondoCutin?'鳳凰乱舞':'鳳凰水晶',1210,H-28);ctx.shadowBlur=0;ctx.fillStyle='#ffe4a0';ctx.fillRect(0,0,W,5);ctx.fillRect(0,H-5,W,5);
  if(p<.16){ctx.fillStyle=`rgba(255,239,190,${(1-p/.16)*.38})`;ctx.fillRect(0,0,W,H);}ctx.restore();
 }
 
@@ -1481,7 +1502,7 @@ function drawShinCutin(){
 }
 
 function keyAttack(f,key,isCPU=false){
- if(scene!=='fight'||announcerLocked()||roundBusy||superCutin||f.ko||f.hurtT>0||f.freezeT>0||f.stateT>0)return;const s=currentConfig();const weakForm=!freeMode&&stageIndex===0&&f===player;if(key==='L'&&f===player&&f.takeoffShin&&f.armorActive&&f.sp>=100){f.sp=0;f.state='special';f.stateT=.95;f.attackHit=true;f.takeoffCannonT=.95;spawnCannon(f,false,true);showCinematic('真ボッチ砲！',480,true);comboText('真ボッチ砲',700);return;}if(f.type==='shinbocchi'){shinAttack(f,key);return;}if(f.type==='mattsuan'){mattsuanAttack(f,key);return;}if(f.type==='tenten'){tentenAttack(f,key);return;}if(f.type==='mogaki'){mogakiAttack(f,key);return;}if(f.type==='haffun'){haffunAttack(f,key);return;}if(f.type==='tetsu'){tetsuAttack(f,key);return;}
+ const held=net.active?(f===player?net.localKeys:net.remoteKeys):keys;if(scene!=='fight'||announcerLocked()||roundBusy||superCutin||f.ko||f.hurtT>0||f.freezeT>0)return;if(f.type==='tetsu'&&(key==='T'||((key==='J'||key==='K')&&f.sp>=100&&held.KeyJ&&held.KeyK))){startTetsuRondo(f);return;}if(f.stateT>0)return;const s=currentConfig();const weakForm=!freeMode&&stageIndex===0&&f===player;if(key==='L'&&f===player&&f.takeoffShin&&f.armorActive&&f.sp>=100){f.sp=0;f.state='special';f.stateT=.95;f.attackHit=true;f.takeoffCannonT=.95;spawnCannon(f,false,true);showCinematic('真ボッチ砲！',480,true);comboText('真ボッチ砲',700);return;}if(f.type==='shinbocchi'){shinAttack(f,key);return;}if(f.type==='mattsuan'){mattsuanAttack(f,key);return;}if(f.type==='tenten'){tentenAttack(f,key);return;}if(f.type==='mogaki'){mogakiAttack(f,key);return;}if(f.type==='haffun'){haffunAttack(f,key);return;}if(f.type==='tetsu'){tetsuAttack(f,key);return;}
  if(key==='J'){f.state='punch';f.stateT=weakForm?.36:(f.type==='misaki'?.26:.28);f.attackHit=false;sfx('punchWhoosh');if(f.type==='misaki')sfx('misakiPunchVoice');if(f===player||net.active||isCPU){f.comboStep=1;f.comboT=.62;}}
  else if(key==='K'){const thirdKick=!freeMode&&stageIndex===2&&f===player&&(f.type==='bocchi'||f.type==='shadow');f.state='kick';f.stateT=weakForm?.60:(thirdKick?.58:(f.type==='misaki'?.44:.48));f.attackHit=false;sfx('kickWhoosh');if(f.type==='misaki')sfx('misakiKickVoice');if((f===player||net.active||isCPU)&&f.comboStep===1&&f.comboT>0){f.comboStep=2;f.comboT=.68;}else if(f===player||net.active||isCPU){f.comboStep=0;}}
  else if(key==='L'&&(freeMode||s.special)&&f.sp>=100){f.sp=0;f.state='special';f.stateT=.58;f.attackHit=true;if(f.type==='bocchi'||f.type==='shadow'){const c=(f===player||net.active||isCPU)&&f.comboStep===2&&f.comboT>0;spawnCannon(f,c);if(c){comboText('BOCCHI COMBO!');f.comboStep=0;}}else{spawnHelicopter(f);}}
@@ -1501,7 +1522,7 @@ function spawnHelicopter(f){
 }
 function registerCombo(att,guarding){if(att!==player||guarding)return;att.hitCount=att.hitChainT>0?att.hitCount+1:1;att.hitChainT=.86;if(att.hitCount>=2){let label=att.hitCount+' HIT';if(att.hitCount>=3)label+='  BOCCHI COMBO!';comboText(label,700);if(att.hitCount===10){sfx('combo10');screenFlash=.16;}}}
 function hit(att,def,damage,kb,up=0,flags={}){
- if(def.ko||def.hurtT>0||roundBusy)return false;
+ if(def.ko||(def.hurtT>0&&!flags.allowRondoLink)||roundBusy)return false;
  const committedHaffunSneeze=def.type==='haffun'&&def.state==='sneeze'&&def.stateT>0;
  const parry=!flags.unblockable&&blockingAvailable()&&def.justBlock>0&&def.lastSDown<.13;
  if(parry){def.justBlock=0;def.sp=clamp(def.sp+30,0,100);def.counterBoostT=1.50;att.freezeT=.56;slowMoT=Math.max(slowMoT,.28);screenFlash=Math.max(screenFlash,.18);shake=Math.max(shake,13);burst(def.x,def.y-120,42,'cyan');triggerBlockFx(def);comboText('COUNTER ×1.5',850);return false;}
@@ -1550,7 +1571,7 @@ function updateFighter(f,o,dt,isPlayer){
  const previousX=f.x;f.vy+=1650*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=Math.pow(.0005,dt);if(f.haffunFlyT>0){f.haffunFlyT=Math.max(0,f.haffunFlyT-dt);f.x+=f.haffunFlyDir*1450*dt;}if(f.y>=GROUND){f.y=GROUND;f.vy=0;f.onGround=true;}f.x=clamp(f.x,f.type==='tetsu'?270:90,W-(f.type==='tetsu'?270:90));if(f.type==='tetsu'&&f.onGround&&f.state==='idle'&&!f.guard&&f.hurtT<=0)f.walkCycle=((f.walkCycle||0)+Math.abs(f.x-previousX)/13)%8;
  if(usesBocchiWalk61(f)&&f.onGround&&!f.guard&&f.hurtT<=0&&f.stateT<=0)f.bocchiWalk61=(((f.bocchiWalk61||0)+(f.x-previousX)*f.face/18)%8+8)%8;
  if((f.type==='shinbocchi'||f.type==='haffun'||f.type==='mogaki'||f.type==='tenten'||f.type==='mattsuan')&&f.onGround&&f.state==='idle')f.walkCycle=((f.walkCycle||0)+Math.abs(f.x-previousX)/26)%2;
- const b=attackBox(f);if(b&&!f.attackHit&&o.hurtT<=0&&!o.ko&&rectHit(b.x,b.y,b.w,b.h,o.x,o.y-120,90,205)){f.attackHit=true;hit(f,o,b.d,b.k,b.u,b);}if((f.state==='punch'||f.state==='kick')&&f.stateT===0)f.attackHit=false;
+ const b=attackBox(f),rondo=f.type==='tetsu'&&f.state==='special'&&Array.isArray(f.tetsuRondoHits);if(b&&(rondo?!f.tetsuRondoHits[b.hitIndex]:!f.attackHit)&&(rondo||o.hurtT<=0)&&!o.ko&&rectHit(b.x,b.y,b.w,b.h,o.x,o.y-120,90,205)){if(rondo)f.tetsuRondoHits[b.hitIndex]=true;else f.attackHit=true;const landed=hit(f,o,b.d,b.k,b.u,b);if(rondo&&b.hitIndex===3&&landed){burst(o.x,o.y-110,36,'gold');shake=Math.max(shake,18);screenFlash=Math.max(screenFlash,.16);sfx('cannon');crystalSound();}}if((f.state==='punch'||f.state==='kick')&&f.stateT===0)f.attackHit=false;
 }
 // Continuous spacing plus decisions with human-scale reaction delays; no HP/damage bonus.
 function cpuRanges(f){
@@ -2131,7 +2152,7 @@ const netBaseTitle=goTitle;goTitle=function(){netClose();$('netScreen').classLis
 $('onlineBtn').onclick=showOnline;$('netCreate').onclick=()=>netOpen(true);$('netJoin').onclick=()=>netOpen(false);
  $('netReady').onclick=()=>{if(!net.connected)return;net.ready=true;$('netCharacter').disabled=true;refreshPortraitGroup('netCharacter');$('netReady').hidden=true;netStatus('相手の準備を待っています…');netSend({type:'ready'});netMaybeStart();};
 $('netCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('netCode').textContent);netStatus('部屋番号をコピーしました。');}catch(e){netStatus('表示中の部屋番号を選択してコピーしてください。');}};
-function netKey(code,down){if(!net.active||scene!=='fight')return false;if(!['KeyA','KeyD','KeyW','KeyS','KeyJ','KeyK','KeyL','KeyI'].includes(code))return false;if(announcerLocked())return true;const before=net.localKeys[code];net.localKeys[code]=down;if(down&&!before&&['KeyJ','KeyK','KeyL','KeyS'].includes(code)){const key=code.slice(3);if(net.host)net.actions.push({side:0,key});else netSend({type:'action',epoch:net.epoch,key});}return true;}
+function netKey(code,down){if(!net.active||scene!=='fight')return false;if(!['KeyA','KeyD','KeyW','KeyS','KeyJ','KeyK','KeyL','KeyI'].includes(code))return false;if(announcerLocked())return true;const before=net.localKeys[code];net.localKeys[code]=down;if(down&&!before&&['KeyJ','KeyK','KeyL','KeyS'].includes(code)){const key=(code==='KeyJ'||code==='KeyK')&&net.localKeys.KeyJ&&net.localKeys.KeyK?'T':code.slice(3);if(net.host)net.actions.push({side:0,key});else netSend({type:'action',epoch:net.epoch,key});}return true;}
 window.addEventListener('keydown',e=>{if(netKey(keyboardCode(e),true)){e.preventDefault();e.stopImmediatePropagation();}},true);window.addEventListener('keyup',e=>{if(netKey(keyboardCode(e),false)){e.preventDefault();e.stopImmediatePropagation();}},true);
 document.querySelectorAll('.touchBtn').forEach(b=>{b.addEventListener('pointerdown',e=>{if(netKey(b.dataset.key,true)){e.preventDefault();e.stopImmediatePropagation();b.setPointerCapture(e.pointerId);b.classList.add('down');}},true);for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,e=>{if(netKey(b.dataset.key,false)){e.preventDefault();e.stopImmediatePropagation();b.classList.remove('down');}},true);});
 function netRelease(){net.localKeys={};net.actions=[];if(net.active)netSend({type:'presence',hidden:document.hidden});}
@@ -2214,7 +2235,7 @@ function arcChoose(type,announce=true){
  arcSelection.choice=type;
  showPortraitCutin(type,'arc');
  for(const t of ARC_CHARACTERS){const b=$('arcPick-'+t);b.setAttribute('aria-pressed',String(t===type));b.classList.toggle('selected',t===type);}
- $('arcChoiceName').textContent=charName(type);$('arcChoiceMove').textContent={shinbocchi:'真ボッチ砲：全画面ビーム（SP100）',bocchi:'パンチ → キック → ボッチ砲',shobobocchi:'パンチ → キック → ボッチ砲',shadow:'パンチ → キック → ボッチ砲',misaki:'必殺技：ヘリコプター砲',tetsu:'フライパン・キック・鳳凰水晶',haffun:'ハッフン！／突撃ハッフン',mogaki:'ビール3秒飲み：SP100・HP30回復',tenten:'成功買い物！ ルーレットで落下＆大破（SP100）',mattsuan:'まっつぁんのいいとこ：15秒間・身長10倍・天からの蹴り'}[type];arcPortrait(type,'arcChoicePortrait');
+ $('arcChoiceName').textContent=charName(type);$('arcChoiceMove').textContent={shinbocchi:'真ボッチ砲：全画面ビーム（SP100）',bocchi:'パンチ → キック → ボッチ砲',shobobocchi:'パンチ → キック → ボッチ砲',shadow:'パンチ → キック → ボッチ砲',misaki:'必殺技：ヘリコプター砲',tetsu:'A＋S同時押し：鳳凰乱舞（4連撃・SP100）／D：鳳凰水晶',haffun:'ハッフン！／突撃ハッフン',mogaki:'ビール3秒飲み：SP100・HP30回復',tenten:'成功買い物！ ルーレットで落下＆大破（SP100）',mattsuan:'まっつぁんのいいとこ：15秒間・身長10倍・天からの蹴り'}[type];arcPortrait(type,'arcChoicePortrait');
  drawArcSelectSlots();if(arcSelection.challenger)arcToHost({a:'choice',match:arcSelection.match,char:type});
 }
 function arcShowSelection(challenger,deadline,fixedType='bocchi'){
@@ -2425,7 +2446,7 @@ setInterval(()=>{
 
 
 const PORTRAIT_GROUPS=['freePlayer','freeEnemy','netCharacter'];
-const PORTRAIT_MOVES={shinbocchi:'真ボッチ砲：全画面ビーム（SP100）',bocchi:'パンチ → キック → ボッチ砲',bocchi3:'第3戦版：赤い特大ボッチ砲',shobobocchi:'パンチ → キック → ボッチ砲',shadow:'パンチ → キック → ボッチ砲',misaki:'ヘリコプター砲',tetsu:'フライパン（4F）・キック（25F）・鳳凰水晶',haffun:'クシャミ（60F）・突撃ハッフン（自傷60）',mogaki:'ビール3秒飲み：HP30回復',tenten:'成功買い物！ 失敗買い物スロット',mattsuan:'まっつぁんのいいとこ：身長10倍・15秒'};
+const PORTRAIT_MOVES={shinbocchi:'真ボッチ砲：全画面ビーム（SP100）',bocchi:'パンチ → キック → ボッチ砲',bocchi3:'第3戦版：赤い特大ボッチ砲',shobobocchi:'パンチ → キック → ボッチ砲',shadow:'パンチ → キック → ボッチ砲',misaki:'ヘリコプター砲',tetsu:'鳳凰乱舞：A＋S同時押し（SP100）／鳳凰水晶：D',haffun:'クシャミ（60F）・突撃ハッフン（自傷60）',mogaki:'ビール3秒飲み：HP30回復',tenten:'成功買い物！ 失敗買い物スロット',mattsuan:'まっつぁんのいいとこ：身長10倍・15秒'};
 function portraitTypes(group){const types=ARC_CHARACTERS;return group==='freePlayer'||group==='freeEnemy'?types.flatMap(t=>t==='bocchi'?[t,'bocchi3']:[t]):types;}
 function initNetSelectLayout(){const root=document.querySelector('#netScreen .netVersusShowcase');if(!root)return;root.innerHTML='<div class="fighterShowcase playerShowcase"><span class="showcaseSlot">1P</span><canvas id="netP1Portrait" width="480" height="408" aria-hidden="true"></canvas><strong id="netP1Char">BOCCHI</strong><small id="netP1Handle">ホスト</small></div><span class="versusFlash" aria-hidden="true">VS</span><div class="fighterShowcase enemyShowcase"><span class="showcaseSlot">2P</span><canvas id="netP2Portrait" width="480" height="408" aria-hidden="true"></canvas><strong id="netP2Char">相手待ち</strong><small id="netP2Handle">部屋に参加すると選べます</small><div class="opponentWaiting"><b>?</b><small>相手が選択中</small></div></div>';}
 initNetSelectLayout();
@@ -2483,9 +2504,12 @@ function showSpaceDialogue(){spaceDialogueStep=0;showStoryCinematic('spaceDialog
 function showSpaceChapterEnding(){showStoryCinematic('spaceEnding','BOCCHI LEGEND ・ 恋愛編 エンディング','assets/romance-fireworks-ending.webp','花火の夜に約束を交わすBOCCHIと美咲','ナレーション','美咲は宇宙で待っている。BOCCHIは追いかけると誓った。\nだが宇宙へ行くには、伝説の厨具が必要だ。','伝説の厨具を探す ▶',beginKingsRoute);music.set('romance');}
 function advanceSpaceDialogue(){if(spaceDialogueStep===0){spaceDialogueStep=1;$('cinematicSpeaker').textContent='BOCCHI';$('cinematicLine').textContent='追いかける！';$('cinematicNext').onclick=showSpaceChapterEnding;return;}showSpaceChapterEnding();}
 function showToolJourney(){showStoryCinematic('toolJourney','BOCCHI LEGEND ・ 伝説の厨具','assets/phoenix-tool-journey.webp','てっちゃんから厨具を受け取り、鳳凰の炎とともに宇宙へ飛ぶBOCCHI','ナレーション','てっちゃんに認められ、BOCCHIは伝説の厨具を手に入れた。\n鳳凰の炎が厨具に宿り、宇宙へ続く道が開く。\n美咲を追いかけ、BOCCHIは夜空へ飛び立った！','シューティングへ ▶',showSkyRumbleIntermission);}
+const FINAL_ENDING_LINES=[['ナレーション','ハッフンを倒し、伝説の厨具に宿る鳳凰の炎が宇宙への道を照らした。'],['BOCCHI','美咲ー！迎えに来たぞ！'],['美咲','かずくん……本当に来てくれたんだね。'],['BOCCHI','待たせてごめん。今度は一緒に帰ろう。'],['美咲','うん。ふたりで花火を見て、それから帰ろう。'],['ナレーション','伝説の厨具が開いた道の先で、ふたりの新しい物語が始まる。']];let finalEndingStep=0;
+function startFinalEnding(){finalEndingStep=0;const [speaker,line]=FINAL_ENDING_LINES[0];showStoryCinematic('finalEnding','BOCCHI LEGEND ・ 最終エンディング','assets/final-ending-space-reunion.webp','宇宙で再会するBOCCHIと美咲',speaker,line,'次へ ▶',advanceFinalEnding);music.set('romance');}
+function advanceFinalEnding(){finalEndingStep++;if(finalEndingStep<FINAL_ENDING_LINES.length){const [speaker,line]=FINAL_ENDING_LINES[finalEndingStep];$('cinematicEyebrow').textContent='BOCCHI LEGEND ・ 最終エンディング';$('cinematicSpeaker').textContent=speaker;$('cinematicLine').textContent=line;return;}$('cinematicEyebrow').textContent='BOCCHI LEGEND ・ THE END';$('cinematicSpeaker').textContent='';$('cinematicLine').textContent='END\nご遊戯ありがとうございました。';$('cinematicNext').textContent='タイトルへ';$('cinematicNext').onclick=goTitle;}
 $('tetsuFinalNext').onclick=()=>scene==='shinBocchiDialogue'?advanceShinBocchiDialogue():scene==='spaceDialogue'?advanceSpaceDialogue():advanceTetsuFinalDialogue();
 const showTetsuDialogueLayerGuard=showTetsuFinalDialogue;showTetsuFinalDialogue=function(){showTetsuDialogueLayerGuard();$('gameViewport').classList.remove('cutinFront40','encounterFront43');$('tetsuFinalNext').focus({preventScroll:true});};
-window.addEventListener('keydown',e=>{if(!(e.key==='Enter'||e.key===' '||e.code==='NumpadEnter'))return;if(['fireworksScene','spaceDialogue','spaceEnding','toolJourney'].includes(scene)){e.preventDefault();e.stopImmediatePropagation();$('cinematicNext').click();return;}if(!['tetsuFinalDialogue','shinBocchiDialogue'].includes(scene))return;e.preventDefault();e.stopImmediatePropagation();$('tetsuFinalNext').click();},true);
+ window.addEventListener('keydown',e=>{if(!(e.key==='Enter'||e.key===' '||e.code==='NumpadEnter'))return;if(['fireworksScene','spaceDialogue','spaceEnding','toolJourney','finalEnding'].includes(scene)){e.preventDefault();e.stopImmediatePropagation();$('cinematicNext').click();return;}if(!['tetsuFinalDialogue','shinBocchiDialogue'].includes(scene))return;e.preventDefault();e.stopImmediatePropagation();$('tetsuFinalNext').click();},true);
 function kingsIntro(retry=false){
  dismissResult();clearInput();scene='kingsIntro';freeMode=true;storyMode=false;stageIndex=2;
  for(const id of ['creditsScreen','romance','titleScreen','freeResultScreen','tutorialScreen','skyRumbleScreen','cinematicScreen','hud'])$(id).classList.remove('show');
@@ -2521,10 +2545,7 @@ $('kingsEncounterSkip').onclick=()=>launchKingsFight();
 function kingsResult(won){
  if(!won){kingsLosses57++;if(kingsLosses57>=2&&!kingsArmor57){kingsArmor57=true;showArmorLesson();$('tDiff').textContent=kingsIndex===4?'てっちゃんに再挑戦':kingsIndex===5?'ハッフンに再挑戦':'独身四天王に再挑戦';$('fightBtn').onclick=()=>{$('tutorialScreen').classList.remove('show');startKingsFight();};return;}kingsIntro(true);return;}
  const defeated=KINGS[kingsIndex];kingsIndex++;if(defeated==='tetsu'){showToolJourney();return;}if(kingsIndex<KINGS.length){if(KINGS[kingsIndex]==='tetsu')showTetsuFinalDialogue();else kingsIntro();return;}
- kingsActive=false;safeSet('bocchi_kings_clear','1');safeSet('bocchi_kings_progress','0');clearInput();scene='kingsClear';
- $('hud').classList.remove('show');$('touch').style.opacity='0';$('kingsScreen').classList.add('show');$('kingsFace').hidden=true;
- $('kingsRank').textContent='最終ボス 制覇';$('kingsName').textContent='BOCCHI伝説';$('kingsInfo').textContent='独身四天王、てっちゃん、ハッフンを倒した。その拳で、伝説を刻め。';
- $('kingsFight').textContent='もう一度挑む';$('kingsFight').onclick=()=>{kingsIndex=0;kingsActive=true;kingsLosses57=0;kingsArmor57=false;skyRumbleCleared=false;kingsIntro();};music.set('romance');
+  kingsActive=false;safeSet('bocchi_kings_clear','1');safeSet('bocchi_kings_progress','0');startFinalEnding();
 }
 const kingsConfig=currentConfig;currentConfig=function(){const c=kingsConfig();return kingsActive&&!net.active?{...c,ai:'kings',music:'boss',special:true}:c;};
 const kingsReset=resetRound;resetRound=function(){kingsReset();if(kingsActive&&!net.active){enemy.hp=enemy.maxHp=KINGS[kingsIndex]==='tetsu'?600:300;if(KINGS[kingsIndex]==='tetsu')enemy.damageScale=1.35;enemy.sp=100;roundTime=99;updateHud();}};
