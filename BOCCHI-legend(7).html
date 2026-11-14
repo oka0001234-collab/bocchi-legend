@@ -2503,7 +2503,7 @@ function kingsResult(won){
  $('kingsFight').textContent='もう一度挑む';$('kingsFight').onclick=()=>{kingsIndex=0;kingsActive=true;kingsLosses57=0;kingsArmor57=false;skyRumbleCleared=false;kingsIntro();};music.set('romance');
 }
 const kingsConfig=currentConfig;currentConfig=function(){const c=kingsConfig();return kingsActive&&!net.active?{...c,ai:'kings',music:'boss',special:true}:c;};
-const kingsReset=resetRound;resetRound=function(){kingsReset();if(kingsActive&&!net.active){enemy.hp=enemy.maxHp=KINGS[kingsIndex]==='tetsu'?600:300;enemy.sp=100;roundTime=99;updateHud();}};
+const kingsReset=resetRound;resetRound=function(){kingsReset();if(kingsActive&&!net.active){enemy.hp=enemy.maxHp=KINGS[kingsIndex]==='tetsu'?600:300;if(KINGS[kingsIndex]==='tetsu')enemy.damageScale=1.35;enemy.sp=100;roundTime=99;updateHud();}};
 const kingsCredits=finishCredits;finishCredits=function(){if(scene!=='credits')return;kingsCredits();kingsActive=true;kingsIndex=0;kingsLosses57=0;kingsArmor57=false;skyRumbleCleared=false;kingsIntro();};$('creditsSkip').onclick=finishCredits;
 const kingsTitle=goTitle;goTitle=function(){kingsActive=false;$('kingsScreen').classList.remove('show');$('tetsuFinalScreen').classList.remove('show');$('skyRumbleScreen').classList.remove('show');kingsTitle();};$('kingsHome').onclick=goTitle;
 // Existing menu callbacks retain wrappers that predate this campaign.
