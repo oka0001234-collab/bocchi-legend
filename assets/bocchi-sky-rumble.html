@@ -64,7 +64,7 @@ let bullets=[],enemyBullets=[],enemies=[],particles=[],items=[],midBoss=null,gia
 let ending=null,hitStop=0;
 let running=false,paused=false,last=0,raf=0,score=0,stage=1,spawnT=0,midBossStarted=false,giantStarted=false,shake=0,flash=0,frame=0,spawnCount=0,bomb=2,combo=0,comboTimer=0,bossCutin=0,bossCutinText='';
 const p={x:W/2,y:H-155,w:52,h:70,hp:100,sp:0,speed:900,fireCd:0,armor:false,armorT:0,inv:0,power:1};
-let dragging=false,targetX=p.x,targetY=p.y;
+let dragging=false,targetX=p.x,targetY=p.y;const heldDirections=new Set();
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
 const hit=(a,b)=>Math.abs(a.x-b.x)<(a.w+b.w)/2&&Math.abs(a.y-b.y)<(a.h+b.h)/2;
 
@@ -197,9 +197,14 @@ cv.addEventListener('pointerdown',e=>{audio.init();audio.resume();e.preventDefau
 cv.addEventListener('pointermove',e=>{if(!dragging)return;e.preventDefault();mapPointer(e)});
 cv.addEventListener('pointerup',e=>{dragging=false;cv.releasePointerCapture?.(e.pointerId)});
 cv.addEventListener('pointercancel',()=>dragging=false);
+window.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();heldDirections.add(e.key);$('touchHint').style.opacity='0';});
+window.addEventListener('keyup',e=>{heldDirections.delete(e.key)});
+window.addEventListener('blur',()=>heldDirections.clear());
+document.addEventListener('visibilitychange',()=>{if(document.hidden)heldDirections.clear();});
 
 function update(dt){
  if(ending)return;
+ if(running&&!paused){const step=p.speed*dt;if(heldDirections.has('ArrowLeft'))targetX-=step;if(heldDirections.has('ArrowRight'))targetX+=step;if(heldDirections.has('ArrowUp'))targetY-=step;if(heldDirections.has('ArrowDown'))targetY+=step;targetX=clamp(targetX,30,W-30);targetY=clamp(targetY,90,H-95);}
  if(hitStop>0){hitStop=Math.max(0,hitStop-dt);return;}
  // Pause combat for the entire cut-in; the separate grace timer starts afterwards.
  if(giantMisaki&&bossCutin>0){bossCutin=Math.max(0,bossCutin-dt);enemyBullets.length=0;bullets.length=0;flash=0;shake=0;return;}
@@ -470,7 +475,7 @@ function render(){
  ctx.restore();$('startBtn').classList.toggle('hidden',running);
 }
 function loop(t){const dt=Math.min(.033,(t-last)/1000||0);last=t;if(ending){updateEnding(dt);render();if(ending.stage!=='end')raf=requestAnimationFrame(loop);return;}if(!running){render();return;}if(!paused)update(dt);render();raf=requestAnimationFrame(loop);}
-$('startBtn').onclick=()=>{if(ending&&ending.stage!=='end')return;if(ending&&ending.stage==='end'&&window.parent!==window){window.parent.postMessage({type:'bocchi-sky-rumble-clear'},location.origin==='null'?'*':location.origin);return;}reset();};
+$('startBtn').onclick=()=>{if(ending&&ending.stage!=='end')return;if(ending&&ending.stage==='end'&&window.parent!==window){window.parent.postMessage({type:'bocchi-sky-rumble-clear'},location.origin==='null'?'*':location.origin);return;}reset();cv.focus({preventScroll:true});};
 $('bossPreviewBtn').onclick=()=>{if(ending)return;audio.init();if(!running){reset();spawnGiantMisaki();}else if(!giantMisaki)spawnGiantMisaki();else setBossPhase(giantMisaki.phase%3+1);bossCutin=0;giantMisaki.transition=0;paused=true;$('pauseBtn').textContent='RESUME';render();};
 // Read-only test hooks activated only with a review query.
 if(location.search.includes('review=1'))window.bossReview={audioTest(){return audio;},fxState(){return {count:breakFx.length,kinds:breakFx.map(f=>f.kind),particles:particles.length};},fxFrame(dt){for(const f of breakFx){f.life-=dt;f.r+=dt*(f.kind==='fireball'?150:480)*(f.scale||1);}breakFx=breakFx.filter(f=>f.life>0);render();},endingState(){return ending?{...ending,enemies:enemyBullets.length,running}:null;},advanceEnding(dt){updateEnding(dt);render();},encounter(n){setBossPhase(n);},tick(dt){update(dt);},timing(){return{cutin:bossCutin,grace:giantMisaki.fireGrace,bullets:enemyBullets.length};},start(){reset();spawnGiantMisaki();bossCutin=0;giantMisaki.transition=0;paused=true;render();},phase(n){setBossPhase(n);giantMisaki.transition=0;bossCutin=0;render();},break(k){damageCloth(k,99999,270,450);render();},step(){paused=false;update(.016);paused=true;bossCutin=0;flash=0;shake=0;render();},shootAt(x,y){const b=bossBox(giantMisaki);bullets.push({x:b.x+b.w*x,y:b.y+b.h*y,vx:0,vy:0,w:8,h:20,d:99999});},hitAt(x,y){return partAt(giantMisaki.phase,x,y);},state(){return JSON.parse(JSON.stringify(giantMisaki));},render(){flash=0;shake=0;damageTexts=[];particles=[];breakFx=[];const was=paused;paused=false;render();paused=was;}};
