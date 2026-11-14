@@ -2547,9 +2547,9 @@ keyAttack=function(f,key,isCPU=false){
  f.buffer39=null;return attackFeel39(f,key,isCPU);
 };
 const hitFeel39=hit;
-hit=function(att,def,damage,kb,up=0){
- const guarded=def.guard&&def.onGround,melee=['punch','kick'].includes(att.state),parry=blockingAvailable()&&def.justBlock>0&&def.lastSDown<.13;
- const confirmed=hitFeel39(att,def,damage,melee&&att.state==='punch'&&!guarded?kb*.65:kb,up);
+hit=function(att,def,damage,kb,up=0,flags={}){
+ const guarded=def.guard&&def.onGround&&!flags.unblockable,melee=['punch','kick'].includes(att.state),parry=!flags.unblockable&&blockingAvailable()&&def.justBlock>0&&def.lastSDown<.13;
+ const confirmed=hitFeel39(att,def,damage,melee&&att.state==='punch'&&!guarded?kb*.65:kb,up,flags);
  if(confirmed){
   if(melee&&!guarded&&!def.ko){att.cancel39=.18;att.hitChainT=Math.max(att.hitChainT,1.05);}
   const heavy=damage>=13,superHit=damage>=25;
@@ -2686,9 +2686,9 @@ const drawPerfect50=drawSuperCutin;drawSuperCutin=function(){drawPerfect50();con
 // Revision 50: readable CPU openings, tactile hits, and persistent touch layout.
 Object.assign(SFX43,{light50:[180,90,.055,.06],heavy50:[95,30,.13,.13],finish50:[160,35,.20,.16],parry50:[1700,2600,.085,.10],perfect50:[900,2400,.27,.13]});
 function vibration50(ms){if(!document.hidden&&navigator.vibrate)try{navigator.vibrate(ms);}catch{}}
-const hit50=hit;hit=function(att,def,damage,kb,up=0){
- const hp=def.hp,parry=blockingAvailable()&&def.justBlock>0&&def.lastSDown<.13&&!def.ko&&def.hurtT<=0&&!roundBusy,guard=def.guard&&def.onGround;
- const result=hit50(att,def,damage,kb,up);
+const hit50=hit;hit=function(att,def,damage,kb,up=0,flags={}){
+ const hp=def.hp,parry=!flags.unblockable&&blockingAvailable()&&def.justBlock>0&&def.lastSDown<.13&&!def.ko&&def.hurtT<=0&&!roundBusy,guard=def.guard&&def.onGround&&!flags.unblockable;
+ const result=hit50(att,def,damage,kb,up,flags);
  if(parry&&!result){/* The uploaded parry sound is played once by triggerBlockFx. */}
  else if(result&&def.hp<hp&&!guard){const heavy=damage>=13,special=damage>=25; sfx(special?'finish50':heavy?'heavy50':'light50');vibration50(special?[18,12,32]:heavy?22:9);hitStopT=Math.max(hitStopT,special?.12:heavy?.09:.045);}
  return result;
