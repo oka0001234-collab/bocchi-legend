@@ -864,9 +864,9 @@ const BATTLE_LOGOS={"round1": "assets/image-028.webp", "round2": "assets/image-0
 const MISAKI_BGM="assets/audio-005.mp3", BATTLE_BGM=MISAKI_BGM;
 function battleBgmSource(mode){if(!['fight','boss','boss2'].includes(mode))return null;if(kingsActive&&!net.active&&kingsIndex===2)return 'assets/audio-006.mp3';if(kingsActive&&!net.active&&kingsIndex===3)return 'assets/shinbocchi-battle.mp3';if(kingsActive&&!net.active&&kingsIndex===4)return 'assets/tetsu-final-battle.mp3';if(!net.active&&!freeMode&&stageIndex===2)return MISAKI_BGM;return net.active||freeMode||stageIndex>=1?BATTLE_BGM:null;}
 const battleLogoPreloads=Object.values(BATTLE_LOGOS).map(src=>{const img=new Image();img.src=src;return img;});
-const EFFECT_AUDIO={"shinVoice56":"assets/audio-007.mp3","parry":"assets/audio-008.mp3","shopWin":"assets/audio-009.mp3","shopStop":"assets/audio-010.mp3","shopSpin":"assets/audio-011.mp3","shopPeka":"assets/audio-012.mp3","haffun":"assets/audio-013.mp3","haffunImpact":"assets/haffun-impact.mp3","mogakiTune":"assets/mogaki-special-latter.mp3","mattsuanSpecial":"assets/mattsuan-special.mp3","levelUp":"assets/levelup-retro-monster.wav","shinArmorTakeoff":"assets/shin-armor-takeoff.mp3","misakiHeliVoice":"assets/misaki-helicopter-voice.mp3","misakiPunchVoice":"assets/misaki-punch-voice.mp3","misakiKickVoice":"assets/misaki-kick-voice.mp3","punchWhoosh": "assets/audio-014.mp3", "punchImpact": "assets/audio-015.mp3", "heavyImpact": "assets/audio-016.mp3", "kickWhoosh": "assets/audio-017.mp3", "kickImpact": "assets/audio-018.mp3", "block": "assets/audio-019.mp3", "laserCharge": "assets/audio-020.mp3", "laserFire": "assets/audio-021.mp3", "laserBeam": "assets/audio-022.mp3", "laserDamage": "assets/audio-023.mp3", "laserTick": "assets/audio-024.mp3", "laserStop": "assets/audio-025.mp3"};
-const MISAKI_VOICE_KEYS=['misakiPunchVoice','misakiKickVoice','misakiHeliVoice'],effectPreloads=new Map();
-for(const name of MISAKI_VOICE_KEYS){const a=new Audio(EFFECT_AUDIO[name]);a.preload='auto';a.load();effectPreloads.set(name,a);}
+const EFFECT_AUDIO={"shinVoice56":"assets/audio-007.mp3","parry":"assets/audio-008.mp3","shopWin":"assets/audio-009.mp3","shopStop":"assets/audio-010.mp3","shopSpin":"assets/audio-011.mp3","shopPeka":"assets/audio-012.mp3","haffun":"assets/audio-013.mp3","haffunImpact":"assets/haffun-impact.mp3","mogakiTune":"assets/mogaki-special-latter.mp3","mattsuanSpecial":"assets/mattsuan-special.mp3","levelUp":"assets/levelup-retro-monster.wav","shinArmorTakeoff":"assets/shin-armor-takeoff.mp3","misakiHeliVoice":"assets/misaki-helicopter-voice.mp3","misakiPunchVoice":"assets/misaki-punch-voice.mp3","misakiKickVoice":"assets/misaki-kick-voice.mp3","tetsuPunchVoice":"assets/tetsu-punch-voice.mp3","tetsuKickVoice":"assets/tetsu-kick-voice.mp3","tetsuPhoenixVoice":"assets/tetsu-phoenix-voice.mp3","punchWhoosh": "assets/audio-014.mp3", "punchImpact": "assets/audio-015.mp3", "heavyImpact": "assets/audio-016.mp3", "kickWhoosh": "assets/audio-017.mp3", "kickImpact": "assets/audio-018.mp3", "block": "assets/audio-019.mp3", "laserCharge": "assets/audio-020.mp3", "laserFire": "assets/audio-021.mp3", "laserBeam": "assets/audio-022.mp3", "laserDamage": "assets/audio-023.mp3", "laserTick": "assets/audio-024.mp3", "laserStop": "assets/audio-025.mp3"};
+const MISAKI_VOICE_KEYS=['misakiPunchVoice','misakiKickVoice','misakiHeliVoice'],CHARACTER_VOICE_KEYS=[...MISAKI_VOICE_KEYS,'tetsuPunchVoice','tetsuKickVoice','tetsuPhoenixVoice'],effectPreloads=new Map();
+for(const name of CHARACTER_VOICE_KEYS){const a=new Audio(EFFECT_AUDIO[name]);a.preload='auto';a.load();effectPreloads.set(name,a);}
 const effectShots=new Set(),effectLoops=new Map();let laserWasVisible=false,effectFocusPaused=false;
 function effectAudio(name,loop=false){
  if(!audioEnabled||document.hidden||effectFocusPaused||!EFFECT_AUDIO[name])return null;
@@ -1312,23 +1312,23 @@ function drawHaffunCutin(){
  ctx.restore();
 }
 
-const TETSU_MOVES={punch:{startup:4,active:4,total:18},kick:{startup:25,active:7,total:46}};
+const TETSU_MOVES={punch:{startup:1,active:4,total:18},kick:{startup:30,active:7,total:46}};
 function tetsuAttack(f,key){
  if(key==='J'||key==='K'){
   const kind=key==='J'?'punch':'kick',m=TETSU_MOVES[kind];
   f.state=kind;f.stateT=m.total/60;f.attackHit=false;
-  if(key==='J'){f.comboStep=1;f.comboT=1.3;sfx('punchWhoosh');}
-  else {f.comboStep=f.comboStep===1&&f.comboT>0?2:0;f.comboT=1.3;sfx('kickWhoosh');}
+  if(key==='J'){f.comboStep=1;f.comboT=1.3;sfx('punchWhoosh');sfx('tetsuPunchVoice');}
+  else {f.comboStep=f.comboStep===1&&f.comboT>0?2:0;f.comboT=1.3;sfx('kickWhoosh');sfx('tetsuKickVoice');}
  }else if(key==='L'&&f.sp>=100){
   const combo=f.comboStep===2&&f.comboT>0;f.sp=0;f.comboStep=0;f.state='special';f.stateT=.75;f.attackHit=true;
-  startSuperCutin(f,()=>{projectiles.push({kind:'phoenix',owner:f,x:f.x+f.face*150,y:f.y-145,vx:f.face*900,w:590,h:260,life:2.2,damage:combo?44:36,hasHit:false});shake=14;screenFlash=.18;burst(f.x,f.y-140,36,'gold');sfx('cannon');crystalSound();});
+  sfx('tetsuPhoenixVoice');startSuperCutin(f,()=>{projectiles.push({kind:'phoenix',owner:f,x:f.x+f.face*150,y:f.y-145,vx:f.face*900,w:590,h:260,life:2.2,damage:combo?44:36,hasHit:false});shake=14;screenFlash=.18;burst(f.x,f.y-140,36,'gold');sfx('cannon');crystalSound();});
  }
 }
 function tetsuAttackBox(f){
  const m=TETSU_MOVES[f.state];if(!m)return null;
  const elapsed=m.total-f.stateT*60;
  if(elapsed+1e-7<m.startup||elapsed>=m.startup+m.active)return null;
- const pan=f.state==='punch';return {x:f.x+f.face*(pan?100:125),y:f.y-(pan?128:130),w:pan?130:180,h:pan?78:90,d:pan?8:21,k:pan?280:460,u:pan?-50:-155};
+ const pan=f.state==='punch';return {x:f.x+f.face*(pan?100:125),y:f.y-(pan?128:130),w:pan?130:180,h:pan?78:90,d:pan?8:21,k:pan?280:460,u:pan?-50:-155,unblockable:!pan};
 }
 function crystalSound(){if(!audioEnabled)return;music.ensure();[784,1175,1568,2093].forEach((f,i)=>music.tone(f,.25,'sine',.08,i*.065));music.noise(.16,.05);}
 function panImpact(){if(!audioEnabled)return;music.ensure();music.tone(430,.16,'triangle',.14);music.tone(1030,.12,'sine',.08,.015);music.noise(.055,.07);}
@@ -1486,11 +1486,11 @@ function spawnHelicopter(f){
  projectiles.push({kind:'heli',owner:f,x:dir<0?W+520:-520,y:GROUND-145,vx:dir*980,w:760,h:300,life:2.8,damage:HELICOPTER_DAMAGE,hasHit:false,warn:.34});
 }
 function registerCombo(att,guarding){if(att!==player||guarding)return;att.hitCount=att.hitChainT>0?att.hitCount+1:1;att.hitChainT=.86;if(att.hitCount>=2){let label=att.hitCount+' HIT';if(att.hitCount>=3)label+='  BOCCHI COMBO!';comboText(label,700);if(att.hitCount===10){sfx('combo10');screenFlash=.16;}}}
-function hit(att,def,damage,kb,up=0){
+function hit(att,def,damage,kb,up=0,flags={}){
  if(def.ko||def.hurtT>0||roundBusy)return false;
- const parry=blockingAvailable()&&def.justBlock>0&&def.lastSDown<.13;
+ const parry=!flags.unblockable&&blockingAvailable()&&def.justBlock>0&&def.lastSDown<.13;
  if(parry){def.justBlock=0;def.sp=clamp(def.sp+30,0,100);def.counterBoostT=1.50;att.freezeT=.56;slowMoT=Math.max(slowMoT,.28);screenFlash=Math.max(screenFlash,.18);shake=Math.max(shake,13);burst(def.x,def.y-120,42,'cyan');triggerBlockFx(def);comboText('COUNTER ×1.5',850);return false;}
- const guarding=def.guard&&def.onGround;const boosted=att.counterBoostT>0;let raw=damage*att.damageScale*(boosted?1.5:1);if(boosted)att.counterBoostT=0;const armorFactor=def.takeoffShin?1/SHIN_TAKEOFF_DEFENSE:(def.armorActive?1/3:1);const dealt=Math.max(1,Math.round(raw*(guarding?.30:1)*armorFactor));
+ const guarding=def.guard&&def.onGround&&!flags.unblockable;const boosted=att.counterBoostT>0;let raw=damage*att.damageScale*(boosted?1.5:1);if(boosted)att.counterBoostT=0;const armorFactor=def.takeoffShin?1/SHIN_TAKEOFF_DEFENSE:(def.armorActive?1/3:1);const dealt=Math.max(1,Math.round(raw*(guarding?.30:1)*armorFactor));
  def.hp=clamp(def.hp-dealt,0,def.maxHp);def.hurtT=guarding?.10:.22;def.state='hurt';def.vx=att.face*kb*(guarding?.35:1);def.vy=up;def.onGround=false;
  // Keep the full third-round Bocchi hurt pose inside the canvas when hit mid-jump.
  if(usesBocchiWalk61(def)&&def.y<GROUND-300){def.y=GROUND-300;if(def.vy<0)def.vy=0;}
@@ -1534,7 +1534,7 @@ function updateFighter(f,o,dt,isPlayer){
  const previousX=f.x;f.vy+=1650*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=Math.pow(.0005,dt);if(f.y>=GROUND){f.y=GROUND;f.vy=0;f.onGround=true;}f.x=clamp(f.x,f.type==='tetsu'?270:90,W-(f.type==='tetsu'?270:90));if(f.type==='tetsu'&&f.onGround&&f.state==='idle'&&!f.guard&&f.hurtT<=0)f.walkCycle=((f.walkCycle||0)+Math.abs(f.x-previousX)/13)%8;
  if(usesBocchiWalk61(f)&&f.onGround&&!f.guard&&f.hurtT<=0&&f.stateT<=0)f.bocchiWalk61=(((f.bocchiWalk61||0)+(f.x-previousX)*f.face/18)%8+8)%8;
  if((f.type==='shinbocchi'||f.type==='haffun'||f.type==='mogaki'||f.type==='tenten'||f.type==='mattsuan')&&f.onGround&&f.state==='idle')f.walkCycle=((f.walkCycle||0)+Math.abs(f.x-previousX)/26)%2;
- const b=attackBox(f);if(b&&!f.attackHit&&o.hurtT<=0&&!o.ko&&rectHit(b.x,b.y,b.w,b.h,o.x,o.y-120,90,205)){f.attackHit=true;hit(f,o,b.d,b.k,b.u);}if((f.state==='punch'||f.state==='kick')&&f.stateT===0)f.attackHit=false;
+ const b=attackBox(f);if(b&&!f.attackHit&&o.hurtT<=0&&!o.ko&&rectHit(b.x,b.y,b.w,b.h,o.x,o.y-120,90,205)){f.attackHit=true;hit(f,o,b.d,b.k,b.u,b);}if((f.state==='punch'||f.state==='kick')&&f.stateT===0)f.attackHit=false;
 }
 // Continuous spacing plus decisions with human-scale reaction delays; no HP/damage bonus.
 function cpuRanges(f){
