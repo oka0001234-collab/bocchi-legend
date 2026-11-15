@@ -2192,7 +2192,7 @@ setInterval(()=>{if(!net.active||!net.connected)return;const age=performance.now
 
 // One cabinet, four seats. PeerServer reserves the cabinet ID atomically.
 // The first browser coordinates queue/admission and relays match packets.
-const arcade={on:false,leader:false,peer:null,link:null,links:new Map(),members:new Map(),id:'',queue:[],match:null,saved:null,generation:0,lastSeen:0,ready:false,finishing:false,cooldown:0,name:'',enabled:false,fightSince:0,retryAt:0,pairHistory:new Map(),introTimer:null};
+const arcade={on:false,leader:false,peer:null,link:null,links:new Map(),members:new Map(),id:'',queue:[],match:null,saved:null,generation:0,lastSeen:0,ready:false,finishing:false,cooldown:0,name:safeGet('bocchi_nickname')||'',enabled:false,fightSince:0,retryAt:0,pairHistory:new Map(),introTimer:null};
 function arcRandomId(){return Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join('');}
 const ARCADE_VERSION='bocchi-arcade-39';
 const ARCADE_ID='bocchi-legend-6accf4cb33a88191-arcade39';
@@ -2451,8 +2451,10 @@ const arcadeFail=netFail;netFail=function(t){if(arcade.saved){arcToHost({a:'canc
 const arcadeTitle=goTitle;goTitle=function(){arcade.enabled=false;arcLeave('');$('nameScreen').hidden=true;arcadeTitle();};
 ['titleBtn','continueTitleBtn','freeTitleBtn','freeBackBtn','netBack','creditsTitle','galleryBack'].forEach(id=>$(id).onclick=goTitle);
 const storyStartWithName=$('startBtn').onclick;
+let nameSubmitAction='start';
 $('startBtn').onclick=()=>{
  if($('startBtn').disabled)return;
+ nameSubmitAction='start';
  $('nameInput').value=arcade.name||safeGet('bocchi_nickname')||'';
  $('nameError').textContent='';$('nameScreen').hidden=false;$('nameInput').focus();
 };
@@ -2460,7 +2462,10 @@ $('nameForm').onsubmit=e=>{
  e.preventDefault();const name=arcCleanName($('nameInput').value);
  if(!name){$('nameError').textContent='名前を入力してください。';$('nameInput').focus();return;}
  arcade.name=name;safeSet('bocchi_nickname',name);$('nameScreen').hidden=true;
- arcade.enabled=true;arcade.fightSince=0;arcade.cooldown=0;storyStartWithName();try{arcJoin();}catch(e){arcade.on=false;arcade.retryAt=Date.now()+30000;}
+ arcade.enabled=true;arcade.fightSince=0;arcade.cooldown=0;
+ if(nameSubmitAction==='resume')resumeCampaign();
+ else{try{localStorage.removeItem(CAMPAIGN_SAVE_KEY);localStorage.removeItem('bocchi_manga_save')}catch{}refreshResumeStoryButton();storyStartWithName();}
+ try{arcJoin();}catch(e){arcade.on=false;arcade.retryAt=Date.now()+30000;}
 };
 $('nameCancel').onclick=()=>{$('nameScreen').hidden=true;$('startBtn').focus();};
 const namedHud=updateHud;updateHud=function(){namedHud();if(arcade.saved&&net.active&&arcade.matchNames){$('pName').textContent=arcade.matchNames[0];$('eName').textContent=arcade.matchNames[1];}else if(arcade.name&&storyMode&&player){$('pName').textContent=arcade.name;} };
@@ -2872,24 +2877,16 @@ function saveCampaignCheckpoint(type,extra={}){safeSet(CAMPAIGN_SAVE_KEY,JSON.st
 function refreshResumeStoryButton(){const b=$('resumeStoryBtn');if(b)b.hidden=!getCampaignCheckpoint();}
 function resumeCampaign(){const c=getCampaignCheckpoint();if(!c)return;storyMode=true;freeMode=false;stageIndex=Number.isInteger(c.stageIndex)?clamp(c.stageIndex,0,stages.length-1):0;roundWins=[0,0];$('titleScreen').classList.remove('show');$('cinematicScreen').classList.remove('show');$('kingsScreen').classList.remove('show');$('tetsuFinalScreen').classList.remove('show');$('skyRumbleScreen').classList.remove('show');kingsActive=false;switch(c.type){case'normal':showTutorial();break;case'normalFight':startFight();break;case'romance':{let m=null;try{m=JSON.parse(safeGet('bocchi_manga_save')||'null')}catch{}if(m&&typeof m.node==='string'&&story[m.node]){romanceStep=m.node;romStats=m.stats||{heart:0,trust:0,natural:0};romFlags=m.flags||[];romHistory=m.history||[];scene='romance';$('titleScreen').classList.remove('show');$('romance').classList.add('show');$('touch').style.opacity='0';showRomance();music.set('romance')}else beginRomance();break;}case'fireworks':startFireworksScene();break;case'spaceDialogue':showSpaceDialogue();break;case'spaceEnding':showSpaceChapterEnding();break;case'kings':kingsActive=true;kingsIndex=clamp(Number(c.kingsIndex)||0,0,KINGS.length-1);kingsLosses57=0;kingsArmor57=false;kingsIntro(true);break;case'shinDialogue':kingsActive=true;kingsIndex=clamp(Number(c.kingsIndex)||0,0,KINGS.length-1);showShinBocchiDialogue();break;case'tetsuDialogue':kingsActive=true;kingsIndex=clamp(Number(c.kingsIndex)||4,0,KINGS.length-1);showTetsuFinalDialogue();break;case'toolJourney':kingsActive=true;kingsIndex=clamp(Number(c.kingsIndex)||5,0,KINGS.length-1);showToolJourney();break;case'skyRumble':kingsActive=true;kingsIndex=clamp(Number(c.kingsIndex)||5,0,KINGS.length-1);showSkyRumbleIntermission(c.shootingCheckpoint||'start');break;case'finalEnding':startFinalEnding(clamp(Number(c.step)||0,0,FINAL_ENDING_LINES.length-1));break;case'finalCredits':startFinalCredits();break;default:showTutorial();}}
 $('resumeStoryBtn').onclick=resumeCampaign;
-// Story start must never wait on the optional online-name / matchmaking flow.
-// Some mobile in-app browsers play the intro voice but interrupt the remaining
-// synchronous handler while opening/focusing the name dialog. Start the story
-// first, then attempt arcade presence independently.
-const freshStartHandler=$('startBtn').onclick;$('startBtn').onclick=()=>{
- try{localStorage.removeItem(CAMPAIGN_SAVE_KEY);localStorage.removeItem('bocchi_manga_save')}catch{}
- refreshResumeStoryButton();
- $('nameScreen').hidden=true;
- arcade.name=arcade.name||safeGet('bocchi_nickname')||'BOCCHI';
- arcade.enabled=true;arcade.fightSince=0;arcade.cooldown=0;
- try{storyStartWithName();}catch(err){
-  console.error('Story start failed; using safe tutorial transition.',err);
-  try{speechSynthesis?.cancel?.()}catch{}
-  try{music.stop()}catch{}
-  try{scene='tutorial';storyMode=true;freeMode=false;stageIndex=0;syncSpecialControl();$('titleScreen').classList.remove('show');$('tutorialScreen').classList.add('show');$('hud').classList.remove('show');$('touch').style.opacity='0';const cfg=currentConfig();$('tTitle').textContent=cfg.title;$('tDiff').textContent=cfg.diff;$('tMain').textContent=cfg.main;$('tTips').innerHTML=cfg.tips.map(x=>`<div class="tip">${x}</div>`).join('');}catch(recoveryError){console.error('Tutorial fallback failed.',recoveryError)}
- }
- try{arcJoin()}catch(err){arcade.on=false;arcade.retryAt=Date.now()+30000;console.warn('Arcade presence unavailable; story continues.',err)}
+// Continue uses the saved player name for the same hidden arcade queue. If no
+// name exists yet, collect it once and then resume the saved story checkpoint.
+$('resumeStoryBtn').onclick=()=>{
+ const rememberedName=arcade.name||safeGet('bocchi_nickname');
+ if(rememberedName){arcade.name=rememberedName;arcade.enabled=true;resumeCampaign();try{arcJoin()}catch(e){arcade.on=false;arcade.retryAt=Date.now()+30000;}}
+ else{nameSubmitAction='resume';$('nameInput').value='';$('nameError').textContent='';$('nameScreen').hidden=false;$('nameInput').focus();}
 };
+// The network state is now initialized before this click handler runs, so keep
+// the remembered nickname step in the normal new-game path.
+const freshStartHandler=$('startBtn').onclick;$('startBtn').onclick=()=>freshStartHandler();
 const showTutorialCheckpoint=showTutorial;showTutorial=function(){saveCampaignCheckpoint('normal',{stageIndex});showTutorialCheckpoint()};
 const startFightCheckpoint=startFight;startFight=function(){saveCampaignCheckpoint('normalFight',{stageIndex});startFightCheckpoint()};
 const beginRomanceCheckpoint=beginRomance;beginRomance=function(){saveCampaignCheckpoint('romance');beginRomanceCheckpoint();saveRomance()};
