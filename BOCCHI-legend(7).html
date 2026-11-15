@@ -2530,8 +2530,8 @@ function kingsIntro(retry=false){
  $('touch').style.opacity='0';$('kingsScreen').classList.add('show');
  $('kingsRank').textContent=kingsIndex===4?'伝説の料理人':kingsIndex===5?'裏ボス':'独身四天王';
  $('kingsName').textContent=charName(KINGS[kingsIndex]);
- const introLines={mattsuan:'凄いとこ見せてやる！',mogaki:'スピードでは負けん！',tenten:'いつでも大成功！！！',shinbocchi:'これが本気',tetsu:'HP 600 ／ 移動速度 3倍 ／ 2本先取',haffun:'俺は伝説 ／ 移動速度 3倍'};
- $('kingsInfo').textContent=(retry?'敗北しても、挑戦は終わらない。 ':'')+(introLines[KINGS[kingsIndex]]||'')+(kingsIndex===4?'':' ／ HP 300 ／ 2本先取');
+ const introLines={mattsuan:'凄いとこ見せてやる！',mogaki:'スピードでは負けん！',tenten:'いつでも大成功！！！',shinbocchi:'これが本気',tetsu:'移動速度 3倍 ／ 2本先取',haffun:'俺は伝説 ／ 移動速度 3倍'};
+ $('kingsInfo').textContent=(retry?'敗北しても、挑戦は終わらない。 ':'')+(introLines[KINGS[kingsIndex]]||'')+(kingsIndex===4?'':' ／ 2本先取');
  $('kingsFace').hidden=false;arcPortrait(KINGS[kingsIndex],'kingsFace');
  $('kingsFight').textContent=retry?'再挑戦':'FIGHT';$('kingsFight').onclick=()=>KINGS[kingsIndex]==='shinbocchi'?showShinBocchiDialogue():startKingsFight();music.set('boss');
  safeSet('bocchi_kings_progress',String(kingsIndex));
