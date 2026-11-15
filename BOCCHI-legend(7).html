@@ -2807,16 +2807,20 @@ function primeShop52(){
   const job=fetch(EFFECT_AUDIO[name]).then(r=>{if(!r.ok)throw Error('audio');return r.arrayBuffer()}).then(bytes=>{music.ensure();if(!music.ac)throw Error('audio context');return music.ac.decodeAudioData(bytes);}).then(buffer=>shopBuffers52.set(name,buffer)).catch(()=>shopLoads52.delete(name));shopLoads52.set(name,job);
  }
 }
-const audio52=effectAudio;effectAudio=function(name,loop=false){
+const audio52=effectAudio;effectAudio=function(name,loop=false,skipVoiceQueue=false){
+ // Tetsu voice queuing calls effectAudio again with skipVoiceQueue=true.
+ // Preserve that flag through this later audio-buffer wrapper; dropping it
+ // recursed between playTetsuVoiceIfIdle and this wrapper until the fight froze.
+ if(TETSU_ATTACK_VOICES.has(name))return audio52(name,loop,skipVoiceQueue);
  const buffer=shopBuffers52.get(name),ac=music.ac;
- if(!buffer||!ac)return audio52(name,loop);
+ if(!buffer||!ac)return audio52(name,loop,skipVoiceQueue);
  if(!audioEnabled||document.hidden||effectFocusPaused)return null;
  try{const source=ac.createBufferSource(),gain=ac.createGain();source.buffer=buffer;source.loop=loop;gain.gain.value=loop?.32:.72;source.connect(gain);gain.connect(ac.destination);let stopped=false;
  const handle={pause(){if(stopped)return;stopped=true;try{source.stop()}catch{}}};
  source.onended=()=>{effectShots.delete(handle);source.disconnect();gain.disconnect();};
  if(!loop){if(effectShots.size>=16){const first=effectShots.values().next().value;first.pause();effectShots.delete(first);}effectShots.add(handle);}
  if(ac.state==='suspended')ac.resume()?.catch(()=>{});source.start(ac.currentTime);return handle;
- }catch{return audio52(name,loop);}
+ }catch{return audio52(name,loop,skipVoiceQueue);}
 };
 const shopStart52=startSuperCutin;startSuperCutin=function(f,...args){const r=shopStart52(f,...args);if(['tenten','shinbocchi'].includes(f.type)&&superCutin?.f===f){cues43(superCutin);syncBattleEffects();}return r;};
 primeShop52();window.addEventListener('pointerdown',primeShop52,{passive:true});
