@@ -1377,7 +1377,7 @@ function tetsuAttackBox(f){
  const pan=f.state==='punch';return {x:f.x+f.face*(pan?100:125),y:f.y-(pan?128:130),w:pan?130:180,h:pan?78:90,d:pan?8:21,k:pan?280:460,u:pan?-50:-155,unblockable:!pan};
 }
 function crystalSound(){if(!audioEnabled)return;music.ensure();[784,1175,1568,2093].forEach((f,i)=>music.tone(f,.25,'sine',.08,i*.065));music.noise(.16,.05);}
-function panImpact(){if(!audioEnabled)return;music.ensure();music.tone(430,.16,'triangle',.14);music.tone(1030,.12,'sine',.08,.015);music.noise(.055,.07);}
+function panImpact(){if(!audioEnabled)return;try{music.ensure();music.tone(430,.16,'triangle',.14);music.tone(1030,.12,'sine',.08,.015);music.noise(.055,.07);}catch(error){console.warn('Tetsu impact sound skipped:',error);}}
 function tetsuPose(f){
  let idx=0,lean=0,lunge=0,squash=1,frame=0;
  if(f.state==='punch'&&f.stateT>0){frame=Math.floor((18-f.stateT*60)+1e-6);idx=frame<4?1:frame<12?2:0;lunge=frame<4?-frame*2:frame<12?20*(1-(frame-4)/16):0;lean=frame<4?-.035:frame<12?.035:0;}
