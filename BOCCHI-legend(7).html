@@ -812,7 +812,21 @@ function scheduleRoundAnnouncement(){stopAnnouncer();if(!battleVoiceEnabled())re
 
 function safeGet(k){try{return localStorage.getItem(k)}catch{return null}}
 function safeSet(k,v){try{localStorage.setItem(k,v)}catch{}}
-function speak(t,lang='ja-JP'){try{if(!audioEnabled||!('speechSynthesis'in window))return;const u=new SpeechSynthesisUtterance(t);u.lang=lang;const v=speechSynthesis.getVoices().find(v=>v.localService&&v.lang.startsWith(lang.slice(0,2)));if(v)u.voice=v;u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){/* Speech is optional; never block the game. */}}
+function playVoiceFallback(src){try{const audio=new Audio(src);audio.preload='auto';audio.volume=1;audio.play().catch(()=>{});return audio;}catch{return null;}}
+function speak(t,lang='ja-JP'){
+ if(!audioEnabled)return false;
+ const introFallback=String(t).toLowerCase()==='you are bocchi',fallback=()=>playVoiceFallback('assets/character-select-voices/01_BOCCHI.mp3');
+ if(!('speechSynthesis'in window)||typeof window.SpeechSynthesisUtterance!=='function'){if(introFallback)fallback();return false;}
+ try{
+  const u=new SpeechSynthesisUtterance(t);u.lang=lang;const v=speechSynthesis.getVoices().find(v=>v.localService&&v.lang.startsWith(lang.slice(0,2)));if(v)u.voice=v;u.rate=.9;
+  let started=false,timer=0;u.onstart=()=>{started=true;clearTimeout(timer);};u.onend=()=>clearTimeout(timer);u.onerror=()=>{clearTimeout(timer);if(introFallback&&!started)fallback();};
+  speechSynthesis.cancel();speechSynthesis.speak(u);
+  // Some mobile browsers expose speechSynthesis but never start an utterance
+  // until a voice is installed. Give the intro a recorded-voice fallback.
+  if(introFallback)timer=setTimeout(()=>{if(!started){try{speechSynthesis.cancel();}catch{}fallback();}},1200);
+  return true;
+ }catch{if(introFallback)fallback();return false;}
+}
 
 const DATA={
  bocchi:'assets/image-003.webp', kick:'assets/image-004.webp', misaki:'assets/image-005.webp', heli:'assets/image-006.webp'
@@ -1014,7 +1028,7 @@ function activateArmorTakeoff(f){
  f.armorUsed=true;f.armorActive=true;f.armorBoostT=ARMOR_TAKEOFF_DURATION;
  f.moveAccel=f.baseMoveAccel*ARMOR_SPEED_MULT;f.jumpPower=f.baseJumpPower*1.22;f.vx+=f.face*620;
  f.freezeT=.34;enemy.freezeT=Math.max(enemy.freezeT,.24);slowMoT=Math.max(slowMoT,.24);screenFlash=.30;shake=Math.max(shake,15);
- burst(f.x,f.y-100,64,'cyan');music.duck(.38);sfx('armor');showCinematic('アーマーテイクオフ！',760,true);speak('アーマーテイクオフ！');comboText('SPEED ×2.6',1200);
+ burst(f.x,f.y-100,64,'cyan');sfx('shinArmorTakeoff');music.duck(.38);sfx('armor');showCinematic('アーマーテイクオフ！',760,true);comboText('SPEED ×2.6',1200);
  if(navigator.vibrate)try{navigator.vibrate([35,25,80,25,120]);}catch(e){}
  updateHud();
 }
@@ -1372,16 +1386,15 @@ function tetsuPose(f){
 function drawTetsuWalk(f){
  const im=imgs.tetsuWalk;if(!im.complete||!im.naturalWidth)return false;
  const cw=im.naturalWidth/4,ch=im.naturalHeight/2;
- const cycle=((f.walkCycle||0)%8+8)%8,frame=Math.floor(cycle),mix=cycle-frame;
+ const cycle=((f.walkCycle||0)%8+8)%8,frame=Math.floor(cycle);
  const feet=[433,432,431,437,419,412,416,419];
  const scale=400/cw;
  ctx.save();ctx.translate(f.x,f.y);ctx.scale(f.face*scale,scale);
- for(const [id,alpha] of [[frame,1-mix],[(frame+1)%8,mix]]){
-  if(alpha<.001)continue;const col=id%4,row=Math.floor(id/4);
-  // Baselines are measured separately for each pose to keep shoes planted.
-  const sx=Math.floor(col*cw),sy=Math.floor(row*ch),sw=Math.floor((col+1)*cw)-sx,sh=Math.floor((row+1)*ch)-sy;
-  ctx.globalAlpha=alpha;ctx.drawImage(im,sx,sy,sw,sh,-cw*.48,-feet[id],sw,sh);
- }
+ const col=frame%4,row=Math.floor(frame/4);
+ // Draw one opaque pose at a time; blending adjacent poses made Tetsu look
+ // like several translucent copies and obscured his movement during the fight.
+ const sx=Math.floor(col*cw),sy=Math.floor(row*ch),sw=Math.floor((col+1)*cw)-sx,sh=Math.floor((row+1)*ch)-sy;
+ ctx.globalAlpha=1;ctx.drawImage(im,sx,sy,sw,sh,-cw*.48,-feet[frame],sw,sh);
  ctx.restore();return true;
 }
 function drawTetsu(f){
@@ -1912,7 +1925,7 @@ document.querySelectorAll('.touchBtn').forEach(b=>{const code=b.dataset.key;cons
 
 function refreshUnlockUI(){const locked=safeGet('bocchi_free_unlocked')!=='1';$('freeBattleBtn').hidden=locked;$('freeLoveBtn').hidden=locked;}
 $('freeLoveBtn').onclick=beginRomance;
-$('startBtn').onclick=()=>{music.ensure();speak('you are bocchi','en-US');storyMode=true;freeMode=false;stageIndex=0;storyContinueCount=0;armorTakeoffUnlocked=false;showTutorial();};$('fightBtn').onclick=startFight;
+ $('startBtn').onclick=()=>{speak('you are bocchi','en-US');music.ensure();storyMode=true;freeMode=false;stageIndex=0;storyContinueCount=0;armorTakeoffUnlocked=false;showTutorial();};$('fightBtn').onclick=startFight;
 function goTitle(){clearInput();scene='title';storyMode=true;freeMode=false;stageIndex=0;storyContinueCount=0;armorTakeoffUnlocked=false;roundWins=[0,0];$('romance').classList.remove('show');$('tutorialScreen').classList.remove('show');$('continueScreen').classList.remove('show');$('freeBattleScreen').classList.remove('show');$('freeResultScreen').classList.remove('show');$('hud').classList.remove('show');$('titleScreen').classList.add('show');$('touch').style.opacity='0';$('fadeOverlay').classList.remove('show');refreshUnlockUI();music.set('fight');}
 $('titleBtn').onclick=goTitle;
 function resumeContinueFight(){
@@ -2525,6 +2538,7 @@ function kingsIntro(retry=false){
 }
 function startKingsFight(){
  clearTimeout(kingsEncounterTimer);const token=++kingsEncounterToken,type=KINGS[kingsIndex];
+ playCharacterSelectVoice(type);
  $('kingsScreen').classList.remove('show');$('kingsEncounterName').textContent=charName(type);$('kingsEncounter').querySelector('.kingsEncounterEyebrow').textContent=kingsIndex===4?'てっちゃん戦':kingsIndex===5?'裏ボス戦':'BOCCHI LEGEND ・ 四天王戦';$('kingsEncounter').querySelector('.kingsEncounterSub').textContent=type==='haffun'?'ハッフン「ハッフン伝説のはじまりだ！」':'次の挑戦者が立ちはだかる！';$('kingsEncounterArt').src=KINGS_CUTIN_ART[type];$('kingsEncounterArt').alt=charName(type)+'のカットイン';
  $('kingsEncounter').classList.add('show');scene='kingsEncounter';clearInput();
  kingsEncounterTimer=setTimeout(()=>launchKingsFight(token),2300);
