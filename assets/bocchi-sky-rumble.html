@@ -58,6 +58,7 @@ canvas{position:absolute;inset:0;display:block;width:100%;height:100%;touch-acti
 <script>
 (()=>{
 const cv=document.getElementById('game'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+const debugCheckpoint=new URLSearchParams(location.search).get('checkpoint');
 const $=id=>document.getElementById(id);
 let breakFx=[];
 let bullets=[],enemyBullets=[],enemies=[],particles=[],items=[],midBoss=null,giantMisaki=null,damageTexts=[];
@@ -121,7 +122,7 @@ function reset(){
  Object.assign(p,{x:W/2,y:H-155,hp:100,sp:0,speed:900,fireCd:0,armor:false,armorT:0,inv:0,power:1});
  targetX=p.x;targetY=p.y;running=true;paused=false;last=performance.now();
  audio.init();audio.setMode('stage');$('pauseBtn').disabled=false;$('pauseBtn').textContent='PAUSE';$('armorBtn').disabled=true;$('touchHint').style.opacity='1';
- $('message').textContent='フルオート射撃中。金色の「P」敵を狙え！';$('startBtn').classList.add('hidden');
+ $('message').textContent='フルオート射撃中。金色の「P」敵を狙え！';if(debugCheckpoint==='mid'){stage=2;score=1250;spawnCount=10;p.power=2;p.sp=55;$('message').textContent='DEBUG：STAGE 2から確認中';}else if(debugCheckpoint==='power4'){stage=3;score=2750;spawnCount=27;p.power=4;p.sp=100;$('armorBtn').disabled=false;$('message').textContent='DEBUG：POWER MAX・STAGE 3';}else if(debugCheckpoint==='midboss'){stage=3;score=3400;spawnCount=30;p.power=4;p.sp=100;$('armorBtn').disabled=false;spawnMidBoss();}else if(debugCheckpoint==='giant'){stage=3;score=4200;spawnCount=36;p.power=4;p.sp=100;p.armor=true;p.armorT=5;$('armorBtn').disabled=false;spawnGiantMisaki();giantMisaki.transition=0;bossCutin=0;} $('startBtn').classList.add('hidden');
  cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
 }
 function fireAuto(){
