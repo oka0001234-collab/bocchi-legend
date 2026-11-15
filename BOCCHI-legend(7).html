@@ -2451,11 +2451,9 @@ const arcadeFail=netFail;netFail=function(t){if(arcade.saved){arcToHost({a:'canc
 const arcadeTitle=goTitle;goTitle=function(){arcade.enabled=false;arcLeave('');$('nameScreen').hidden=true;arcadeTitle();};
 ['titleBtn','continueTitleBtn','freeTitleBtn','freeBackBtn','netBack','creditsTitle','galleryBack'].forEach(id=>$(id).onclick=goTitle);
 const storyStartWithName=$('startBtn').onclick;
-let nameSubmitAction='start';
 $('startBtn').onclick=()=>{
  if($('startBtn').disabled)return;
- nameSubmitAction='start';
- $('nameInput').value=arcade.name||safeGet('bocchi_nickname')||'';
+ $('nameInput').value='';
  $('nameError').textContent='';$('nameScreen').hidden=false;$('nameInput').focus();
 };
 $('nameForm').onsubmit=e=>{
@@ -2463,8 +2461,7 @@ $('nameForm').onsubmit=e=>{
  if(!name){$('nameError').textContent='名前を入力してください。';$('nameInput').focus();return;}
  arcade.name=name;safeSet('bocchi_nickname',name);$('nameScreen').hidden=true;
  arcade.enabled=true;arcade.fightSince=0;arcade.cooldown=0;
- if(nameSubmitAction==='resume')resumeCampaign();
- else{try{localStorage.removeItem(CAMPAIGN_SAVE_KEY);localStorage.removeItem('bocchi_manga_save')}catch{}refreshResumeStoryButton();storyStartWithName();}
+ try{localStorage.removeItem(CAMPAIGN_SAVE_KEY);localStorage.removeItem('bocchi_manga_save')}catch{}refreshResumeStoryButton();storyStartWithName();
  try{arcJoin();}catch(e){arcade.on=false;arcade.retryAt=Date.now()+30000;}
 };
 $('nameCancel').onclick=()=>{$('nameScreen').hidden=true;$('startBtn').focus();};
@@ -2880,9 +2877,8 @@ $('resumeStoryBtn').onclick=resumeCampaign;
 // Continue uses the saved player name for the same hidden arcade queue. If no
 // name exists yet, collect it once and then resume the saved story checkpoint.
 $('resumeStoryBtn').onclick=()=>{
- const rememberedName=arcade.name||safeGet('bocchi_nickname');
- if(rememberedName){arcade.name=rememberedName;arcade.enabled=true;resumeCampaign();try{arcJoin()}catch(e){arcade.on=false;arcade.retryAt=Date.now()+30000;}}
- else{nameSubmitAction='resume';$('nameInput').value='';$('nameError').textContent='';$('nameScreen').hidden=false;$('nameInput').focus();}
+ const rememberedName=arcade.name||safeGet('bocchi_nickname')||'BOCCHI';
+ arcade.name=rememberedName;arcade.enabled=true;resumeCampaign();try{arcJoin()}catch(e){arcade.on=false;arcade.retryAt=Date.now()+30000;}
 };
 // The network state is now initialized before this click handler runs, so keep
 // the remembered nickname step in the normal new-game path.
