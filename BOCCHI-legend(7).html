@@ -792,16 +792,16 @@ function showBattleLogo(kind){
 
 function stopAnnouncer(){stopBattleEffects();
  clearTimeout(announcerPendingTimer);announcerPending=false;
- if(announcer){const a=announcer;announcer=null;clearTimeout(a.timer);clearTimeout(a.watchdog);a.audio?.pause();}
+ if(announcer){const a=announcer;announcer=null;clearTimeout(a.timer);clearTimeout(a.watchdog);clearTimeout(a.hardTimer);clearTimeout(a.remoteWatchdog);a.audio?.pause();}
  $('announcerBanner').hidden=true;$('battleLogo').hidden=true;$('resultBanner').classList.remove('logoKo');clearInput();if(typeof net!=='undefined'){net.localKeys={};net.remoteKeys={};net.actions=[];}
 }
 function playAnnouncement(kind,done,remoteId=null){
  stopAnnouncer();if(!battleVoiceEnabled()){if(kind==='ko')resultTimer=setTimeout(()=>{if(scene==='fight'&&done)done();},650);else if(done)done();return;}const spec=ANNOUNCER_AUDIO[kind];if(!spec)return;
- const a=announcer={id:remoteId||('voice-'+(++announcerSeq)),kind,done,localDone:false,remoteDone:!net.active||!net.host,audio:null,timer:null,watchdog:null};
+ const a=announcer={id:remoteId||('voice-'+(++announcerSeq)),kind,done,localDone:false,remoteDone:!net.active||!net.host,audio:null,timer:null,watchdog:null,hardTimer:null,remoteWatchdog:null};
  if(battleLogosEnabled())showBattleLogo(kind);else if(kind!=='ko'){$('announcerBanner').textContent=kind==='round1'?'ROUND 1':kind==='round2'?'ROUND 2':'FINAL ROUND';$('announcerBanner').hidden=false;}
- const finish=()=>{if(announcer!==a||a.localDone)return;a.localDone=true;clearTimeout(a.timer);clearTimeout(a.watchdog);if(net.active&&!net.host){netSend({type:'voiceDone',id:a.id});return;}finishAnnouncementIfReady();};
+ const finish=()=>{if(announcer!==a||a.localDone)return;a.localDone=true;clearTimeout(a.timer);clearTimeout(a.watchdog);if(net.active&&!net.host){netSend({type:'voiceDone',id:a.id});return;}if(net.active&&net.host&&!a.remoteDone)a.remoteWatchdog=setTimeout(()=>{if(announcer===a&&!a.remoteDone){a.remoteDone=true;finishAnnouncementIfReady();}},1400);finishAnnouncementIfReady();};
  const fallback=()=>{if(announcer!==a||a.localDone||a.fallbackUsed)return;a.fallbackUsed=true;clearTimeout(a.watchdog);const remaining=Math.max(0,spec.duration-(a.audio?.currentTime||0));a.audio?.pause();a.timer=setTimeout(finish,remaining*1000);};
- a.finish=finish;a.fallback=fallback;
+ a.finish=finish;a.fallback=fallback;a.hardTimer=setTimeout(()=>{if(announcer!==a)return;a.localDone=true;a.remoteDone=true;a.audio?.pause();if(net.active&&!net.host)netSend({type:'voiceDone',id:a.id});finishAnnouncementIfReady();},Math.max(3500,(spec.duration+2.25)*1000));
  if(!audioEnabled){fallback();return;}
  try{const audio=a.audio=new Audio(spec.src);audio.preload='auto';audio.volume=1;audio.addEventListener('ended',finish,{once:true});audio.addEventListener('error',fallback,{once:true});const promise=audio.play();if(promise?.catch)promise.catch(fallback);
  // A playback failure cannot leave the fight locked forever. Active playback still waits for ended.
@@ -2096,7 +2096,7 @@ function combatSound(name){
 
 // Private two-player room; host owns all simulation and scoring.
 const net={active:false,host:false,peer:null,conn:null,connected:false,ready:false,otherReady:false,remoteKeys:{},localKeys:{},actions:[],lastSeen:0,lastSend:0,seq:0,recvSeq:-1,epoch:0,remoteChar:'bocchi',remoteName:'',result:null,roundDelay:0,paused:false,remoteHidden:false,token:0,rtt:0};
-const NET_VERSION='bocchi-room-8';
+const NET_VERSION='bocchi-room-9';
 function netStatus(t){$('netStatus').textContent=t;}
 function netSend(m){if(net.conn?.open&&net.conn.bufferSize<8){try{net.conn.send(m);}catch(e){netFail('通信が途切れました。部屋を作り直してください。');}}}
 function netClose(){stopAnnouncer();net.token++;net.active=false;net.connected=false;net.ready=false;net.otherReady=false;net.actions=[];net.localKeys={};net.remoteKeys={};net.remoteChar='bocchi';net.remoteName='';const c=net.conn,p=net.peer;net.conn=null;net.peer=null;if(c)c.close();if(p)p.destroy();superCutin=null;clearInput();$('netBadge').hidden=true;$('netReady').hidden=true;$('netCharacter').disabled=false;refreshPortraitGroup('netCharacter');$('netCreate').disabled=false;$('netJoin').disabled=false;}
@@ -2177,7 +2177,7 @@ window.addEventListener('keydown',e=>{if(netKey(keyboardCode(e),true)){e.prevent
 document.querySelectorAll('.touchBtn').forEach(b=>{b.addEventListener('pointerdown',e=>{if(netKey(b.dataset.key,true)){e.preventDefault();e.stopImmediatePropagation();b.setPointerCapture(e.pointerId);b.classList.add('down');}},true);for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,e=>{if(netKey(b.dataset.key,false)){e.preventDefault();e.stopImmediatePropagation();b.classList.remove('down');}},true);});
 function netRelease(){net.localKeys={};net.actions=[];if(net.active)netSend({type:'presence',hidden:document.hidden});}
 window.addEventListener('blur',netRelease);document.addEventListener('visibilitychange',netRelease);
-setInterval(()=>{if(!net.active||!net.connected)return;const age=performance.now()-net.lastSeen;if(age>12000){netFail('通信が途切れたため対戦を終了しました。');return;}netSend({type:'ping',at:performance.now()});$('netBadge').textContent=(net.host?'あなた：左':'あなた：右')+' · '+net.rtt+' ms'+(net.paused?' · 通信待ち':'');},400);
+setInterval(()=>{if(!net.active||!net.connected)return;const age=performance.now()-net.lastSeen;if(age>12000){netFail('通信が途切れたため対戦を終了しました。');return;}netSend({type:'ping',at:performance.now()});const waitLabel=announcerLocked()?' · 音声同期中':net.paused?(document.hidden?' · この画面が非表示':net.remoteHidden?' · 相手画面が非表示':' · 通信待ち'):'';$('netBadge').textContent=(net.host?'あなた：左':'あなた：右')+' · '+net.rtt+' ms'+waitLabel;},400);
 
 
 // One cabinet, four seats. PeerServer reserves the cabinet ID atomically.
