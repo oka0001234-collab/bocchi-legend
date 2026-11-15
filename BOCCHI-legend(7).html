@@ -972,7 +972,7 @@ Music.prototype.tick=function(){if(!audioEnabled||document.hidden)return;const b
 
 function sfx(name){if(!audioEnabled)return;if(SFX43[name]){synth43(name);return;}if(EFFECT_AUDIO[name]){effectAudio(name);return;}if(['punchWhoosh','kickWhoosh','punchImpact','kickImpact','heavyImpact'].includes(name)){combatSound(name);return;}if(customAudio[name]){const a=new Audio(customAudio[name]);a.volume=.8;a.play().catch(()=>{});return;}music.ensure();const A=music;if(name==='haffun'){A.tone(180,.08,'sawtooth',.06);A.noise(.26,.18);A.tone(95,.20,'triangle',.10,.04);return;}if(name==='punch'){A.tone(130,.06,'square',.12);A.noise(.04,.04)}else if(name==='kick'){A.tone(88,.09,'sawtooth',.14);A.noise(.05,.05)}else if(name==='kick3'){A.noise(.09,.09);A.tone(58,.13,'sawtooth',.17);A.tone(116,.10,'square',.08,.018);A.tone(520,.055,'triangle',.05,.035)}else if(name==='cannon'){A.tone(330,.18,'sawtooth',.12);A.tone(165,.32,'square',.08,.05)}else if(name==='block'){A.tone(620,.045,'square',.055);A.tone(980,.07,'triangle',.04,.015)}else if(name==='parry'){A.noise(.16,.12);A.tone(72,.20,'sawtooth',.16);A.tone(1760,.055,'square',.11,.008);A.tone(2470,.07,'triangle',.09,.025);A.tone(3520,.10,'sine',.075,.055);A.tone(880,.22,'sawtooth',.05,.075)}else if(name==='damage'){A.tone(65,.08,'square',.11)}else if(name==='helicopter'){A.tone(55,.22,'sawtooth',.15);A.noise(.2,.06)}else if(name==='win'){A.tone(523,.1,'square',.07);A.tone(659,.1,'square',.06,.1);A.tone(784,.25,'square',.06,.2)}else if(name==='combo10'){A.tone(784,.08,'square',.07);A.tone(988,.08,'square',.06,.07);A.tone(1318,.18,'sawtooth',.06,.14)}else if(name==='phase'){A.noise(.18,.08);A.tone(92,.45,'sawtooth',.09);A.tone(184,.35,'square',.05,.08)}else if(name==='glass'){A.noise(.18,.13);A.tone(1880,.045,'square',.08);A.tone(1320,.07,'triangle',.06,.03);A.tone(820,.11,'sawtooth',.04,.05)}else if(name==='armor'){A.noise(.22,.08);A.tone(110,.20,'sawtooth',.12);A.tone(220,.18,'square',.09,.05);A.tone(440,.16,'sawtooth',.08,.11);A.tone(880,.18,'triangle',.09,.18);A.tone(1760,.24,'sine',.075,.26)}}
 
-function fighter(type,x,face){const shobo=type==='shobobocchi',characterId=shobo?'shobobocchi':type;if(shobo)type='bocchi';return{mattsuanLock55:type==='mattsuan'?5:0,type,characterId,shoboForm:shobo,arcVisualForm:shobo?0:undefined,x,y:GROUND,vx:0,vy:0,face,hp:100,maxHp:100,sp:0,onGround:true,state:'idle',stateT:0,attackHit:false,hurtT:0,freezeT:0,guard:false,guardT:0,justBlock:0,lastSDown:99,comboStep:0,comboT:0,hitCount:0,hitChainT:0,counterBoostT:0,aiT:0,aiQueue:[],aiQueueT:0,specialT:0,ko:false,flash:0,moveAccel:1800,jumpPower:650,damageScale:1,reachScale:1,phase2:false,armorActive:false,armorBoostT:0,armorUsed:false,takeoffShin:false,takeoffTransformT:0,takeoffCannonT:0,baseMoveAccel:1800,baseJumpPower:650};}
+function fighter(type,x,face){const shobo=type==='shobobocchi',characterId=shobo?'shobobocchi':type;if(shobo)type='bocchi';return{mattsuanLock55:type==='mattsuan'?5:0,type,characterId,shoboForm:shobo,arcVisualForm:shobo?0:undefined,x,y:GROUND,vx:0,vy:0,face,hp:100,maxHp:100,sp:0,tetsuRondoCooldown:0,onGround:true,state:'idle',stateT:0,attackHit:false,hurtT:0,freezeT:0,guard:false,guardT:0,justBlock:0,lastSDown:99,comboStep:0,comboT:0,hitCount:0,hitChainT:0,counterBoostT:0,aiT:0,aiQueue:[],aiQueueT:0,specialT:0,ko:false,flash:0,moveAccel:1800,jumpPower:650,damageScale:1,reachScale:1,phase2:false,armorActive:false,armorBoostT:0,armorUsed:false,takeoffShin:false,takeoffTransformT:0,takeoffCannonT:0,baseMoveAccel:1800,baseJumpPower:650};}
 function configureFighter(f,isPlayer){
  if(freeMode){f.moveAccel=f.type==='misaki'?1900:1800;f.jumpPower=650;f.damageScale=1;f.reachScale=1;return;}
  if(isPlayer&&stageIndex===0){f.moveAccel=1150;f.jumpPower=500;f.damageScale=.80;f.reachScale=.82;}
@@ -1005,8 +1005,9 @@ function syncSpecialControl(){
  const controlled=net.active?(net.host?player:enemy):player,showRondo=controlled?.type==='tetsu';
  if(btn)btn.style.display=show?'':'none';
  if(armor)armor.style.display=showArmor?'':'none';
- if(rondo){rondo.style.display=showRondo?'':'none';rondo.disabled=!showRondo||controlled.sp<100||scene!=='fight'||roundBusy||announcerLocked()||!!superCutin||controlled.ko||controlled.hurtT>0||controlled.freezeT>0;}
- if(rondoLabel)rondoLabel.textContent=showRondo&&controlled.sp>=100?'4連撃':showRondo?'SP '+Math.floor(controlled.sp)+'%':'4連撃';
+ const rondoCooldown=showRondo?Math.max(0,controlled.tetsuRondoCooldown||0):0;
+ if(rondo){rondo.style.display=showRondo?'':'none';rondo.disabled=!showRondo||controlled.sp<100||rondoCooldown>0||scene!=='fight'||roundBusy||announcerLocked()||!!superCutin||controlled.ko||controlled.hurtT>0||controlled.freezeT>0;}
+ if(rondoLabel)rondoLabel.textContent=showRondo&&rondoCooldown>0?'あと'+rondoCooldown.toFixed(1)+'秒':showRondo&&controlled.sp>=100?'4連撃':showRondo?'SP '+Math.floor(controlled.sp)+'%':'4連撃';
  if(atk){atk.classList.toggle('twoCol',!show&&!showArmor&&!showRondo);atk.classList.toggle('fourCol',(show&&showArmor)||(show&&showRondo)||(!show&&!showArmor&&showRondo));}
 }
 
@@ -1355,8 +1356,8 @@ function drawHaffunCutin(){
 const TETSU_MOVES={punch:{startup:1,active:4,total:18},kick:{startup:30,active:7,total:46}};
 const TETSU_RONDO={frameDuration:.17,total:1.36,hitFrames:[2,3,4,6],damage:[8,8,8,20]};
 function startTetsuRondo(f){
- if(f.type!=='tetsu'||f.sp<100||scene!=='fight'||announcerLocked()||roundBusy||superCutin||f.ko||f.hurtT>0||f.freezeT>0)return false;
- f.sp=0;f.comboStep=0;f.state='special';f.stateT=TETSU_RONDO.total;f.tetsuRondoHits=[];f.attackHit=false;f.tetsuRondoCutin=true;
+ if(f.type!=='tetsu'||f.sp<100||(f.tetsuRondoCooldown||0)>0||scene!=='fight'||announcerLocked()||roundBusy||superCutin||f.ko||f.hurtT>0||f.freezeT>0)return false;
+ f.sp=0;f.tetsuRondoCooldown=8;f.comboStep=0;f.state='special';f.stateT=TETSU_RONDO.total;f.tetsuRondoHits=[];f.attackHit=false;f.tetsuRondoCutin=true;
  sfx('tetsuPhoenixVoice');startSuperCutin(f,()=>{f.state='special';f.stateT=TETSU_RONDO.total;f.tetsuRondoHits=[];f.attackHit=false;f.tetsuRondoCutin=false;shake=8;screenFlash=.10;burst(f.x,f.y-140,18,'gold');});return true;
 }
 function tetsuAttack(f,key){
@@ -1549,9 +1550,10 @@ function hit(att,def,damage,kb,up=0,flags={}){
  if(def.ko||(def.hurtT>0&&!flags.allowRondoLink)||roundBusy)return false;
  const committedHaffunSneeze=def.type==='haffun'&&def.state==='sneeze'&&def.stateT>0;
  const parry=!flags.unblockable&&blockingAvailable()&&def.justBlock>0&&def.lastSDown<.13;
- if(parry){def.justBlock=0;def.sp=clamp(def.sp+30,0,100);def.counterBoostT=1.50;att.freezeT=.56;slowMoT=Math.max(slowMoT,.28);screenFlash=Math.max(screenFlash,.18);shake=Math.max(shake,13);burst(def.x,def.y-120,42,'cyan');triggerBlockFx(def);comboText('COUNTER ×1.5',850);return false;}
+ if(parry){def.justBlock=0;def.sp=clamp(def.sp+30,0,100);def.counterBoostT=1.50;if(!(att.type==='tetsu'&&att.stateT>0&&['punch','kick','special'].includes(att.state)))att.freezeT=.56;slowMoT=Math.max(slowMoT,.28);screenFlash=Math.max(screenFlash,.18);shake=Math.max(shake,13);burst(def.x,def.y-120,42,'cyan');triggerBlockFx(def);comboText('COUNTER ×1.5',850);return false;}
  const guarding=def.guard&&def.onGround&&!flags.unblockable;const boosted=att.counterBoostT>0;let raw=damage*att.damageScale*(boosted?1.5:1);if(boosted)att.counterBoostT=0;const armorFactor=def.takeoffShin?1/SHIN_TAKEOFF_DEFENSE:(def.armorActive?1/3:1);const dealt=Math.max(1,Math.round(raw*(guarding?.30:1)*armorFactor));
- def.hp=clamp(def.hp-dealt,0,def.maxHp);if(committedHaffunSneeze){def.hurtT=0;}else{def.hurtT=guarding?.10:.22;def.state='hurt';def.vx=att.face*kb*(guarding?.35:1);def.vy=up;def.onGround=false;}
+ const committedTetsuAttack=def.type==='tetsu'&&def.stateT>0&&['punch','kick','special'].includes(def.state);
+ def.hp=clamp(def.hp-dealt,0,def.maxHp);if(committedHaffunSneeze||committedTetsuAttack){def.hurtT=0;}else{def.hurtT=guarding?.10:.22;def.state='hurt';def.vx=att.face*kb*(guarding?.35:1);def.vy=up;def.onGround=false;}
  if(att.type==='haffun'&&att.state==='sneeze'&&!def.ko){def.haffunFlyDir=att.face|| (def.x>=att.x?1:-1);def.haffunFlyT=.82;def.vx=def.haffunFlyDir*520;def.vy=-390;def.onGround=false;}
  // Keep the full third-round Bocchi hurt pose inside the canvas when hit mid-jump.
  if(usesBocchiWalk61(def)&&def.y<GROUND-300){def.y=GROUND-300;if(def.vy<0)def.vy=0;}
@@ -1586,7 +1588,7 @@ function updateFighter(f,o,dt,isPlayer){
  updateMattsuanTimer(f,dt);
  if(f.takeoffTransformT>0){f.takeoffTransformT=Math.max(0,f.takeoffTransformT-dt);if(f.takeoffTransformT===0&&f.state==='special'){f.state='idle';f.stateT=0;} }
  const inputKeys=net.active?(f===player?net.localKeys:net.remoteKeys):keys;
- f.lastSDown+=dt;f.justBlock=Math.max(0,f.justBlock-dt);f.hurtT=Math.max(0,f.hurtT-dt);f.freezeT=Math.max(0,f.freezeT-dt);f.flash=Math.max(0,f.flash-dt);f.comboT=Math.max(0,f.comboT-dt);f.hitChainT=Math.max(0,f.hitChainT-dt);f.counterBoostT=Math.max(0,f.counterBoostT-dt);f.guardT=Math.max(0,f.guardT-dt);if(f.armorActive){f.armorBoostT=Math.max(0,f.armorBoostT-dt);if(f.armorBoostT<=0){f.armorActive=false;f.moveAccel=f.baseMoveAccel;f.jumpPower=f.baseJumpPower;if(f.takeoffShin)f.takeoffShin=false;if(f===player){toast('ARMOR END',700);sfx('block');}}}if(f.hitChainT<=0)f.hitCount=0;if(f.comboT<=0&&f===player)f.comboStep=0;if(f.freezeT>0)return;f.guard=f.guardT>0;
+ f.lastSDown+=dt;f.justBlock=Math.max(0,f.justBlock-dt);f.hurtT=Math.max(0,f.hurtT-dt);f.freezeT=Math.max(0,f.freezeT-dt);f.flash=Math.max(0,f.flash-dt);f.comboT=Math.max(0,f.comboT-dt);f.hitChainT=Math.max(0,f.hitChainT-dt);f.counterBoostT=Math.max(0,f.counterBoostT-dt);f.guardT=Math.max(0,f.guardT-dt);f.tetsuRondoCooldown=Math.max(0,(f.tetsuRondoCooldown||0)-dt);if(f.armorActive){f.armorBoostT=Math.max(0,f.armorBoostT-dt);if(f.armorBoostT<=0){f.armorActive=false;f.moveAccel=f.baseMoveAccel;f.jumpPower=f.baseJumpPower;if(f.takeoffShin)f.takeoffShin=false;if(f===player){toast('ARMOR END',700);sfx('block');}}}if(f.hitChainT<=0)f.hitCount=0;if(f.comboT<=0&&f===player)f.comboStep=0;if(f.freezeT>0)return;f.guard=f.guardT>0;
  if(isPlayer&&!roundBusy&&!f.ko&&f.hurtT<=0){let mv=0;if(inputKeys.KeyA)mv--;if(inputKeys.KeyD)mv++;if(inputKeys.KeyS&&f.stateT<=0)f.guard=true;f.vx+=mv*f.moveAccel*dt;if(inputKeys.KeyW&&f.onGround&&f.stateT<=0){f.vy=-f.jumpPower;f.onGround=false;inputKeys.KeyW=false;}}
  else if(!isPlayer&&!roundBusy&&!f.ko&&f.hurtT<=0)cpu(f,o,dt);
  const lockShinArmorAttack=f.takeoffShin&&f.armorActive&&(f.state==='punch'||f.state==='kick');if(f.hurtT<=0&&!f.guard&&f.state!=='special'&&!lockShinArmorAttack)f.face=o.x>=f.x?1:-1;
