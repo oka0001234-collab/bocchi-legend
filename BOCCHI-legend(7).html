@@ -1379,7 +1379,7 @@ function tetsuAttackBox(f){
  const m=TETSU_MOVES[f.state];if(!m)return null;
  const elapsed=m.total-f.stateT*60;
  if(elapsed+1e-7<m.startup||elapsed>=m.startup+m.active)return null;
- const pan=f.state==='punch';return {x:f.x+f.face*(pan?100:125),y:f.y-(pan?128:130),w:pan?130:180,h:pan?78:90,d:pan?8:21,k:pan?280:460,u:pan?-50:-155,unblockable:!pan};
+ const pan=f.state==='punch';return {x:f.x+f.face*(pan?100:125),y:f.y-(pan?128:130),w:pan?130:180,h:pan?78:90,d:pan?8:14,k:pan?280:460,u:pan?-50:-155,unblockable:!pan};
 }
 function crystalSound(){if(!audioEnabled)return;music.ensure();[784,1175,1568,2093].forEach((f,i)=>music.tone(f,.25,'sine',.08,i*.065));music.noise(.16,.05);}
 function panImpact(){if(!audioEnabled)return;try{music.ensure();music.tone(430,.16,'triangle',.14);music.tone(1030,.12,'sine',.08,.015);music.noise(.055,.07);}catch(error){console.warn('Tetsu impact sound skipped:',error);}}
